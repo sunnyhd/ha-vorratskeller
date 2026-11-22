@@ -29,6 +29,9 @@ const TEXTE = {
     name: "Vorratskeller",
     titel_dashboard: "Vorratskeller",
     etikett_format: "Etikettenbogen",
+    etikett_bedarf_1: "Bedarf: {n} Etiketten, ein Bogen; {frei} Felder bleiben frei (später mit „Beginnen bei Feld“ nutzen).",
+    etikett_bedarf: "Bedarf: {n} Etiketten auf {boegen} Bögen; {frei} Felder bleiben frei.",
+    etikett_gross: "Viele Produkte in einem Fach: {faecher}. Ein Scan zeigt dann eine lange Liste. Fach nach Böden aufteilen (z. B. „Weißes Regal, oberster Boden“) ergibt kürzere Listen, braucht aber mehr Etiketten.",
     etikett_start: "Beginnen bei Feld",
     etikett_versatz_x: "Versatz rechts (mm)",
     etikett_versatz_y: "Versatz unten (mm)",
@@ -184,6 +187,9 @@ const TEXTE = {
     name: "Pantry (Vorratskeller)",
     titel_dashboard: "Pantry",
     etikett_format: "Label sheet",
+    etikett_bedarf_1: "Needed: {n} labels, one sheet; {frei} positions stay free (use them later via “Start at position”).",
+    etikett_bedarf: "Needed: {n} labels on {boegen} sheets; {frei} positions stay free.",
+    etikett_gross: "Many products on one shelf: {faecher}. A scan then shows a long list. Splitting the shelf by board (e.g. “White shelf, top board”) gives shorter lists but needs more labels.",
     etikett_start: "Start at position",
     etikett_versatz_x: "Shift right (mm)",
     etikett_versatz_y: "Shift down (mm)",
@@ -625,6 +631,22 @@ export const ETIKETTEN_FORMATE = {
   papier: { label: "format_papier", b: 60, h: 60, spalten: 3, zeilen: 4, lueckeX: 5, lueckeY: 6 },
 };
 const ETIKETTEN_SPEICHER = "vorratskeller-etiketten";
+// Ab so vielen Produkten je Fach lohnt es sich, das Fach aufzuteilen (Scan zeigt sonst eine lange Liste)
+const ETIKETT_GROSS = 10;
+
+/** Bedarf: Etiketten, Bögen und freie Felder auf dem letzten Bogen. */
+export function etikettenBedarf(formatId, anzahl, start = 1) {
+  const f = ETIKETTEN_FORMATE[formatId];
+  const proSeite = f.spalten * f.zeilen;
+  const belegt = Math.min(Math.max(1, start), proSeite) - 1 + anzahl;
+  const boegen = Math.max(1, Math.ceil(belegt / proSeite));
+  return { etiketten: anzahl, boegen, frei: boegen * proSeite - belegt };
+}
+
+function etikettenBedarfText(anzahl, e) {
+  const b = etikettenBedarf(e.format, anzahl, e.start);
+  return t(b.boegen === 1 ? "etikett_bedarf_1" : "etikett_bedarf", { n: fmt(b.etiketten), boegen: fmt(b.boegen), frei: fmt(b.frei) });
+}
 
 function etikettenEinstellung() {
   let e = {};
@@ -1431,6 +1453,7 @@ class VorratskellerCard extends HTMLElement {
       return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
     };
     const e = etikettenEinstellung();
+    const grosse = alle.filter((f) => f.produkte.length > ETIKETT_GROSS);
     const formatWahl = Object.entries(ETIKETTEN_FORMATE)
       .map(([id, f]) => `<option value="${id}" ${id === e.format ? "selected" : ""}>${esc(t(f.label))}</option>`)
       .join("");
@@ -1443,6 +1466,8 @@ class VorratskellerCard extends HTMLElement {
     this._inhalt.innerHTML = `
       ${this._titel(t("titel_etiketten"))}
       <p class="muted">${esc(t("etiketten_hinweis"))}</p>
+      <p id="bedarf"></p>
+      ${grosse.length ? `<p class="muted">${esc(t("etikett_gross", { faecher: grosse.map((f) => `${f.name} (${f.produkte.length})`).join(", ") }))}</p>` : ""}
       <div class="zeile">
         <label style="flex:3 1 260px">${esc(t("etikett_format"))}<select id="format">${formatWahl}</select></label>
         <label>${esc(t("etikett_start"))}<input id="start" type="number" min="1" step="1" value="${e.start}"></label>
@@ -1465,6 +1490,7 @@ class VorratskellerCard extends HTMLElement {
         y: num($("#vy").value),
         rahmen: $("#rahmen").checked,
       };
+      $("#bedarf").textContent = etikettenBedarfText(alle.length, neu);
       try {
         localStorage.setItem(ETIKETTEN_SPEICHER, JSON.stringify(neu));
       } catch (_err) {
@@ -1473,6 +1499,7 @@ class VorratskellerCard extends HTMLElement {
       return neu;
     };
     this._inhalt.querySelectorAll("select, input").forEach((el) => el.addEventListener("change", lesen));
+    $("#bedarf").textContent = etikettenBedarfText(alle.length, e);
     $("#drucken").addEventListener("click", () => {
       const w = window.open("", "_blank");
       if (!w) return toast(this, t("druck_blockiert"));
