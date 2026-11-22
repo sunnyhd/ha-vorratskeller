@@ -22,7 +22,7 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
   Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal.
 
-## Aufbau (Version 1, Stand 2026-11-22, Branch `v1-integration`)
+## Aufbau (Version 1, Stand 2026-11-22, auf `main` seit PR #1)
 - `custom_components/vorratskeller/`: `lager.py` (Fachlogik ohne HA: Produkte, Chargen, FIFO, Inventur,
   Reichweite, Journal), `seed.py` (Erstbefüllung aus `data/checkliste.json`, Soll auf Personen/Tage umgerechnet),
   `manager.py` (Store `.storage/vorratskeller`, Einkaufsliste, Wochenbericht, Mitternachts-Aktualisierung),
@@ -54,8 +54,9 @@ Rückgängig, Fach-Filter, Scanner von Hand (Regal-Code, unbekannter Barcode →
 zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen außer Open Food Facts.
 
 ## Offen
-- Repo öffentlich auf GitHub (KB, 2026-11-22), Lizenz MIT, 3D-Modell öffentlich. PR #1 `v1-integration` → `main`:
-  Merge mit Freigabe KB; HACS-Lizenzprüfung wird erst nach dem Merge grün (GitHub erkennt die Lizenz nur auf `main`).
+- Repo öffentlich auf GitHub `sunnyhd/ha-vorratskeller` (KB, 2026-11-22), Lizenz MIT, 3D-Modell öffentlich,
+  README mit Screenshots aus dem Test-HA. PR #1 gemergt (747abd6), alle Prüfungen grün (hassfest, HACS, Tests).
+- KB: Release v0.1.0 (Marketplace/HACS installiert sonst den letzten Commit) und Einspielen zu Hause.
 - KB, später (2026-11-22 vertagt): Gerät an der Kellertür. a) altes Fire nur für Entnahme-Kacheln, b) eigenes
   ELC SMT101 privat gekauft, c) Pilot-Panel der Firma (abgeraten: Firmengerät; Raum-Panel-App ist Firmencode mit
   Kamera aus). Vorschlag: Wandgerät nur Entnahme, Scannen beim Einräumen mit den Handys (Rückkamera, https).
