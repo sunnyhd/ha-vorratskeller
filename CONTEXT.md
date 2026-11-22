@@ -11,7 +11,7 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
   Services, Entitäten, mitgelieferter Karte (Scanner, Entnahme) und Dashboard-Strategie
   (`custom:vorratskeller`); Verteilung über HACS aus eigenem Repo `ha-vorratskeller`, nicht über `ha-addons`
   (Supervisor-Repo; HACS richtet Updates nach den Releases des ganzen Repos).
-- Grocy-Variante ist verworfen, bleibt als Referenz in `docs/grundlagen/grocy-variante-*`.
+- Grocy-Variante ist verworfen; die Unterlagen liegen nur lokal in `docs/grundlagen/grocy-variante-*` (gitignored, KB 2026-11-22).
 
 ## Fachliche Grundlage (Quellen)
 - Mengen: BLE-Vorratskalkulator, Tageswerte je Person (2.200 kcal), 14 Tage × 4 Personen; BBK empfiehlt 10 Tage.
@@ -53,10 +53,8 @@ Rückgängig, Fach-Filter, Scanner von Hand (Regal-Code, unbekannter Barcode →
 zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen außer Open Food Facts.
 
 ## Offen
-- KB: GitHub-Repo `sunnyhd/ha-vorratskeller` (öffentlich) anlegen und pushen; erst dann laufen hassfest und
-  HACS-Prüfung (lokal kein Docker). Lizenz MIT vorgeschlagen (`LICENSE`, Inhaber „sunnyhd“).
-- KB: Ob `docs/grundlagen/vorratskeller-3d.html` und die Grocy-Unterlagen ins öffentliche Repo sollen
-  (Raumaufteilung des Kellers); sonst vor dem Push entfernen oder ignorieren.
+- Repo öffentlich auf GitHub (KB, 2026-11-22), Lizenz MIT, 3D-Modell öffentlich. PR #1 `v1-integration` → `main`:
+  Merge mit Freigabe KB; HACS-Lizenzprüfung wird erst nach dem Merge grün (GitHub erkennt die Lizenz nur auf `main`).
 - KB, später (2026-11-22 vertagt): Gerät an der Kellertür. a) altes Fire nur für Entnahme-Kacheln, b) eigenes
   ELC SMT101 privat gekauft, c) Pilot-Panel der Firma (abgeraten: Firmengerät; Raum-Panel-App ist Firmencode mit
   Kamera aus). Vorschlag: Wandgerät nur Entnahme, Scannen beim Einräumen mit den Handys (Rückkamera, https).

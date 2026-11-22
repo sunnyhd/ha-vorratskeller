@@ -6,3 +6,4 @@ config/
 node_modules/
 .pytest_cache/
 .ruff_cache/
+docs/grundlagen/grocy-variante-*
