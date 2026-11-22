@@ -111,6 +111,8 @@ test("Gefäßform aus Packung und Hinweis", () => {
   assert.equal(f("Haferflocken", "× 500 g"), "packung");
   assert.equal(f("Taschenlampen"), "kiste");
   assert.equal(f("Chopped tomatoes", "× 400 g", "can or jar"), "dose");
+  assert.equal(mod.form({ name: "Eier", packung: "Stück", hinweis: "", form: "packung" }), "packung");
+  assert.equal(mod.form({ name: "Eier", packung: "Stück", hinweis: "", form: "unsinn" }), "kiste");
 });
 
 test("Vorschlag für Titel und Symbol beim Anlegen", () => {

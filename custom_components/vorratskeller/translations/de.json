@@ -49,6 +49,17 @@
         "sat": "Samstag",
         "sun": "Sonntag"
       }
+    },
+    "form": {
+      "options": {
+        "": "automatisch",
+        "glas": "Glas",
+        "dose": "Dose",
+        "flasche": "Flasche",
+        "kasten": "Kasten",
+        "packung": "Packung",
+        "kiste": "Kiste"
+      }
     }
   },
   "entity": {
@@ -197,6 +208,10 @@
         "hinweis": {
           "name": "Hinweis",
           "description": "Freitext."
+        },
+        "form": {
+          "name": "Form",
+          "description": "Gefäß in der Regal-Ansicht. Leer: aus Packung und Hinweis abgeleitet."
         }
       }
     },
@@ -239,6 +254,10 @@
         "hinweis": {
           "name": "Hinweis",
           "description": "Freitext."
+        },
+        "form": {
+          "name": "Form",
+          "description": "Gefäß in der Regal-Ansicht. Leer: aus Packung und Hinweis abgeleitet."
         }
       }
     },

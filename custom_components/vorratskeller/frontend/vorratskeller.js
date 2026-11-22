@@ -28,6 +28,15 @@ const TEXTE = {
   de: {
     name: "Vorratskeller",
     titel_dashboard: "Vorratskeller",
+    form: "Form im Regal",
+    form_auto: "automatisch ({form})",
+    form_glas: "Glas",
+    form_dose: "Dose",
+    form_flasche: "Flasche",
+    form_kasten: "Kasten",
+    form_packung: "Packung",
+    form_kiste: "Kiste",
+    form_gespeichert: "{name}: Form gespeichert.",
     start_titel: "Noch nichts eingelagert.",
     start_text: "Die Soll-Mengen für {n} Produkte sind angelegt. Jetzt erfassen, was schon im Keller steht.",
     start_schritt_1: "Unter Entnehmen bei jedem Produkt mit + die vorhandenen Packungen einlagern.",
@@ -158,6 +167,15 @@ const TEXTE = {
   en: {
     name: "Pantry (Vorratskeller)",
     titel_dashboard: "Pantry",
+    form: "Shape on the shelf",
+    form_auto: "automatic ({form})",
+    form_glas: "Jar",
+    form_dose: "Can",
+    form_flasche: "Bottle",
+    form_kasten: "Crate",
+    form_packung: "Pack",
+    form_kiste: "Box",
+    form_gespeichert: "{name}: shape saved.",
     start_titel: "Nothing stored yet.",
     start_text: "Targets for {n} products are set up. Now record what is already in your pantry.",
     start_schritt_1: "Under Take out, press + on each product for every pack you have.",
@@ -375,6 +393,7 @@ export function produkte(hass) {
       fach_id: makeId(a.fach || "ohne-fach"),
       packung: a.packung || "",
       hinweis: a.hinweis || "",
+      form: a.form || "",
       mhd: a.naechstes_mhd,
       tage: a.tage_bis_mhd,
       haltbarkeit: num(a.haltbarkeit_monate),
@@ -436,11 +455,14 @@ export function zustand(p) {
   return "ok";
 }
 
+const FORMEN = ["glas", "dose", "flasche", "kasten", "packung", "kiste"];
+
 /** Farbstufe eines Anteils 0..1. */
 const stufe = (f) => (f >= 0.9 ? "s-ok" : f >= 0.5 ? "s-knapp" : "s-leer");
 
 /** Form des Gefäßes aus Packung, Hinweis und Gruppe: glas, dose, flasche, kasten, packung, kiste. */
 export function form(p) {
+  if (FORMEN.includes(p.form) && p.form) return p.form;
   const text = `${p.packung} ${p.hinweis} ${p.name}`.toLowerCase();
   if (/kasten|kästen|crate/.test(text)) return "kasten";
   if (/\bdose\b|\bcan\b|konserve|canned/.test(text)) return "dose";
@@ -1325,6 +1347,10 @@ class VorratskellerCard extends HTMLElement {
       <div class="zeile">
         <label>${esc(t("menge"))}<input id="menge" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
         <label>${esc(t("mhd_einlagern"))}<input id="mhd" type="date" min="${isoHeute()}" value="${esc(mhd)}"></label>
+        <label>${esc(t("form"))}<select id="form">
+          <option value="">${esc(t("form_auto", { form: t(`form_${form({ ...p, form: "" })}`) }))}</option>
+          ${FORMEN.map((f) => `<option value="${f}" ${p.form === f ? "selected" : ""}>${esc(t(`form_${f}`))}</option>`).join("")}
+        </select></label>
       </div>
       <div class="zeile">
         <button class="aktion" id="rein">${esc(t("einlagern"))}</button>
@@ -1338,6 +1364,14 @@ class VorratskellerCard extends HTMLElement {
     });
     $("#raus").addEventListener("click", () => this._entnehmen(p.id, menge()));
     $("#fertig").addEventListener("click", () => this._ergebnisSchliessen());
+    $("#form").addEventListener("change", async (ev) => {
+      try {
+        await callService(this._hass, "produkt_aendern", { produkt: p.id, form: ev.target.value });
+        toast(this, t("form_gespeichert", { name: p.name }));
+      } catch (err) {
+        toast(this, fehlerText(err));
+      }
+    });
   }
 
   _zeigeUnbekannt(code, vorschlag) {

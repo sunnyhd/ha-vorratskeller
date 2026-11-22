@@ -94,6 +94,7 @@ class Produkt:
     haltbarkeit_monate: int = 0
     hinweis: str = ""
     barcodes: list[str] = field(default_factory=list)
+    form: str = ""  # Gefäß in der Regal-Ansicht; leer = aus Packung und Hinweis ableiten
 
 
 @dataclass

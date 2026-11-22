@@ -107,6 +107,11 @@ produkt_anlegen:
     hinweis: &hinweis
       selector:
         text:
+    form: &form
+      selector:
+        select:
+          translation_key: form
+          options: ["", "glas", "dose", "flasche", "kasten", "packung", "kiste"]
 
 produkt_aendern:
   fields:
@@ -125,6 +130,7 @@ produkt_aendern:
     soll: *soll
     haltbarkeit_monate: *haltbarkeit
     hinweis: *hinweis
+    form: *form
 
 produkt_loeschen:
   fields:
