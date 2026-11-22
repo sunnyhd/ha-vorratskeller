@@ -1,7 +1,7 @@
 /*
  * Vorratskeller: Karte und Dashboard-Strategie für Home Assistant.
  *
- * Karte:      type: custom:vorratskeller-card, modus: kopf | regal | entnahme | scanner | fehlend | ablaufend | etiketten
+ * Karte:      type: custom:vorratskeller-card, modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten
  * Dashboard:  strategy: { type: custom:vorratskeller }
  *
  * Ohne Build-Schritt und ohne Fremdcode zur Laufzeit von außen: Scanner-Rückfall (zxing-wasm)
@@ -124,6 +124,19 @@ const TEXTE = {
     status_knapp: "knapp",
     status_leer: "leer",
     status_frei: "ohne Soll",
+    satz_reicht: "Der Vorrat reicht {tage}.",
+    n_tage: "{n} Tage",
+    produkte_fehlen: "Produkte fehlen",
+    bald_verbrauchen: "bald verbrauchen",
+    zuerst_verbrauchen: "Zuerst verbrauchen",
+    einkaufen: "Einkaufen",
+    nichts_laeuft_ab_kurz: "Nichts läuft bald ab.",
+    n_leer: "{n} leer",
+    n_knapp: "{n} knapp",
+    alles_da: "alles da",
+    zurueck: "Zurück",
+    view_panel: "Panel",
+    modus_panel: "Wandpanel",
     vorrat: "Vorrat",
     vorratsstand: "Vorratsstand",
     reichweite: "Reichweite",
@@ -233,6 +246,19 @@ const TEXTE = {
     status_knapp: "low",
     status_leer: "empty",
     status_frei: "no target",
+    satz_reicht: "Supplies last {tage}.",
+    n_tage: "{n} days",
+    produkte_fehlen: "products missing",
+    bald_verbrauchen: "use soon",
+    zuerst_verbrauchen: "Use first",
+    einkaufen: "Shopping",
+    nichts_laeuft_ab_kurz: "Nothing expires soon.",
+    n_leer: "{n} empty",
+    n_knapp: "{n} low",
+    alles_da: "all there",
+    zurueck: "Back",
+    view_panel: "Panel",
+    modus_panel: "Wall panel",
     vorrat: "Pantry",
     vorratsstand: "Stock level",
     reichweite: "Days of supply",
@@ -332,6 +358,7 @@ export function produkte(hass) {
       fach: a.fach || "",
       fach_id: makeId(a.fach || "ohne-fach"),
       packung: a.packung || "",
+      hinweis: a.hinweis || "",
       mhd: a.naechstes_mhd,
       tage: a.tage_bis_mhd,
       haltbarkeit: num(a.haltbarkeit_monate),
@@ -391,6 +418,49 @@ export function zustand(p) {
   if (p.bestand <= 0) return "leer";
   if (p.fehlt > 0) return "knapp";
   return "ok";
+}
+
+/** Farbstufe eines Anteils 0..1. */
+const stufe = (f) => (f >= 0.9 ? "s-ok" : f >= 0.5 ? "s-knapp" : "s-leer");
+
+/** Form des Gefäßes aus Packung, Hinweis und Gruppe: glas, dose, flasche, kasten, packung, kiste. */
+export function form(p) {
+  const text = `${p.packung} ${p.hinweis} ${p.name}`.toLowerCase();
+  if (/kasten|kästen|crate/.test(text)) return "kasten";
+  if (/\bdose\b|\bcan\b|konserve|canned/.test(text)) return "dose";
+  if (/glas|gläser|\bjar|tube/.test(text)) return "glas";
+  if (/flasche|bottle|\d\s*l\b|× ?[\d,.]+ ?l\b/.test(text)) return "flasche";
+  if (/× ?[\d,.]+ ?k?g\b|packung|pack\b|tafel|bars?\b/.test(text)) return "packung";
+  return "kiste";
+}
+
+/** SVG eines Gefäßes, gefüllt zu f (0..1); Farbe über --c. */
+function gefaessSvg(art, f, id) {
+  const fuell = (x, y, b, h, r) =>
+    `<clipPath id="${id}"><rect x="${x}" y="${y}" width="${b}" height="${h}" rx="${r}"/></clipPath>
+     <rect class="inhalt" clip-path="url(#${id})" x="${x}" y="${(y + h * (1 - f)).toFixed(1)}" width="${b}" height="${(h * f).toFixed(1)}"/>`;
+  const svg = (inhalt) => `<svg width="48" height="64" viewBox="0 0 48 64" aria-hidden="true">${inhalt}</svg>`;
+  switch (art) {
+    case "glas":
+      return svg(`<rect class="deckel" x="13" y="6" width="22" height="8" rx="2"/>
+        <rect class="huelle" x="9" y="13" width="30" height="48" rx="8"/>${fuell(10.5, 14.5, 27, 45, 7)}`);
+    case "dose":
+      return svg(`<rect class="huelle" x="9" y="12" width="30" height="49" rx="4"/>${fuell(10.5, 13.5, 27, 46, 3)}
+        <rect class="deckel" x="9" y="21" width="30" height="2.5" opacity=".6"/><rect class="deckel" x="9" y="49" width="30" height="2.5" opacity=".6"/>`);
+    case "flasche":
+      return svg(`<rect class="deckel" x="20" y="1" width="8" height="6" rx="1.5"/>
+        <path class="huelle" d="M19 7h10v8c0 3 6 5 6 11v32a4 4 0 0 1-4 4H17a4 4 0 0 1-4-4V26c0-6 6-8 6-11z"/>
+        ${fuell(14.5, 16, 19, 44.5, 4)}`);
+    case "kasten":
+      return svg(`<rect class="huelle" x="3" y="22" width="42" height="39" rx="4"/>${fuell(4.5, 23.5, 39, 36, 3)}
+        <rect class="deckel" x="10" y="12" width="5" height="12" rx="2"/><rect class="deckel" x="21.5" y="12" width="5" height="12" rx="2"/>
+        <rect class="deckel" x="33" y="12" width="5" height="12" rx="2"/>`);
+    case "packung":
+      return svg(`<path class="huelle" d="M10 14l4-6h20l4 6v45a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2z"/>${fuell(11.5, 15, 25, 44.5, 1)}`);
+    default:
+      return svg(`<rect class="huelle" x="4" y="24" width="40" height="37" rx="5"/>${fuell(5.5, 25.5, 37, 34, 4)}
+        <rect class="deckel" x="16" y="18" width="16" height="7" rx="3" opacity=".7"/>`);
+  }
 }
 
 function navigiere(ziel) {
@@ -500,61 +570,86 @@ const STYLE = `
   .s-knapp { --c: var(--warning-color, #ffa600); }
   .s-leer { --c: var(--error-color, #db4437); }
   .s-frei { --c: var(--disabled-text-color, #9e9e9e); }
-  /* Kopf: Ring und Kennzahlen */
-  .kopf { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-  .ring { position: relative; width: 132px; height: 132px; flex: none; }
-  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .ring .spur { stroke: var(--divider-color); }
-  .ring .wert { stroke: var(--c); stroke-linecap: round; transition: stroke-dashoffset 600ms cubic-bezier(.2,.8,.2,1); }
-  .ring .mitte { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
-  .ring .prozent { font-size: 1.9rem; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1; }
-  .ring .label { font-size: 0.8rem; color: var(--secondary-text-color); margin-top: 4px; }
-  .kennzahlen { flex: 1 1 180px; min-width: 0; }
-  .gross { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  .gross .zahl { font-size: 2.6rem; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+  /* Kopf: Satz, Ring, Zähler */
+  .kopf { display: flex; gap: 18px; align-items: center; }
+  .ring { position: relative; width: 104px; height: 104px; flex: none; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+  .ring .spur, .miniring .spur { stroke: var(--divider-color); }
+  .ring .wert, .miniring .wert { stroke: var(--c); stroke-linecap: round;
+    transition: stroke-dashoffset 600ms cubic-bezier(.2,.8,.2,1); }
+  .ring .mitte { position: absolute; inset: 0; display: grid; place-content: center; font-size: 1.5rem;
+    font-weight: 600; font-variant-numeric: tabular-nums; }
+  .satz { font-size: 1.6rem; font-weight: 600; line-height: 1.2; text-wrap: balance; }
+  .satz em { font-style: normal; color: var(--c); }
+  .unter-satz { margin-top: 6px; color: var(--secondary-text-color); text-wrap: pretty; }
   .stats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   .stat { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px;
     border-radius: 20px; border: 1px solid var(--divider-color); background: none; font: inherit;
     color: var(--primary-text-color); }
   button.stat { cursor: pointer; }
   .stat ha-icon { --mdc-icon-size: 20px; color: var(--c); }
-  .gruppen { margin-top: 18px; display: grid; gap: 10px; }
-  .gruppe { display: grid; grid-template-columns: 24px 1fr auto; gap: 4px 10px; align-items: center; }
-  .gruppe ha-icon { --mdc-icon-size: 20px; color: var(--c); grid-row: span 2; }
-  .gruppe .gname { font-size: 0.9rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .gruppe .gwert { font-size: 0.85rem; color: var(--secondary-text-color); font-variant-numeric: tabular-nums; }
-  .balken { grid-column: 2 / 4; height: 8px; border-radius: 4px; background: var(--divider-color); overflow: hidden; }
-  .balken span { display: block; height: 100%; background: var(--c); transform-origin: left;
-    transform: scaleX(var(--f)); transition: transform 600ms cubic-bezier(.2,.8,.2,1); }
-  /* Regal-Ansicht */
-  .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .gruppen { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .gruppe { display: flex; gap: 10px; align-items: center; min-width: 0; }
+  .miniring { width: 40px; height: 40px; flex: none; transform: rotate(-90deg); }
+  .gruppe .gtext { min-width: 0; }
+  .gruppe .gname { font-size: 0.9rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gruppe .gwert { font-size: 0.8rem; color: var(--secondary-text-color); font-variant-numeric: tabular-nums; }
+  @media (max-width: 420px) { .kopf { flex-direction: column; align-items: flex-start; } .satz { font-size: 1.35rem; } }
+  /* Regal gezeichnet */
+  .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
   .regal h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 500; }
-  .boden { margin-bottom: 14px; }
-  .boden-name { font-size: 0.8rem; color: var(--secondary-text-color); margin-bottom: 4px; }
-  .dosen { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; padding: 0 6px; }
-  .brett { height: 6px; border-radius: 3px; background: var(--secondary-text-color); opacity: 0.45; margin-top: 2px; }
-  .dose { position: relative; width: 84px; height: 104px; padding: 8px 6px 6px; border-radius: 10px 10px 4px 4px;
-    border: 2px solid var(--c); background: var(--card-background-color); color: var(--primary-text-color);
-    font: inherit; cursor: pointer; overflow: hidden; display: flex; flex-direction: column; align-items: center;
-    gap: 2px; text-align: center; touch-action: manipulation; transition: transform 80ms ease-out; }
-  .dose:active { transform: scale(0.96); }
-  .dose .fuell { position: absolute; inset: 0; background: var(--c); opacity: 0.22; transform-origin: bottom;
-    transform: scaleY(var(--f)); transition: transform 400ms cubic-bezier(.2,.8,.2,1); }
-  .dose > :not(.fuell) { position: relative; }
-  .dose ha-icon { --mdc-icon-size: 22px; color: var(--c); }
-  .dose .dname { font-size: 0.72rem; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; hyphens: auto; overflow-wrap: anywhere; }
-  .dose .dzahl { margin-top: auto; font-size: 0.95rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-  .dose .dzahl small { font-weight: 400; color: var(--secondary-text-color); }
-  .dose.alt-mhd::after { content: ""; position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
-    border-radius: 50%; background: var(--error-color, #db4437); }
+  .gestell { border-left: 8px solid var(--regal-pfosten); border-right: 8px solid var(--regal-pfosten);
+    border-radius: 6px; background: var(--regal-rueck); padding: 6px 10px 0; }
+  .gestell { --regal-pfosten: color-mix(in srgb, var(--secondary-text-color) 55%, transparent);
+    --regal-rueck: var(--secondary-background-color); }
+  .boden-name { font-size: 0.75rem; color: var(--secondary-text-color); margin: 4px 0 2px; }
+  .fachreihe { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: flex-end; }
+  .brett { height: 8px; margin: 0 -10px 6px; background: var(--regal-pfosten); border-radius: 2px; }
+  .gefaess { width: 78px; padding: 4px 2px 2px; border: none; background: none; color: var(--primary-text-color);
+    font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    border-radius: 10px; touch-action: manipulation; transition: transform 80ms ease-out; }
+  .gefaess:active { transform: scale(0.95); }
+  .gefaess svg { display: block; }
+  .gefaess .huelle { fill: var(--card-background-color); stroke: var(--c); stroke-width: 2.5; }
+  .gefaess .inhalt { fill: var(--c); opacity: 0.8; }
+  .gefaess .deckel { fill: var(--c); }
+  .gefaess .dname { font-size: 0.7rem; line-height: 1.15; text-align: center; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; hyphens: auto;
+    overflow-wrap: anywhere; min-height: 1.6em; }
+  .gefaess .dzahl { font-size: 0.8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .gefaess .dzahl small { font-weight: 400; color: var(--secondary-text-color); }
+  .gefaess.alt-mhd .dzahl::after { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--error-color, #db4437); margin-left: 4px; vertical-align: 1px; }
   .legende { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; color: var(--secondary-text-color);
-    margin: 0 0 12px; }
+    margin: 0 0 8px; }
   .legende span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px;
     background: var(--c); margin-right: 6px; vertical-align: -1px; }
+  /* Wandpanel */
+  .gross3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .gross3 > * { border-radius: 14px; padding: 14px; background: var(--secondary-background-color); border: none;
+    border-top: 4px solid var(--c); font: inherit; color: var(--primary-text-color); text-align: left; }
+  .gross3 .n { font-size: 2.8rem; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+  .gross3 .t { font-size: 0.9rem; color: var(--secondary-text-color); margin-top: 6px; }
+  .tun { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 10px; }
+  .tun section { border-radius: 14px; padding: 12px 14px; background: var(--secondary-background-color); }
+  .tun h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 600; }
+  .eintrag { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0;
+    border-top: 1px solid var(--divider-color); font-size: 0.95rem; }
+  .eintrag span:last-child { color: var(--c); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
+  .feld { position: relative; overflow: hidden; border-radius: 12px; padding: 12px; min-height: 76px;
+    border: 1px solid var(--c); background: var(--card-background-color); color: var(--primary-text-color);
+    font: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column;
+    justify-content: space-between; gap: 6px; touch-action: manipulation; transition: transform 80ms ease-out; }
+  .feld::before { content: ""; position: absolute; inset: 0; background: var(--c); opacity: 0.16; }
+  .feld > * { position: relative; }
+  .feld:active { transform: scale(0.97); }
+  .feld b { font-weight: 600; }
+  .feld .leise { font-size: 0.8rem; color: var(--secondary-text-color); }
   @media (prefers-reduced-motion: reduce) {
-    .tile, .dose { transition: none; } .tile:active, .dose:active { transform: none; }
-    .ring .wert, .balken span, .dose .fuell { transition-duration: 1ms; }
+    .tile, .gefaess, .feld { transition: none; }
+    .tile:active, .gefaess:active, .feld:active { transform: none; }
+    .ring .wert, .miniring .wert { transition-duration: 1ms; }
   }
 `;
 
@@ -562,7 +657,7 @@ const STYLE = `
 // Karte
 // ---------------------------------------------------------------------------
 
-const MODI = ["entnahme", "scanner", "fehlend", "ablaufend", "etiketten", "kopf", "regal"];
+const MODI = ["entnahme", "scanner", "fehlend", "ablaufend", "etiketten", "kopf", "regal", "panel"];
 
 class VorratskellerCard extends HTMLElement {
   static getStubConfig() {
@@ -587,6 +682,7 @@ class VorratskellerCard extends HTMLElement {
                 { value: "etiketten", label: t("modus_etiketten", {}, lang) },
                 { value: "kopf", label: t("modus_kopf", {}, lang) },
                 { value: "regal", label: t("modus_regal", {}, lang) },
+                { value: "panel", label: t("modus_panel", {}, lang) },
               ],
             },
           },
@@ -680,6 +776,7 @@ class VorratskellerCard extends HTMLElement {
     else if (modus === "scanner") this._scannerAktualisieren();
     else if (modus === "kopf") this._renderKopf(liste);
     else if (modus === "regal") this._renderRegal(liste);
+    else if (modus === "panel") this._renderPanel(liste);
   }
 
   _titel(standard) {
@@ -807,22 +904,31 @@ class VorratskellerCard extends HTMLElement {
     }
   }
 
-  // --- Kopf: Ring, Reichweite, Gruppen ---------------------------------------
+  // --- Kopf: Satz, Ring, Gruppen ------------------------------------------
+
+  _kennzahlen() {
+    const st = (k) => this._hass.states[summaryEntity(this._hass, k)];
+    const reichweite = st("reichweite");
+    return {
+      prozent: num(st("abdeckung")?.state),
+      tage: Number(reichweite?.state),
+      engpass: reichweite?.attributes?.engpass,
+      fehlend: num(st("fehlend")?.state),
+      ablaufend: num(st("ablaufend")?.state),
+      chargen: st("ablaufend")?.attributes?.chargen || [],
+    };
+  }
 
   _renderKopf(liste) {
-    const st = (k) => this._hass.states[summaryEntity(this._hass, k)];
-    const prozent = num(st("abdeckung")?.state);
-    const reichweite = st("reichweite");
-    const tage = Number(reichweite?.state);
-    const fehlend = num(st("fehlend")?.state);
-    const ablaufend = num(st("ablaufend")?.state);
-    const ringKlasse = prozent >= 90 ? "s-ok" : prozent >= 50 ? "s-knapp" : "s-leer";
-    const umfang = 2 * Math.PI * 52;
-    // Abdeckung je Gruppe aus den Produkten (Überbestand zählt nicht)
+    const k = this._kennzahlen();
+    const ringKlasse = stufe(k.prozent / 100);
+    const tageKlasse = !Number.isFinite(k.tage) ? "s-frei" : k.tage >= 14 ? "s-ok" : k.tage >= 7 ? "s-knapp" : "s-leer";
+    const U = 2 * Math.PI * 50;
+    const u = 2 * Math.PI * 15;
     const gruppen = new Map();
     for (const p of liste) {
       if (p.soll <= 0) continue;
-      const g = gruppen.get(p.gruppe) ?? { name: p.gruppe, icon: p.icon, soll: 0, da: 0 };
+      const g = gruppen.get(p.gruppe) ?? { name: p.gruppe, soll: 0, da: 0 };
       g.soll += p.soll;
       g.da += Math.min(p.soll, p.bestand);
       gruppen.set(p.gruppe, g);
@@ -830,39 +936,36 @@ class VorratskellerCard extends HTMLElement {
     const zeilen = [...gruppen.values()]
       .map((g) => ({ ...g, f: g.soll ? g.da / g.soll : 0 }))
       .sort((a, b) => a.f - b.f)
-      .map((g) => {
-        const k = g.f >= 0.9 ? "s-ok" : g.f >= 0.5 ? "s-knapp" : "s-leer";
-        return `<div class="gruppe ${k}"><ha-icon icon="${esc(g.icon)}"></ha-icon>
-          <span class="gname">${esc(g.name)}</span><span class="gwert">${fmt(Math.round(g.f * 100))} %</span>
-          <div class="balken"><span style="--f:${g.f.toFixed(3)}"></span></div></div>`;
-      })
+      .map(
+        (g) => `<div class="gruppe ${stufe(g.f)}">
+          <svg class="miniring" viewBox="0 0 40 40" aria-hidden="true">
+            <circle class="spur" cx="20" cy="20" r="15" fill="none" stroke-width="6"></circle>
+            <circle class="wert" cx="20" cy="20" r="15" fill="none" stroke-width="6" stroke-dasharray="${u.toFixed(1)}"
+              stroke-dashoffset="${(u * (1 - g.f)).toFixed(1)}"></circle></svg>
+          <div class="gtext"><div class="gname">${esc(g.name)}</div>
+            <div class="gwert">${fmt(Math.round(g.f * 100))} %</div></div></div>`,
+      )
       .join("");
+    const satz = Number.isFinite(k.tage)
+      ? t("satz_reicht", { tage: `<em>${esc(t("n_tage", { n: fmt(Math.floor(k.tage)) }))}</em>` })
+      : esc(t("reicht_nicht"));
     this._inhalt.innerHTML = `
-      ${this._titel("")}
       <div class="kopf">
-        <div class="ring ${ringKlasse}" role="img" aria-label="${esc(t("vorratsstand"))}: ${fmt(prozent)} %">
+        <div class="ring ${ringKlasse}" role="img" aria-label="${esc(t("vorratsstand"))}: ${fmt(Math.round(k.prozent))} %">
           <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="spur" cx="60" cy="60" r="52" fill="none" stroke-width="12"></circle>
-            <circle class="wert" cx="60" cy="60" r="52" fill="none" stroke-width="12"
-              stroke-dasharray="${umfang.toFixed(1)}"
-              stroke-dashoffset="${(umfang * (1 - Math.min(prozent, 100) / 100)).toFixed(1)}"></circle>
-          </svg>
-          <div class="mitte"><div class="prozent">${fmt(Math.round(prozent))} %</div>
-            <div class="label">${esc(t("vorratsstand"))}</div></div>
+            <circle class="spur" cx="60" cy="60" r="50" fill="none" stroke-width="14"></circle>
+            <circle class="wert" cx="60" cy="60" r="50" fill="none" stroke-width="14" stroke-dasharray="${U.toFixed(1)}"
+              stroke-dashoffset="${(U * (1 - Math.min(k.prozent, 100) / 100)).toFixed(1)}"></circle></svg>
+          <div class="mitte">${fmt(Math.round(k.prozent))} %</div>
         </div>
-        <div class="kennzahlen">
-          ${
-            Number.isFinite(tage)
-              ? `<div class="gross"><span class="zahl">${fmt(Math.floor(tage))}</span>
-                  <span>${esc(t("tage_reicht"))}</span></div>
-                ${reichweite.attributes?.engpass ? `<div class="muted">${esc(t("engpass", { gruppe: reichweite.attributes.engpass }))}</div>` : ""}`
-              : `<div class="muted">${esc(t("reicht_nicht"))}</div>`
-          }
+        <div>
+          <div class="satz ${tageKlasse}">${satz}</div>
+          ${k.engpass ? `<div class="unter-satz">${esc(t("engpass", { gruppe: k.engpass }))}</div>` : ""}
           <div class="stats">
-            <button class="stat ${fehlend ? "s-knapp" : "s-ok"}" data-nav="einkauf">
-              <ha-icon icon="mdi:cart-arrow-down"></ha-icon>${esc(t("n_unter_soll", { n: fmt(fehlend) }))}</button>
-            <span class="stat ${ablaufend ? "s-leer" : "s-ok"}">
-              <ha-icon icon="mdi:calendar-alert"></ha-icon>${esc(t("n_ablaufend", { n: fmt(ablaufend) }))}</span>
+            <button class="stat ${k.fehlend ? "s-knapp" : "s-ok"}" data-nav="einkauf">
+              <ha-icon icon="mdi:cart-arrow-down"></ha-icon>${esc(t("n_unter_soll", { n: fmt(k.fehlend) }))}</button>
+            <span class="stat ${k.ablaufend ? "s-leer" : "s-ok"}">
+              <ha-icon icon="mdi:calendar-alert"></ha-icon>${esc(t("n_ablaufend", { n: fmt(k.ablaufend) }))}</span>
           </div>
         </div>
       </div>
@@ -870,47 +973,118 @@ class VorratskellerCard extends HTMLElement {
     this._inhalt.querySelector("[data-nav]")?.addEventListener("click", (ev) => navigiere(ev.currentTarget.dataset.nav));
   }
 
-  // --- Regal-Ansicht --------------------------------------------------------
+  // --- Regal, gezeichnet ----------------------------------------------------
 
-  _renderRegal(liste) {
-    const dose = (p) => {
-      const z = zustand(p);
-      const f = p.soll > 0 ? Math.min(1, p.bestand / p.soll) : p.bestand > 0 ? 1 : 0;
-      const alt = p.mhd && p.tage < 0 ? " alt-mhd" : "";
-      const label = t("kachel_label", {
-        name: p.name,
-        bestand: fmt(p.bestand),
-        soll: p.soll ? t("kachel_soll", { soll: fmt(p.soll) }) : "",
-      });
-      return `<button class="dose s-${z}${alt}" data-id="${esc(p.id)}" title="${esc(p.name)}" aria-label="${esc(label)}">
-        <span class="fuell" style="--f:${f.toFixed(3)}"></span>
-        <ha-icon icon="${esc(p.icon)}"></ha-icon>
-        <span class="dname">${esc(p.name)}</span>
-        <span class="dzahl">${fmt(p.bestand)}${p.soll ? `<small>/${fmt(p.soll)}</small>` : ""}</span>
-      </button>`;
-    };
-    const html = regale(liste)
+  _gefaess(p, nr) {
+    const z = zustand(p);
+    const f = p.soll > 0 ? Math.min(1, p.bestand / p.soll) : p.bestand > 0 ? 1 : 0;
+    const alt = p.mhd && p.tage < 0 ? " alt-mhd" : "";
+    const label = t("kachel_label", {
+      name: p.name,
+      bestand: fmt(p.bestand),
+      soll: p.soll ? t("kachel_soll", { soll: fmt(p.soll) }) : "",
+    });
+    return `<button class="gefaess s-${z}${alt}" data-id="${esc(p.id)}" title="${esc(p.name)}" aria-label="${esc(label)}">
+      ${gefaessSvg(form(p), f, `vk${nr}`)}
+      <span class="dname">${esc(p.name)}</span>
+      <span class="dzahl">${fmt(p.bestand)}${p.soll ? `<small>/${fmt(p.soll)}</small>` : ""}</span>
+    </button>`;
+  }
+
+  _renderRegal(liste, ziel = this._inhalt, { nurFach = null, titel = true } = {}) {
+    let nr = 0;
+    const alle = regale(nurFach ? liste.filter((p) => p.fach_id === nurFach) : liste);
+    const html = alle
       .map(
-        (r) => `<section class="regal"><h3>${esc(r.name)}</h3>
+        (r) => `<section class="regal">${nurFach ? "" : `<h3>${esc(r.name)}</h3>`}<div class="gestell">
           ${r.boeden
             .map(
-              (b) => `<div class="boden">${b.boden ? `<div class="boden-name">${esc(b.boden)}</div>` : ""}
-                <div class="dosen">${b.produkte.map(dose).join("")}</div><div class="brett"></div></div>`,
+              (b) => `${b.boden ? `<div class="boden-name">${esc(b.boden)}</div>` : ""}
+                <div class="fachreihe">${b.produkte.map((p) => this._gefaess(p, nr++)).join("")}</div>
+                <div class="brett"></div>`,
             )
-            .join("")}</section>`,
+            .join("")}</div></section>`,
       )
       .join("");
     const fokus = this.shadowRoot.activeElement?.dataset?.id;
-    this._inhalt.innerHTML = `
-      ${this._titel(t("titel_regal"))}
-      <div class="legende">
+    ziel.innerHTML = `
+      ${titel ? this._titel(t("titel_regal")) : ""}
+      ${titel ? `<div class="legende">
         <span class="s-ok">${esc(t("status_ok"))}</span><span class="s-knapp">${esc(t("status_knapp"))}</span>
         <span class="s-leer">${esc(t("status_leer"))}</span><span class="s-frei">${esc(t("status_frei"))}</span>
+        <span class="muted">${esc(t("regal_hinweis"))}</span>
+      </div>` : ""}
+      ${alle.length ? `<div class="regale">${html}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
+    ziel.querySelectorAll(".gefaess").forEach((b) => b.addEventListener("click", () => this._entnehmen(b.dataset.id)));
+    if (fokus) ziel.querySelector(`.gefaess[data-id="${CSS.escape(fokus)}"]`)?.focus();
+  }
+
+  // --- Wandpanel ------------------------------------------------------------
+
+  _renderPanel(liste) {
+    if (this._panelFach) {
+      // Ein Fach offen: dessen Produkte gezeichnet, darunter zurück
+      const fach = faecher(liste).find((f) => f.id === this._panelFach);
+      this._inhalt.innerHTML = `<h2>${esc(fach?.name ?? "")}</h2><div id="fachinhalt"></div>
+        <div class="zeile"><button class="aktion zweit" id="zurueck">${esc(t("zurueck"))}</button></div>`;
+      this._renderRegal(liste, this._inhalt.querySelector("#fachinhalt"), { nurFach: this._panelFach, titel: false });
+      this._inhalt.querySelector("#zurueck").addEventListener("click", () => {
+        this._panelFach = null;
+        this._signatur = "";
+        this._render();
+      });
+      return;
+    }
+    const k = this._kennzahlen();
+    const tageKlasse = !Number.isFinite(k.tage) ? "s-frei" : k.tage >= 14 ? "s-ok" : k.tage >= 7 ? "s-knapp" : "s-leer";
+    const verbrauchen = k.chargen
+      .slice(0, 5)
+      .map((c) => {
+        const wann = c.tage < 0 ? t("abgelaufen_kurz") : c.tage === 0 ? t("heute") : t("in_tagen", { tage: c.tage });
+        return `<div class="eintrag ${c.tage < 0 ? "s-leer" : "s-knapp"}"><span>${esc(c.name)}</span><span>${esc(wann)}</span></div>`;
+      })
+      .join("");
+    const einkaufen = liste
+      .filter((p) => p.fehlt > 0)
+      .sort((a, b) => b.fehlt / (b.soll || 1) - a.fehlt / (a.soll || 1))
+      .slice(0, 5)
+      .map((p) => `<div class="eintrag s-knapp"><span>${esc(p.name)}</span><span>${esc(`${fmt(p.fehlt)} ${p.packung}`.trim())}</span></div>`)
+      .join("");
+    const rang = { leer: 3, knapp: 2, ok: 1, frei: 0 };
+    const felder = regale(liste)
+      .flatMap((r) => r.boeden.map((b) => ({ ...b, regal: r.name })))
+      .map((b) => {
+        const z = b.produkte.map(zustand);
+        const schlecht = z.reduce((a, x) => (rang[x] > rang[a] ? x : a), "frei");
+        const leer = z.filter((x) => x === "leer").length;
+        const knapp = z.filter((x) => x === "knapp").length;
+        const text = leer ? t("n_leer", { n: leer }) : knapp ? t("n_knapp", { n: knapp }) : t("alles_da");
+        return `<button class="feld s-${schlecht}" data-fach="${esc(b.id)}">
+          <div><b>${esc(b.regal)}</b>${b.boden ? `<div class="leise">${esc(b.boden)}</div>` : ""}</div><span>${esc(text)}</span></button>`;
+      })
+      .join("");
+    this._inhalt.innerHTML = `
+      <div class="gross3">
+        <div class="${tageKlasse}"><div class="n">${Number.isFinite(k.tage) ? fmt(Math.floor(k.tage)) : "–"}</div>
+          <div class="t">${esc(t("tage_reicht"))}</div></div>
+        <button class="${k.fehlend ? "s-knapp" : "s-ok"}" data-nav="einkauf" style="cursor:pointer">
+          <div class="n">${fmt(k.fehlend)}</div><div class="t">${esc(t("produkte_fehlen"))}</div></button>
+        <div class="${k.ablaufend ? "s-leer" : "s-ok"}"><div class="n">${fmt(k.ablaufend)}</div>
+          <div class="t">${esc(t("bald_verbrauchen"))}</div></div>
       </div>
-      <p class="muted" style="margin:0 0 12px">${esc(t("regal_hinweis"))}</p>
-      ${liste.length ? `<div class="regale">${html}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
-    this._inhalt.querySelectorAll(".dose").forEach((b) => b.addEventListener("click", () => this._entnehmen(b.dataset.id)));
-    if (fokus) this._inhalt.querySelector(`.dose[data-id="${CSS.escape(fokus)}"]`)?.focus();
+      <div class="tun">
+        <section><h3>${esc(t("zuerst_verbrauchen"))}</h3>${verbrauchen || `<div class="muted">${esc(t("nichts_laeuft_ab_kurz"))}</div>`}</section>
+        <section><h3>${esc(t("einkaufen"))}</h3>${einkaufen || `<div class="muted">${esc(t("alles_im_soll"))}</div>`}</section>
+      </div>
+      <div class="raster">${felder}</div>`;
+    this._inhalt.querySelector("[data-nav]")?.addEventListener("click", (ev) => navigiere(ev.currentTarget.dataset.nav));
+    this._inhalt.querySelectorAll(".feld").forEach((b) =>
+      b.addEventListener("click", () => {
+        this._panelFach = b.dataset.fach;
+        this._signatur = "";
+        this._render();
+      }),
+    );
   }
 
   // --- Listen ---------------------------------------------------------------
@@ -1316,24 +1490,32 @@ export function generateDashboard(hass) {
     sections: [
       {
         type: "grid",
+        column_span: 2,
         cards: [
           { type: "heading", heading: t("vorrat"), heading_style: "title" },
-          { type: "custom:vorratskeller-card", modus: "kopf" },
+          { type: "custom:vorratskeller-card", modus: "kopf", grid_options: { columns: "full" } },
+        ],
+      },
+      {
+        type: "grid",
+        cards: [{ type: "custom:vorratskeller-card", modus: "ablaufend", grid_options: { columns: "full" } }],
+      },
+      {
+        type: "grid",
+        column_span: 2,
+        cards: [
           {
             type: "history-graph",
             title: t("vorratsstand"),
             hours_to_show: 24 * 30,
             entities: [{ entity: s("abdeckung") }],
+            grid_options: { columns: "full" },
           },
         ],
       },
       {
         type: "grid",
-        cards: [{ type: "custom:vorratskeller-card", modus: "ablaufend" }],
-      },
-      {
-        type: "grid",
-        cards: [{ type: "custom:vorratskeller-card", modus: "fehlend" }],
+        cards: [{ type: "custom:vorratskeller-card", modus: "fehlend", grid_options: { columns: "full" } }],
       },
     ],
   };
@@ -1344,6 +1526,14 @@ export function generateDashboard(hass) {
     icon: "mdi:bookshelf",
     type: "panel",
     cards: [{ type: "custom:vorratskeller-card", modus: "regal" }],
+  };
+
+  const panel = {
+    title: t("view_panel"),
+    path: "panel",
+    icon: "mdi:tablet-dashboard",
+    type: "panel",
+    cards: [{ type: "custom:vorratskeller-card", modus: "panel" }],
   };
 
   const keller = {
@@ -1414,7 +1604,7 @@ export function generateDashboard(hass) {
       ],
     };
   }
-  return { title: t("name"), views: [uebersicht, regal, keller, scanner, bestand, einkauf, etiketten] };
+  return { title: t("name"), views: [uebersicht, regal, keller, scanner, bestand, einkauf, etiketten, panel] };
 }
 
 class VorratskellerStrategy extends HTMLElement {

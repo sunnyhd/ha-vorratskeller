@@ -49,7 +49,9 @@
   </tr>
 </table>
 
-![Regal-Ansicht: Fächer als Regal, Produkte als farbige Blöcke](docs/bilder/regal.png)
+![Regal-Ansicht: Fächer als Regal, Produkte als Gläser, Dosen und Flaschen](docs/bilder/regal.png)
+
+![Panel für das Tablet an der Kellertür](docs/bilder/panel.png)
 
 ## So greift es ineinander
 
@@ -97,15 +99,16 @@ Die Strategie baut das ganze Dashboard aus den Entitäten, ähnlich wie das Ener
 | Ansicht | Inhalt |
 |---|---|
 | Übersicht | Ring mit Vorratsstand, Reichweite in Tagen, Füllstand je Gruppe, bald ablaufende Chargen, Produkte unter Soll, Verlauf |
-| Regal | die Fächer als Regal gezeichnet, jedes Produkt als farbiger Block (grün im Soll, orange knapp, rot leer); Tippen nimmt eine Packung heraus |
+| Regal | die Fächer als Regal gezeichnet, jedes Produkt als Glas, Dose, Flasche oder Packung, gefüllt nach Bestand (grün im Soll, orange knapp, rot leer); Tippen nimmt eine Packung heraus |
 | Entnehmen | eine Kachel je Produkt, nach Fach filterbar. Tippen nimmt eine Packung heraus (mit „Rückgängig“), **+** lagert eine ein |
 | Scanner | Kamera oder Eingabe von Hand: Barcode (EAN) oder Regal-Code |
 | Bestand | alle Produkte nach Gruppen |
 | Einkauf | was bis zum Soll fehlt |
 | Etiketten | ein QR-Code je Fach zum Ausdrucken |
+| Panel | für das Tablet an der Kellertür: große Zahlen, was zuerst verbraucht und was eingekauft werden muss, jedes Fach als Feld in der Farbe seines knappsten Produkts; antippen zeigt das Fach |
 
 Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
-`modus: kopf | regal | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
+`modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
 
 ### Scanner
 
