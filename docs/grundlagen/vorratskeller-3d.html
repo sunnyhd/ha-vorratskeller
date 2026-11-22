@@ -58,10 +58,10 @@ button:focus-visible{outline:2px solid var(--kraft);outline-offset:2px}
   <div class="bar leg" id="leg" style="margin-top:10px" aria-label="Gruppen hervorheben"></div>
   <div class="cols">
     <div><h2>Wasser neben dem Regal</h2><p>Die 13 Kästen Wasser in Glasflaschen (rund 195 kg) stehen nicht im Regal, sondern daneben: vor dem linken Regal, nahe der Tür, in Stapeln von höchstens 4 Kästen auf Latten. So bleiben sie leicht zu tauschen. In den Regalen stehen unten die Konserven und rechts H-Milch und Rapsöl, oben nur Leichtes wie Eimer mit Trockenware und Toilettenpapier. Links bleiben zwei Böden und rechts einer frei als Reserve.</p></div>
-    <div><h2>Abstand zu Boden und Wand</h2><p>Der unterste Boden sitzt 15 cm über dem Ziegelboden, die Regale stehen einige Zentimeter vor der Wand. Die dunkle Stelle an der Rückwand ist im Modell markiert: vor dem Einräumen prüfen, ob es Schimmel ist.</p></div>
+    <div><h2>Abstand zu Boden und Wand</h2><p>Der unterste Boden sitzt 15 cm über dem Ziegelboden, die Regale stehen einige Zentimeter vor der Wand.</p></div>
     <div><h2>Was das Modell annimmt</h2><ul><li>Raum 3 × 4 m (Breite × Tiefe). Die Höhe von 2,25 m ist aus dem Foto geschätzt.</li><li>Stahlregal links 2,4 m lang, rechts 1,6 m, je 40 cm tief mit 5 Böden; weißes Regal 1 m lang, 45 cm tief, 4 Fächer. Die Regalmaße sind geschätzt.</li><li>Bitte vor dem Kauf nachmessen, vor allem die Traglast pro Boden.</li></ul></div>
   </div>
-  <p class="small" style="margin-top:22px">Mengen und Aufteilung: <a href="https://claude.ai/artifact/3WgvR3hecagusgoFYyfo2h">Checkliste Vorratskammer 14 Tage</a>. Modell gebaut mit three.js r128.</p>
+  <p class="small" style="margin-top:22px">Mengen und Aufteilung: <a href="vorratskammer-14-tage.html">Checkliste Vorratskammer 14 Tage</a>. Modell gebaut mit three.js r128.</p>
 </div></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -98,7 +98,6 @@ box(W,HR,0.05,conc,W/2,HR/2,-D-0.025);
 box(0.05,HR,D,conc,-0.025,HR/2,-D/2);
 box(0.05,HR,D,conc,W+0.025,HR/2,-D/2);
 const damp=add(new THREE.PlaneGeometry(0.55,0.4),mat('_','#1f2a1e',{roughness:1,transparent:true,opacity:.9}),1.15,0.2,-D+0.005);damp.castShadow=false;
-const stain=add(new THREE.PlaneGeometry(0.9,1.5),mat('_','#6f716b',{roughness:1,transparent:true,opacity:.5}),1.55,1.05,-D+0.003);stain.castShadow=false;
 cyl(0.07,0.07,0.08,mat('_','#fff6d8',{emissive:'#fff1c4',emissiveIntensity:1}),1.9,HR-0.04,-1.7);
 scene.add(new THREE.HemisphereLight('#dfe6ea','#4a2f26',0.32));
 const lamp=new THREE.PointLight('#fff1d6',0.85,9,1.6);lamp.position.set(1.9,HR-0.15,-1.7);lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);scene.add(lamp);
@@ -168,7 +167,6 @@ fill(Wh,3,'N',[['carton',1,'#d8303a'],['carton',1,'#f2f2f2']],'Hausapotheke');
 fill(Wh,2,'N',[['carton',1,'#f2c230'],['lampe',4],['block',2,'#333']],'Radio, Lampen, Batterien');
 fill(Wh,1,'N',[['carton',1,'#5a6a74'],['kart',8]],'Kocher, 8 Kartuschen');
 fill(Wh,0,'N',[['decke',4,'#7a5a8a']],'Decken');
-labels.push({t:'Dunkle Stelle prüfen',cat:'N',p:new THREE.Vector3(1.15,0.5,-D+0.02)});
 
 /* Etiketten */
 const lblEls=labels.map(l=>{const e=document.createElement('div');e.className='lbl';e.textContent=l.t;e.style.setProperty('--c',(CAT[l.cat]||['','#8a98a3'])[1]);stage.appendChild(e);return e});

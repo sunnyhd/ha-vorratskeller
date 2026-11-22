@@ -3,3 +3,7 @@ docs/grundlagen/kellerraum-foto.jpg
 __pycache__/
 .DS_Store
 config/
+node_modules/
+.pytest_cache/
+.ruff_cache/
+docs/grundlagen/grocy-variante-*
