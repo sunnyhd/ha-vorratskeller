@@ -1,0 +1,289 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vorratskeller",
+        "description": "Lagerbuch für den Vorratskeller. Die Checkliste enthält einen 14-Tage-Vorrat nach BLE und BBK; Soll und Ziele werden auf Personen und Tage umgerechnet.",
+        "data": {
+          "checkliste": "Produkte aus der Checkliste übernehmen",
+          "personen": "Personen",
+          "tage": "Tage"
+        },
+        "data_description": {
+          "checkliste": "Nur beim ersten Einrichten; ein vorhandenes Lagerbuch bleibt erhalten."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Vorratskeller ist schon eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "data": {
+          "einkaufsliste": "Einkaufsliste",
+          "notify_dienst": "Push-Nachricht an",
+          "wochentag": "Wochenbericht am",
+          "uhrzeit": "Uhrzeit",
+          "warn_tage": "„Läuft bald ab“ ab Tagen vor MHD",
+          "open_food_facts": "Unbekannte Barcodes bei Open Food Facts nachschlagen"
+        },
+        "data_description": {
+          "einkaufsliste": "Produkte unter Soll kommen mit „(Vorrat)“ auf diese Liste, ohne Dubletten.",
+          "notify_dienst": "z. B. notify.mobile_app_handy. Leer: kein Wochenbericht.",
+          "open_food_facts": "Es geht nur die Barcode-Nummer nach außen."
+        }
+      }
+    }
+  },
+  "selector": {
+    "wochentag": {
+      "options": {
+        "mon": "Montag",
+        "tue": "Dienstag",
+        "wed": "Mittwoch",
+        "thu": "Donnerstag",
+        "fri": "Freitag",
+        "sat": "Samstag",
+        "sun": "Sonntag"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "fehlend": {
+        "name": "Fehlende Produkte"
+      },
+      "ablaufend": {
+        "name": "Bald ablaufend"
+      },
+      "reichweite": {
+        "name": "Reichweite"
+      },
+      "abdeckung": {
+        "name": "Vorratsstand"
+      }
+    }
+  },
+  "services": {
+    "einlagern": {
+      "name": "Einlagern",
+      "description": "Lagert Packungen eines Produkts ein.",
+      "fields": {
+        "produkt": {
+          "name": "Produkt",
+          "description": "Kennung des Produkts (z. B. h-milch) oder Entität des Produkt-Sensors."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN auf der Packung, statt des Produkts."
+        },
+        "menge": {
+          "name": "Menge",
+          "description": "Anzahl der Packungen."
+        },
+        "mhd": {
+          "name": "Mindesthaltbarkeitsdatum",
+          "description": "Datum auf der Packung. Ohne Angabe gilt heute plus übliche Haltbarkeit."
+        }
+      }
+    },
+    "entnehmen": {
+      "name": "Entnehmen",
+      "description": "Entnimmt Packungen nach FIFO: das früheste MHD zuerst.",
+      "fields": {
+        "produkt": {
+          "name": "Produkt",
+          "description": "Kennung des Produkts (z. B. h-milch) oder Entität des Produkt-Sensors."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN auf der Packung, statt des Produkts."
+        },
+        "menge": {
+          "name": "Menge",
+          "description": "Anzahl der Packungen."
+        }
+      }
+    },
+    "inventur": {
+      "name": "Inventur",
+      "description": "Setzt den gezählten Bestand eines Produkts.",
+      "fields": {
+        "produkt": {
+          "name": "Produkt",
+          "description": "Kennung des Produkts (z. B. h-milch) oder Entität des Produkt-Sensors."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN auf der Packung, statt des Produkts."
+        },
+        "menge": {
+          "name": "Gezählte Menge",
+          "description": "Anzahl der Packungen, die tatsächlich da sind."
+        },
+        "mhd": {
+          "name": "Mindesthaltbarkeitsdatum",
+          "description": "Datum auf der Packung. Ohne Angabe gilt heute plus übliche Haltbarkeit."
+        }
+      }
+    },
+    "barcode_zuordnen": {
+      "name": "Barcode zuordnen",
+      "description": "Ordnet einen Barcode einem Produkt zu.",
+      "fields": {
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN auf der Packung, statt des Produkts."
+        },
+        "produkt": {
+          "name": "Produkt",
+          "description": "Kennung des Produkts (z. B. h-milch) oder Entität des Produkt-Sensors."
+        }
+      }
+    },
+    "barcode_suchen": {
+      "name": "Barcode suchen",
+      "description": "Sucht das Produkt zu einem Barcode, bei Unbekannten bei Open Food Facts (nur die Nummer geht nach außen).",
+      "fields": {
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN auf der Packung, statt des Produkts."
+        }
+      }
+    },
+    "produkt_anlegen": {
+      "name": "Produkt anlegen",
+      "description": "Legt ein neues Produkt an.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name des Produkts."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN auf der Packung, statt des Produkts."
+        },
+        "gruppe": {
+          "name": "Gruppe",
+          "description": "Kennung der Gruppe, z. B. obst-nuesse."
+        },
+        "fach": {
+          "name": "Fach",
+          "description": "Lagerort im Keller."
+        },
+        "packung": {
+          "name": "Packung",
+          "description": "Beschreibung einer Packung, z. B. „× 500 g“."
+        },
+        "packungsmenge": {
+          "name": "Packungsmenge",
+          "description": "Menge einer Packung in der Einheit der Gruppe (kg oder l), für die Reichweite."
+        },
+        "soll": {
+          "name": "Soll",
+          "description": "Sollbestand in Packungen."
+        },
+        "haltbarkeit_monate": {
+          "name": "Übliche Haltbarkeit",
+          "description": "In Monaten; 0 = ohne MHD."
+        },
+        "hinweis": {
+          "name": "Hinweis",
+          "description": "Freitext."
+        }
+      }
+    },
+    "produkt_aendern": {
+      "name": "Produkt ändern",
+      "description": "Ändert Felder eines Produkts.",
+      "fields": {
+        "produkt": {
+          "name": "Produkt",
+          "description": "Kennung des Produkts (z. B. h-milch) oder Entität des Produkt-Sensors."
+        },
+        "name": {
+          "name": "Name",
+          "description": "Name des Produkts."
+        },
+        "gruppe": {
+          "name": "Gruppe",
+          "description": "Kennung der Gruppe, z. B. obst-nuesse."
+        },
+        "fach": {
+          "name": "Fach",
+          "description": "Lagerort im Keller."
+        },
+        "packung": {
+          "name": "Packung",
+          "description": "Beschreibung einer Packung, z. B. „× 500 g“."
+        },
+        "packungsmenge": {
+          "name": "Packungsmenge",
+          "description": "Menge einer Packung in der Einheit der Gruppe (kg oder l), für die Reichweite."
+        },
+        "soll": {
+          "name": "Soll",
+          "description": "Sollbestand in Packungen."
+        },
+        "haltbarkeit_monate": {
+          "name": "Übliche Haltbarkeit",
+          "description": "In Monaten; 0 = ohne MHD."
+        },
+        "hinweis": {
+          "name": "Hinweis",
+          "description": "Freitext."
+        }
+      }
+    },
+    "produkt_loeschen": {
+      "name": "Produkt löschen",
+      "description": "Löscht ein Produkt mit allen Chargen.",
+      "fields": {
+        "produkt": {
+          "name": "Produkt",
+          "description": "Kennung des Produkts (z. B. h-milch) oder Entität des Produkt-Sensors."
+        }
+      }
+    },
+    "bericht_senden": {
+      "name": "Bericht senden",
+      "description": "Sendet den Wochenbericht sofort."
+    },
+    "einkaufsliste_abgleichen": {
+      "name": "Einkaufsliste abgleichen",
+      "description": "Setzt fehlende Produkte auf die Einkaufsliste."
+    }
+  },
+  "exceptions": {
+    "unknown_product": {
+      "message": "Produkt „{produkt}“ gibt es nicht."
+    },
+    "unknown_barcode": {
+      "message": "Barcode {barcode} ist keinem Produkt zugeordnet."
+    },
+    "product_required": {
+      "message": "Produkt oder Barcode angeben."
+    },
+    "invalid_amount": {
+      "message": "Die Menge muss größer als 0 sein."
+    },
+    "invalid_name": {
+      "message": "Der Name darf nicht leer sein."
+    },
+    "not_enough_stock": {
+      "message": "Von {produkt} sind nur {vorhanden} da, nicht {menge}."
+    },
+    "not_loaded": {
+      "message": "Vorratskeller ist nicht geladen."
+    },
+    "no_notify_target": {
+      "message": "In den Optionen ist kein Ziel für Push-Nachrichten eingestellt."
+    },
+    "notify_target_missing": {
+      "message": "Ziel {ziel} für Push-Nachrichten gibt es nicht."
+    }
+  }
+}

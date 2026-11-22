@@ -1,0 +1,14 @@
+{
+  "services": {
+    "einlagern": { "service": "mdi:tray-arrow-down" },
+    "entnehmen": { "service": "mdi:tray-arrow-up" },
+    "inventur": { "service": "mdi:clipboard-check-outline" },
+    "barcode_zuordnen": { "service": "mdi:barcode" },
+    "barcode_suchen": { "service": "mdi:barcode-scan" },
+    "produkt_anlegen": { "service": "mdi:package-variant-plus" },
+    "produkt_aendern": { "service": "mdi:package-variant" },
+    "produkt_loeschen": { "service": "mdi:package-variant-remove" },
+    "bericht_senden": { "service": "mdi:message-text-outline" },
+    "einkaufsliste_abgleichen": { "service": "mdi:cart-arrow-down" }
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vorratskeller",
+        "description": "Inventory for the pantry. The checklist holds a 14-day supply based on German BLE and BBK guidance; targets are scaled to persons and days.",
+        "data": {
+          "checkliste": "Import products from the checklist",
+          "personen": "Persons",
+          "tage": "Days"
+        },
+        "data_description": {
+          "checkliste": "Only on first setup; an existing inventory is kept."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "einkaufsliste": "Shopping list",
+          "notify_dienst": "Send notification to",
+          "wochentag": "Weekly report on",
+          "uhrzeit": "Time",
+          "warn_tage": "“Expiring soon” days before date",
+          "open_food_facts": "Look up unknown barcodes at Open Food Facts"
+        },
+        "data_description": {
+          "einkaufsliste": "Products below target are added with “(Vorrat)”, without duplicates.",
+          "notify_dienst": "e.g. notify.mobile_app_phone. Empty: no weekly report.",
+          "open_food_facts": "Only the barcode number is sent."
+        }
+      }
+    }
+  },
+  "selector": {
+    "wochentag": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "fehlend": {
+        "name": "Missing products"
+      },
+      "ablaufend": {
+        "name": "Expiring soon"
+      },
+      "reichweite": {
+        "name": "Range"
+      },
+      "abdeckung": {
+        "name": "Stock level"
+      }
+    }
+  },
+  "services": {
+    "einlagern": {
+      "name": "Store",
+      "description": "Adds packages of a product to the stock.",
+      "fields": {
+        "produkt": {
+          "name": "Product",
+          "description": "Product ID (e.g. h-milch) or entity of the product sensor."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN on the package, instead of the product."
+        },
+        "menge": {
+          "name": "Quantity",
+          "description": "Number of packages."
+        },
+        "mhd": {
+          "name": "Best-before date",
+          "description": "Date on the package. Defaults to today plus the usual shelf life."
+        }
+      }
+    },
+    "entnehmen": {
+      "name": "Take out",
+      "description": "Removes packages first-in-first-out: earliest best-before date first.",
+      "fields": {
+        "produkt": {
+          "name": "Product",
+          "description": "Product ID (e.g. h-milch) or entity of the product sensor."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN on the package, instead of the product."
+        },
+        "menge": {
+          "name": "Quantity",
+          "description": "Number of packages."
+        }
+      }
+    },
+    "inventur": {
+      "name": "Stocktaking",
+      "description": "Sets the counted stock of a product.",
+      "fields": {
+        "produkt": {
+          "name": "Product",
+          "description": "Product ID (e.g. h-milch) or entity of the product sensor."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN on the package, instead of the product."
+        },
+        "menge": {
+          "name": "Counted quantity",
+          "description": "Number of packages actually present."
+        },
+        "mhd": {
+          "name": "Best-before date",
+          "description": "Date on the package. Defaults to today plus the usual shelf life."
+        }
+      }
+    },
+    "barcode_zuordnen": {
+      "name": "Assign barcode",
+      "description": "Assigns a barcode to a product.",
+      "fields": {
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN on the package, instead of the product."
+        },
+        "produkt": {
+          "name": "Product",
+          "description": "Product ID (e.g. h-milch) or entity of the product sensor."
+        }
+      }
+    },
+    "barcode_suchen": {
+      "name": "Look up barcode",
+      "description": "Finds the product for a barcode; unknown codes are looked up at Open Food Facts (only the number is sent).",
+      "fields": {
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN on the package, instead of the product."
+        }
+      }
+    },
+    "produkt_anlegen": {
+      "name": "Create product",
+      "description": "Creates a new product.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Product name."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "EAN/GTIN on the package, instead of the product."
+        },
+        "gruppe": {
+          "name": "Group",
+          "description": "Group ID, e.g. obst-nuesse."
+        },
+        "fach": {
+          "name": "Shelf",
+          "description": "Storage location in the cellar."
+        },
+        "packung": {
+          "name": "Package",
+          "description": "Description of one package, e.g. “× 500 g”."
+        },
+        "packungsmenge": {
+          "name": "Package amount",
+          "description": "Amount per package in the group's unit (kg or l), used for the range."
+        },
+        "soll": {
+          "name": "Target",
+          "description": "Target stock in packages."
+        },
+        "haltbarkeit_monate": {
+          "name": "Usual shelf life",
+          "description": "In months; 0 = no best-before date."
+        },
+        "hinweis": {
+          "name": "Note",
+          "description": "Free text."
+        }
+      }
+    },
+    "produkt_aendern": {
+      "name": "Change product",
+      "description": "Changes fields of a product.",
+      "fields": {
+        "produkt": {
+          "name": "Product",
+          "description": "Product ID (e.g. h-milch) or entity of the product sensor."
+        },
+        "name": {
+          "name": "Name",
+          "description": "Product name."
+        },
+        "gruppe": {
+          "name": "Group",
+          "description": "Group ID, e.g. obst-nuesse."
+        },
+        "fach": {
+          "name": "Shelf",
+          "description": "Storage location in the cellar."
+        },
+        "packung": {
+          "name": "Package",
+          "description": "Description of one package, e.g. “× 500 g”."
+        },
+        "packungsmenge": {
+          "name": "Package amount",
+          "description": "Amount per package in the group's unit (kg or l), used for the range."
+        },
+        "soll": {
+          "name": "Target",
+          "description": "Target stock in packages."
+        },
+        "haltbarkeit_monate": {
+          "name": "Usual shelf life",
+          "description": "In months; 0 = no best-before date."
+        },
+        "hinweis": {
+          "name": "Note",
+          "description": "Free text."
+        }
+      }
+    },
+    "produkt_loeschen": {
+      "name": "Delete product",
+      "description": "Deletes a product with all its batches.",
+      "fields": {
+        "produkt": {
+          "name": "Product",
+          "description": "Product ID (e.g. h-milch) or entity of the product sensor."
+        }
+      }
+    },
+    "bericht_senden": {
+      "name": "Send report",
+      "description": "Sends the weekly report now."
+    },
+    "einkaufsliste_abgleichen": {
+      "name": "Sync shopping list",
+      "description": "Adds missing products to the shopping list."
+    }
+  },
+  "exceptions": {
+    "unknown_product": {
+      "message": "Unknown product “{produkt}”."
+    },
+    "unknown_barcode": {
+      "message": "Barcode {barcode} is not assigned to a product."
+    },
+    "product_required": {
+      "message": "Specify a product or a barcode."
+    },
+    "invalid_amount": {
+      "message": "The quantity must be greater than 0."
+    },
+    "invalid_name": {
+      "message": "The name must not be empty."
+    },
+    "not_enough_stock": {
+      "message": "Only {vorhanden} of {produkt} in stock, not {menge}."
+    },
+    "not_loaded": {
+      "message": "Vorratskeller is not loaded."
+    },
+    "no_notify_target": {
+      "message": "No notification target configured."
+    },
+    "notify_target_missing": {
+      "message": "Notification target {ziel} does not exist."
+    }
+  }
+}

@@ -1,0 +1,135 @@
+einlagern:
+  fields:
+    produkt: &produkt
+      example: h-milch
+      selector:
+        text:
+    barcode: &barcode
+      example: "4006040000006"
+      selector:
+        text:
+    menge: &menge
+      default: 1
+      selector:
+        number:
+          min: 0.001
+          max: 10000
+          step: any
+          mode: box
+    mhd: &mhd
+      selector:
+        date:
+
+entnehmen:
+  fields:
+    produkt: *produkt
+    barcode: *barcode
+    menge: *menge
+
+inventur:
+  fields:
+    produkt: *produkt
+    barcode: *barcode
+    menge:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: any
+          mode: box
+    mhd: *mhd
+
+barcode_zuordnen:
+  fields:
+    barcode:
+      required: true
+      example: "4006040000006"
+      selector:
+        text:
+    produkt:
+      required: true
+      example: h-milch
+      selector:
+        text:
+
+barcode_suchen:
+  fields:
+    barcode:
+      required: true
+      example: "4006040000006"
+      selector:
+        text:
+
+produkt_anlegen:
+  fields:
+    name:
+      required: true
+      selector:
+        text:
+    barcode: *barcode
+    gruppe: &gruppe
+      example: obst-nuesse
+      selector:
+        text:
+    fach: &fach
+      selector:
+        text:
+    packung: &packung
+      example: "× 500 g"
+      selector:
+        text:
+    packungsmenge: &packungsmenge
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+    soll: &soll
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: 1
+          mode: box
+    haltbarkeit_monate: &haltbarkeit
+      selector:
+        number:
+          min: 0
+          max: 600
+          step: 1
+          mode: box
+    hinweis: &hinweis
+      selector:
+        text:
+
+produkt_aendern:
+  fields:
+    produkt:
+      required: true
+      example: h-milch
+      selector:
+        text:
+    name:
+      selector:
+        text:
+    gruppe: *gruppe
+    fach: *fach
+    packung: *packung
+    packungsmenge: *packungsmenge
+    soll: *soll
+    haltbarkeit_monate: *haltbarkeit
+    hinweis: *hinweis
+
+produkt_loeschen:
+  fields:
+    produkt:
+      required: true
+      example: h-milch
+      selector:
+        text:
+
+bericht_senden:
+
+einkaufsliste_abgleichen:

@@ -1,0 +1,15 @@
+{
+  "domain": "vorratskeller",
+  "name": "Vorratskeller",
+  "after_dependencies": ["todo", "notify"],
+  "codeowners": ["@sunnyhd"],
+  "config_flow": true,
+  "dependencies": ["http", "frontend"],
+  "documentation": "https://github.com/sunnyhd/ha-vorratskeller",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/sunnyhd/ha-vorratskeller/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}
