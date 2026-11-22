@@ -19,7 +19,7 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
   (Gruppe, Ziel, Einheit, Regal, Items `[Produkt, Hinweis, Anzahl, Packung, Menge, MHD-Monate]`).
 - Checkliste und 3D-Modell des Kellers: `docs/grundlagen/vorratskammer-14-tage.html`, `vorratskeller-3d.html`
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
-  Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal. Feuchte Rückwand (Hygrometer, Fleck prüfen).
+  Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal.
 
 ## Aufbau (Version 1, Stand 2026-11-22, Branch `v1-integration`)
 - `custom_components/vorratskeller/`: `lager.py` (Fachlogik ohne HA: Produkte, Chargen, FIFO, Inventur,
