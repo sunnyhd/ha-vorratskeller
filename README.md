@@ -1,23 +1,72 @@
-# Vorratskeller für Home Assistant
+<p align="center">
+  <img src="custom_components/vorratskeller/brand/icon@2x.png" width="112" alt="">
+</p>
 
-Lagerbuch für den Vorratskeller als Integration für Home Assistant: was ist da, was fehlt,
-was läuft bald ab. Mit Chargen und Mindesthaltbarkeitsdatum (MHD), Entnahme nach FIFO,
-Kamera-Scanner, Regal-Etiketten, Einkaufsliste und Wochenbericht als Push-Nachricht.
+<h1 align="center">Vorratskeller für Home Assistant</h1>
 
-Die Erstbefüllung ist ein 14-Tage-Notvorrat für vier Personen nach den Empfehlungen von
-BLE (Vorratskalkulator) und BBK; Soll und Ziele werden beim Einrichten auf Personen und Tage
-umgerechnet.
+<p align="center">
+  <b>Was ist da, was fehlt, was läuft bald ab.</b><br>
+  Lagerbuch für den Vorratskeller, ganz in Home Assistant: ohne Zusatzserver, ohne Cloud-Konto.
+</p>
+
+<p align="center">
+  <a href="https://github.com/sunnyhd/ha-vorratskeller/actions/workflows/validate.yml"><img src="https://github.com/sunnyhd/ha-vorratskeller/actions/workflows/validate.yml/badge.svg" alt="Prüfungen"></a>
+  <img src="https://img.shields.io/badge/Home%20Assistant-2026.10%2B-18BCF2?logo=homeassistant&logoColor=white" alt="Home Assistant 2026.10+">
+  <img src="https://img.shields.io/badge/Marketplace-Integration-41BDF5" alt="Marketplace">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/sunnyhd/ha-vorratskeller" alt="Lizenz MIT"></a>
+</p>
+
+![Übersicht des Vorratskeller-Dashboards](docs/bilder/uebersicht.png)
+
+## Was es kann
+
+- 📦 **Lagerbuch mit Chargen:** Jede Einlagerung ist eine Charge mit Mindesthaltbarkeitsdatum (MHD).
+  Entnommen wird nach FIFO: was zuerst abläuft, geht zuerst raus.
+- 🎯 **Soll je Produkt:** Startet mit einem 14-Tage-Notvorrat nach den Empfehlungen von BLE und BBK,
+  umgerechnet auf Personen und Tage. Jedes Soll lässt sich ändern.
+- 👆 **Entnehmen mit einem Tipp:** eine Kachel je Produkt, nach Regalfach filterbar, mit „Rückgängig“.
+- 📷 **Kamera-Scanner:** EAN-Barcodes auf der Packung und QR-Etiketten am Regal. Unbekannte Barcodes
+  schlägt Open Food Facts vor; dorthin geht nur die Nummer.
+- 🛒 **Einkaufsliste:** Was unter Soll fällt, landet automatisch auf einer To-do-Liste von Home Assistant.
+- 🔔 **Wochenbericht** als Push-Nachricht: was bald abläuft und was fehlt.
+- 📊 **Eigenes Dashboard**, das sich selbst aufbaut, wie das Energie-Dashboard.
+- 🏷️ **Regal-Etiketten** mit QR-Code zum Ausdrucken.
+
+<table>
+  <tr>
+    <td width="62%"><img src="docs/bilder/entnehmen.png" alt="Entnehmen: eine Kachel je Produkt"></td>
+    <td><img src="docs/bilder/entnehmen-handy.png" alt="Entnehmen auf dem Handy, dunkles Design"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Entnehmen: Bestand / Soll, nächstes MHD, <b>+</b> lagert ein</sub></td>
+    <td align="center"><sub>Auf dem Handy, dunkles Design</sub></td>
+  </tr>
+</table>
+
+## So greift es ineinander
+
+```mermaid
+flowchart LR
+  scan["📷 Scanner<br>EAN oder Regal-QR"] --> buch[("Lagerbuch<br>Chargen, MHD, Soll")]
+  kachel["👆 Kachel<br>Entnehmen"] --> buch
+  dienst["⚙️ Dienste<br>Automationen"] --> buch
+  buch --> sens["Sensoren<br>je Produkt + Übersicht"]
+  sens --> dash["📊 Dashboard"]
+  buch -->|unter Soll| liste["🛒 Einkaufsliste"]
+  buch -->|wöchentlich| push["🔔 Push-Nachricht"]
+```
 
 ## Installation
 
-1. Ab Home Assistant 2026.11: Einstellungen → Marketplace → Menü oben rechts → *Add from link*,
-   `sunnyhd/ha-vorratskeller` eintragen, Typ *Integration*.
-   Bis 2026.10: HACS → Menü → Benutzerdefinierte Repositories →
-   `https://github.com/sunnyhd/ha-vorratskeller`, Kategorie *Integration*.
-2. „Vorratskeller“ installieren und Home Assistant neu starten.
-3. Einstellungen → Geräte & Dienste → Integration hinzufügen → **Vorratskeller**.
+1. **Repository hinzufügen**
+   - Ab Home Assistant 2026.11: *Einstellungen → Marketplace →* Menü oben rechts *→ Add from link*,
+     `sunnyhd/ha-vorratskeller` eintragen, Typ *Integration*.
+   - Bis 2026.10: *HACS →* Menü *→ Benutzerdefinierte Repositories →*
+     `https://github.com/sunnyhd/ha-vorratskeller`, Kategorie *Integration*.
+2. **Vorratskeller** installieren und Home Assistant neu starten.
+3. *Einstellungen → Geräte & Dienste → Integration hinzufügen →* **Vorratskeller**.
    Checkliste übernehmen, Personen und Tage angeben.
-4. Dashboard: Einstellungen → Dashboards → Dashboard hinzufügen → **Vorratskeller**
+4. **Dashboard:** *Einstellungen → Dashboards → Dashboard hinzufügen →* **Vorratskeller**
    (unter den Community-Dashboards). Alternativ ein leeres Dashboard anlegen und im
    Raw-Konfigurationseditor eintragen:
 
@@ -26,7 +75,7 @@ umgerechnet.
      type: custom:vorratskeller
    ```
 
-5. Optionen der Integration: Einkaufsliste (`todo`-Entität), Ziel der Push-Nachricht
+5. **Optionen** der Integration: Einkaufsliste (`todo`-Entität), Ziel der Push-Nachricht
    (z. B. `notify.mobile_app_handy`), Wochentag und Uhrzeit des Berichts, Vorlauf für
    „läuft bald ab“, Open Food Facts an oder aus.
 
@@ -59,6 +108,8 @@ Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
   Ohne Kamera geht die Eingabe von Hand.
 - Erkennung: `BarcodeDetector` des Browsers, sonst zxing-wasm. Die WebAssembly-Datei liefert
   die Integration selbst aus; es wird nichts von einem CDN geladen.
+
+![Regal-Etiketten mit QR-Code je Fach](docs/bilder/etiketten.png)
 
 ## Entitäten
 
@@ -96,6 +147,32 @@ Alle Änderungen landen mit Zeit und Benutzer im Journal.
 - **Wochenbericht:** am gewählten Tag zur gewählten Uhrzeit, was bald abläuft und wie viele
   Produkte unter Soll sind.
 
+### Beispiel: Warnung, wenn der Vorrat knapp wird
+
+```yaml
+automation:
+  - alias: Vorrat reicht keine Woche mehr
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.vorratskeller_reichweite
+        below: 7
+    actions:
+      - action: notify.mobile_app_handy
+        data:
+          title: Vorratskeller
+          message: >-
+            Der Vorrat reicht noch {{ states('sensor.vorratskeller_reichweite') }} Tage,
+            knapp ist {{ state_attr('sensor.vorratskeller_reichweite', 'engpass') }}.
+```
+
+## Datenschutz
+
+- Alles bleibt in Home Assistant. Kein Konto, kein eigener Server, keine Telemetrie.
+- Nach außen geht nur eine Anfrage an Open Food Facts, und nur wenn ein Barcode unbekannt ist:
+  die Barcode-Nummer, ohne Cookies und ohne Kennung des Hauses. In den Optionen abschaltbar.
+- Die Barcode-Erkennung im Browser lädt nichts aus dem Netz; alle Bibliotheken liefert die
+  Integration selbst aus.
+
 ## Daten
 
 Das Lagerbuch liegt in `.storage/vorratskeller` und ist damit in jedem Backup von Home
@@ -106,7 +183,8 @@ Einrichten wird es wieder geladen.
 
 ```bash
 uv venv --python 3.14 .venv
-uv pip install --python .venv/bin/python pytest-homeassistant-custom-component==0.13.375 ruff
+uv pip install --python .venv/bin/python \
+  pytest-homeassistant-custom-component==0.13.375 home-assistant-frontend==20260930.5 ruff
 .venv/bin/python -m pytest tests -q
 node --test tests/frontend/*.test.mjs
 ```
@@ -116,7 +194,14 @@ dorthin verlinken, `.venv/bin/hass -c config`. Fremdbibliotheken unter
 `custom_components/vorratskeller/frontend/vendor` baut `scripts/vendor.sh`;
 Lizenzen in `frontend/vendor/LICENSES.md`.
 
+## Quellen
+
+- BLE: [Vorratskalkulator](https://www.ernaehrungsvorsorge.de/private-vorsorge/notvorrat/vorratskalkulator/)
+  und [Lagerung von Lebensmitteln](https://www.ernaehrungsvorsorge.de/private-vorsorge/empfehlungen-tipps/so-koennen-lebensmittel-gelagert-werden)
+- BBK: [Ratgeber und Checkliste](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Ratgeber-Checkliste/ratgeber-checkliste_node.html)
+- Produktdaten: [Open Food Facts](https://world.openfoodfacts.org/) (ODbL)
+
 ## Lizenz
 
-MIT, siehe `LICENSE`. Mitgelieferte Bibliotheken: MIT (barcode-detector, zxing-wasm,
+MIT, siehe [`LICENSE`](LICENSE). Mitgelieferte Bibliotheken: MIT (barcode-detector, zxing-wasm,
 qrcode-generator) und Apache 2.0 (zxing-cpp).
