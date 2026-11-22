@@ -155,6 +155,12 @@ Die Ansicht **Etiketten** druckt einen QR-Code je Fach auf Etikettenbögen von A
 | 3474 | 70 × 37 mm, Papier | 24 | trockene Räume |
 | Normalpapier | 60 × 60 mm | 12 | zum Ausschneiden |
 
+Gebraucht wird ein Etikett je Fach; die Ansicht zeigt Anzahl, Bögen und freie Felder. Beispiel: 10 Fächer
+passen auf einen Bogen L4776, 2 Felder bleiben für spätere Fächer. Hat ein Fach sehr viele Produkte (etwa ein
+ganzes Regal unter einem Namen), zeigt ein Scan eine lange Liste; nach Böden aufgeteilte Fächer ergeben kürzere
+Listen, brauchen aber mehr Etiketten. L4776 gibt es meist nur zu 20 Bögen (240 Etiketten), das reicht für Jahre;
+für den Probedruck genügt Normalpapier.
+
 Die Ränder sind mittig auf A4 gerechnet. Zum Ausrichten zuerst mit „Rahmen mitdrucken“ auf Normalpapier drucken,
 gegen den Bogen ins Licht halten und Abweichungen mit dem Versatz in mm ausgleichen. „Beginnen bei Feld“
 nutzt angebrochene Bögen. Im Druckdialog Skalierung 100 % und keine Ränder wählen.

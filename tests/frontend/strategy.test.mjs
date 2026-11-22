@@ -167,3 +167,10 @@ test("Etiketten: Positionen auf dem Bogen", () => {
   const ab = mod.etikettenPositionen("L4776", 2, 12);
   assert.deepEqual(ab.map((p) => p.seite), [0, 1]);
 });
+
+test("Etiketten: Bedarf an Bögen", () => {
+  assert.deepEqual(mod.etikettenBedarf("L4776", 10), { etiketten: 10, boegen: 1, frei: 2 });
+  assert.deepEqual(mod.etikettenBedarf("L4776", 13), { etiketten: 13, boegen: 2, frei: 11 });
+  assert.deepEqual(mod.etikettenBedarf("L4776", 2, 11), { etiketten: 2, boegen: 1, frei: 0 });
+  assert.deepEqual(mod.etikettenBedarf("3474", 10), { etiketten: 10, boegen: 1, frei: 14 });
+});

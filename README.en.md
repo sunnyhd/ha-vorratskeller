@@ -117,7 +117,9 @@ Tap selects a product and shows stock, best-before date and the Take out and Sto
 
 The **Labels** view prints one QR code per shelf on Avery Zweckform label sheets: L4776 (99.1 × 42.3 mm,
 weatherproof film, 12 per sheet, recommended for cellars), 3474 (70 × 37 mm, paper, 24 per sheet) or plain paper.
-Print once with outlines on plain paper, hold it against the sheet and correct any offset in mm; “Start at
+You need one label per shelf; the view shows the count, sheets and free positions (10 shelves fit on one
+L4776 sheet). A shelf with very many products gives a long list when scanned; splitting it by board gives shorter
+lists but needs more labels. Print once with outlines on plain paper, hold it against the sheet and correct any offset in mm; “Start at
 position” uses partly used sheets. Choose 100 % scale and no margins in the print dialog.
 
 ## Entities
