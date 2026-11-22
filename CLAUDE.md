@@ -3,7 +3,8 @@
 Privates Projekt von KB (Haushalt, 4 Personen). Regeln für `~/privat` gelten: `../CLAUDE.md`.
 
 ## Was es ist
-Eigene Integration für Home Assistant, verteilt über HACS aus einem öffentlichen GitHub-Repo:
+Eigene Integration für Home Assistant, verteilt über den Marketplace von Home Assistant (bis 2026.10 HACS, seit 2026.11 eingebaut; Format `hacs.json`
+unverändert) aus einem öffentlichen GitHub-Repo:
 Lagerbuch mit Chargen und Mindesthaltbarkeitsdatum, Soll je Produkt (14-Tage-Notvorrat nach BBK/BLE), Entnahme
 nach FIFO, Kamera-Scanner (Regal-QR und EAN, Open Food Facts), Einkaufsliste und Push-Nachrichten über Home Assistant,
 eigenes Dashboard über eine Dashboard-Strategie wie beim Energie-Dashboard.

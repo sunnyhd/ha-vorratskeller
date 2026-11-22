@@ -10,7 +10,9 @@ umgerechnet.
 
 ## Installation
 
-1. HACS → Integrationen → Menü → Benutzerdefinierte Repositories →
+1. Ab Home Assistant 2026.11: Einstellungen → Marketplace → Menü oben rechts → *Add from link*,
+   `sunnyhd/ha-vorratskeller` eintragen, Typ *Integration*.
+   Bis 2026.10: HACS → Menü → Benutzerdefinierte Repositories →
    `https://github.com/sunnyhd/ha-vorratskeller`, Kategorie *Integration*.
 2. „Vorratskeller“ installieren und Home Assistant neu starten.
 3. Einstellungen → Geräte & Dienste → Integration hinzufügen → **Vorratskeller**.

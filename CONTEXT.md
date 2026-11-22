@@ -9,7 +9,8 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
   öffentliches GitHub-Repo, Open-Food-Facts-Abfrage ja, Push und Einkaufsliste über HA.
 - Claude, 2026-11-22 (Architektur): Custom Integration (Domain `vorratskeller`) mit Speicher in HA (`.storage`),
   Services, Entitäten, mitgelieferter Karte (Scanner, Entnahme) und Dashboard-Strategie
-  (`custom:vorratskeller`); Verteilung über HACS aus eigenem Repo `ha-vorratskeller`, nicht über `ha-addons`
+  (`custom:vorratskeller`); Verteilung über den Marketplace (seit HA 2026.11, vorher HACS; `hacs.json` und
+  `hacs/action` gelten weiter) aus eigenem Repo `ha-vorratskeller`, nicht über `ha-addons`
   (Supervisor-Repo; HACS richtet Updates nach den Releases des ganzen Repos).
 - Grocy-Variante ist verworfen; die Unterlagen liegen nur lokal in `docs/grundlagen/grocy-variante-*` (gitignored, KB 2026-11-22).
 
