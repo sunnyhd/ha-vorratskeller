@@ -73,8 +73,13 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
   „+“ fragt Menge und MHD ab, Wochenbericht mit Überschuss und Namen der fehlenden Produkte, Blueprint
   `blueprints/automation/vorratskeller/push_vorrat.yaml` (Test in `tests/test_blueprint.py`).
   Bearbeiten-Modus und Ortsfilter liegen in `SITZUNG` (Modul), weil HA die Karten bei neuen Sensoren neu aufbaut.
-- Releases bis v0.5.1 erstellt, 0.6.0 in PR #12; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
+- Releases bis v0.6.0 erstellt; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
   „testen später“): Kamera, Etikettendruck auf echtem Bogen, Panel am Tablet.
+- Marketplace: Antrag hacs/default#14729 (2026-11-22, unter sunnyhd). Prüfung dauert laut Doku Monate; keine
+  Reviews anfordern, sonst wird der PR geschlossen. Bis dahin Installation über den My-Home-Assistant-Link.
+- Idee für ein späteres Release (KB, offen): Kamera-Inventur. Vorschlag: Foto vom Regal → `ai_task` schlägt
+  Bestände vor → KB bestätigt; nie automatisch buchen. Offen: Cloud-KI oder lokal (Ollama), weil Bilder aus dem
+  Haus sonst nach außen gehen.
 - Zurückgestellt (KB): Amazon-Affiliate-Link zu den Zweckform-Bögen. Hinweis: Partnerlinks laut
   Amazon-Richtlinien nicht in clientseitiger Software, also nur in der README; braucht KBs Partner-Tag.
 - Dialog „Dashboard hinzufügen“: Titel und Symbol lassen sich nicht vorbelegen, kein Vorschaubild für
