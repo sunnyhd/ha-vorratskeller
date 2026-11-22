@@ -119,3 +119,11 @@ test("Vorschlag für Titel und Symbol beim Anlegen", () => {
   assert.deepEqual(Strategy.getCreateSuggestions({ locale: { language: "en" } }), { title: "Pantry", icon: "mdi:warehouse" });
   Strategy.getCreateSuggestions({ locale: { language: "de" } });
 });
+
+test("Ohne Bestand kein Verlauf in der Übersicht", () => {
+  const leer = { ...hass, states: { ...hass.states } };
+  for (const id of ["sensor.vorratskeller_h_milch", "sensor.vorratskeller_eier"]) leer.states[id] = { ...hass.states[id], state: "0" };
+  const typen = (d) => d.views[0].sections.flatMap((x) => x.cards.map((c) => c.type));
+  assert.ok(!typen(mod.generateDashboard(leer)).includes("history-graph"));
+  assert.ok(typen(mod.generateDashboard(hass)).includes("history-graph"));
+});
