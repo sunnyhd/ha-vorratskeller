@@ -34,7 +34,11 @@
 - 📷 **Camera scanner:** EAN barcodes on packs and QR labels on shelves. Unknown barcodes are looked up on
   Open Food Facts; only the number is sent.
 - 🛒 **Shopping list:** whatever falls below target lands on a Home Assistant to-do list.
-- 🔔 **Weekly report** as a push notification: what expires soon and what is missing.
+- ✏️ **Edit in the dashboard:** create, change and delete products, rename shelves, choose the shape on the
+  shelf (jar, can, bottle …), no YAML needed.
+- 🏠 **Several storage locations,** e.g. pantry and kitchen, with a location filter.
+- 🔔 **Weekly report** as a push notification: what expires soon, what is above target and should be used up,
+  what is missing. Plus a **blueprint** for your own days, times and recipients.
 - 📊 **Own dashboard** that builds itself, like the Energy dashboard.
 - 🏷️ **Shelf labels** with QR codes to print.
 - 🌐 **German and English:** the interface follows each user's language; product names, units and
@@ -81,8 +85,8 @@ Minimum version: Home Assistant 2026.10.
 | View | Content |
 |---|---|
 | Overview | ring with stock level, days of supply, fill level per group, batches expiring soon, products below target, history |
-| Shelves | the shelves drawn as a rack, each product as jar, can, bottle or pack, filled by stock (green at target, orange low, red empty); a tap takes out one pack |
-| Take out | one tile per product, filterable by shelf. A tap takes out one pack (with “Undo”), **+** stores one |
+| Shelves | the shelves drawn as a rack, each product as jar, can, bottle or pack, filled by stock (green at target, orange low, red empty); a tap takes out one pack, “Edit” changes products and shelves |
+| Take out | one tile per product, filterable by shelf. A tap takes out one pack (with “Undo”), **+** stores and asks for quantity and best-before date |
 | Scanner | camera or manual entry: barcode (EAN) or shelf code |
 | Stock | all products by group |
 | Shopping | what is missing to reach the target |
@@ -117,7 +121,7 @@ position” uses partly used sheets. Choose 100 % scale and no margins in the pr
 
 | Entity | State | Attributes |
 |---|---|---|
-| `sensor.vorratskeller_<product>` | stock in packs | target, shortfall, next best-before date, days to it, batches, shelf, barcodes |
+| `sensor.vorratskeller_<product>` | stock in packs | target, shortfall, next best-before date, days to it, batches, shelf, location, shape, barcodes |
 | `sensor.vorratskeller_fehlende_produkte` | number of products below target | list with shortfalls |
 | `sensor.vorratskeller_bald_ablaufend` | batches within the warning period (including expired) | batches with days left |
 | `sensor.vorratskeller_reichweite` | days the supply lasts (scarcest group) | days per group, bottleneck (`engpass`) |
@@ -132,7 +136,8 @@ position” uses partly used sheets. Choose 100 % scale and no margins in the pr
 | `vorratskeller.inventur` | set the counted stock |
 | `vorratskeller.barcode_zuordnen` | assign a barcode to a product |
 | `vorratskeller.barcode_suchen` | product for a barcode, otherwise a suggestion from Open Food Facts |
-| `vorratskeller.produkt_anlegen` / `produkt_aendern` / `produkt_loeschen` | create / change / delete products |
+| `vorratskeller.produkt_anlegen` / `produkt_aendern` / `produkt_loeschen` | create / change / delete products, incl. `form` and `ort` |
+| `vorratskeller.fach_umbenennen` | rename a shelf for all its products (`alt`, `neu`, optional `ort`) |
 | `vorratskeller.einkaufsliste_abgleichen` | put missing products on the shopping list |
 | `vorratskeller.bericht_senden` | send the weekly report now |
 

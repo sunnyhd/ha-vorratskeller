@@ -32,7 +32,11 @@
 - 📷 **Kamera-Scanner:** EAN-Barcodes auf der Packung und QR-Etiketten am Regal. Unbekannte Barcodes
   schlägt Open Food Facts vor; dorthin geht nur die Nummer.
 - 🛒 **Einkaufsliste:** Was unter Soll fällt, landet automatisch auf einer To-do-Liste von Home Assistant.
-- 🔔 **Wochenbericht** als Push-Nachricht: was bald abläuft und was fehlt.
+- ✏️ **Bearbeiten im Dashboard:** Produkte anlegen, ändern und löschen, Regale und Fächer umbenennen,
+  Form im Regal wählen (Glas, Dose, Flasche …), ohne YAML.
+- 🏠 **Mehrere Lagerorte,** z. B. Keller und Küche, mit Filter nach Ort.
+- 🔔 **Wochenbericht** als Push-Nachricht: was bald abläuft, was über Soll liegt und aufgebraucht werden sollte,
+  was fehlt. Dazu ein **Blueprint** für eigene Tage, Uhrzeiten und Empfänger.
 - 📊 **Eigenes Dashboard**, das sich selbst aufbaut, wie das Energie-Dashboard.
 - 🏷️ **Regal-Etiketten** mit QR-Code zum Ausdrucken.
 - 🌐 **Deutsch und Englisch:** Die Oberfläche folgt der Sprache des Benutzers; Produktnamen, Einheiten
@@ -98,8 +102,8 @@ Die Strategie baut das ganze Dashboard aus den Entitäten, ähnlich wie das Ener
 | Ansicht | Inhalt |
 |---|---|
 | Übersicht | Ring mit Vorratsstand, Reichweite in Tagen, Füllstand je Gruppe, bald ablaufende Chargen, Produkte unter Soll, Verlauf |
-| Regal | die Fächer als Regal gezeichnet, jedes Produkt als Glas, Dose, Flasche oder Packung, gefüllt nach Bestand (grün im Soll, orange knapp, rot leer); Tippen nimmt eine Packung heraus |
-| Entnehmen | eine Kachel je Produkt, nach Fach filterbar. Tippen nimmt eine Packung heraus (mit „Rückgängig“), **+** lagert eine ein |
+| Regal | die Fächer als Regal gezeichnet, jedes Produkt als Glas, Dose, Flasche oder Packung, gefüllt nach Bestand (grün im Soll, orange knapp, rot leer); Tippen nimmt eine Packung heraus, „Bearbeiten“ ändert Produkte und Fächer |
+| Entnehmen | eine Kachel je Produkt, nach Fach filterbar. Tippen nimmt eine Packung heraus (mit „Rückgängig“), **+** lagert ein und fragt Menge und MHD ab |
 | Scanner | Kamera oder Eingabe von Hand: Barcode (EAN) oder Regal-Code |
 | Bestand | alle Produkte nach Gruppen |
 | Einkauf | was bis zum Soll fehlt |
@@ -161,7 +165,7 @@ nutzt angebrochene Bögen. Im Druckdialog Skalierung 100 % und keine Ränder wä
 
 | Entität | Zustand | Attribute |
 |---|---|---|
-| `sensor.vorratskeller_<produkt>` | Bestand in Packungen | Soll, Fehlmenge, nächstes MHD, Tage bis MHD, Chargen, Fach, Barcodes |
+| `sensor.vorratskeller_<produkt>` | Bestand in Packungen | Soll, Fehlmenge, nächstes MHD, Tage bis MHD, Chargen, Fach, Lagerort, Form, Barcodes |
 | `sensor.vorratskeller_fehlende_produkte` | Anzahl unter Soll | Liste mit Fehlmengen |
 | `sensor.vorratskeller_bald_ablaufend` | Anzahl Chargen bis zum Vorlauf (auch abgelaufene) | Chargen mit Tagen bis MHD |
 | `sensor.vorratskeller_reichweite` | Tage, die der Vorrat reicht (knappste Gruppe) | Tage je Gruppe, Engpass |
