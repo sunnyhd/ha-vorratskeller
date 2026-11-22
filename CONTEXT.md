@@ -58,8 +58,10 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
   HACS-Prüfung (lokal kein Docker). Lizenz MIT vorgeschlagen (`LICENSE`, Inhaber „sunnyhd“).
 - KB: Ob `docs/grundlagen/vorratskeller-3d.html` und die Grocy-Unterlagen ins öffentliche Repo sollen
   (Raumaufteilung des Kellers); sonst vor dem Push entfernen oder ignorieren.
-- KB: Fire-Tablet Modell und Fire-OS-Version; ob dort `BarcodeDetector` oder der zxing-Rückfall läuft, zeigt
-  nur das Gerät. Kamera braucht https (Cloudflare-Adresse) oder localhost.
+- KB, später (2026-11-22 vertagt): Gerät an der Kellertür. a) altes Fire nur für Entnahme-Kacheln, b) eigenes
+  ELC SMT101 privat gekauft, c) Pilot-Panel der Firma (abgeraten: Firmengerät; Raum-Panel-App ist Firmencode mit
+  Kamera aus). Vorschlag: Wandgerät nur Entnahme, Scannen beim Einräumen mit den Handys (Rückkamera, https).
+  Auf Android ohne Google-Dienste fehlt `BarcodeDetector` evtl., dann zxing-Rückfall; am Gerät ungeprüft.
 - KB: Kellertablet-Benutzer in HA mit „nur lokal anmelden“ (HA über Cloudflare erreichbar).
 - Nicht geprüft: Dialog „Neues Dashboard“ → Community-Dashboards (Bildschirm im Test nicht verfügbar;
   Dashboard per gleicher WebSocket-API angelegt), Druck der Etiketten, Kamera am echten Gerät.
