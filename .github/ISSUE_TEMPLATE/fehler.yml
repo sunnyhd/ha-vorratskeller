@@ -1,0 +1,44 @@
+name: Fehler melden / Bug report
+description: Etwas funktioniert nicht wie beschrieben. / Something does not work as documented.
+labels: [bug]
+body:
+  - type: textarea
+    id: beschreibung
+    attributes:
+      label: Was ist passiert? / What happened?
+      description: Was hast du erwartet, was ist stattdessen passiert? / What did you expect, what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: schritte
+    attributes:
+      label: Schritte zum Nachstellen / Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home-Assistant-Version / Home Assistant version
+      placeholder: "2026.11.2"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version von Vorratskeller / Vorratskeller version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: geraet
+    attributes:
+      label: Gerät und Browser / Device and browser
+      description: Nur bei Problemen mit Karte, Scanner oder Dashboard. / Only for card, scanner or dashboard issues.
+      placeholder: "Android 15, Home Assistant App 2026.11"
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Auszug aus dem Log (Einstellungen → System → Protokolle), ohne Adressen und Namen. / Log excerpt (Settings → System → Logs), without addresses or names.
+      render: text
