@@ -40,7 +40,6 @@ CHECKLISTE_PERSONEN: Final = 4
 CHECKLISTE_TAGE: Final = 14
 
 # Kennzeichen der Einträge auf der Einkaufsliste
-EINKAUF_SUFFIX: Final = " (Vorrat)"
 
 # Höchstzahl der Journaleinträge im Speicher
 JOURNAL_MAX: Final = 2000
@@ -96,5 +95,17 @@ GRUPPEN_ICONS: Final = {
     "hausapotheke-bbk": "mdi:medical-bag",
     "strom-licht-kochen-bbk": "mdi:flashlight",
     "fuer-den-raum": "mdi:toolbox-outline",
+    # Englische Checkliste (data/checkliste.en.json)
+    "drinks": "mdi:bottle-wine-outline",
+    "grains-potatoes-pasta-rice": "mdi:barley",
+    "vegetables-pulses": "mdi:carrot",
+    "fruit-nuts": "mdi:food-apple-outline",
+    "milk-dairy": "mdi:cheese",
+    "fish-meat-eggs": "mdi:fish",
+    "fats-oils": "mdi:bottle-tonic-outline",
+    "other": "mdi:shaker-outline",
+    "first-aid-kit-bbk": "mdi:medical-bag",
+    "power-light-cooking-bbk": "mdi:flashlight",
+    "for-the-room": "mdi:toolbox-outline",
 }
 DEFAULT_ICON: Final = "mdi:package-variant-closed"

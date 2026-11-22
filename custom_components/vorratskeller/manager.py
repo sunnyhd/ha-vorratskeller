@@ -30,9 +30,7 @@ from .const import (
     DEFAULT_WARN_TAGE,
     DEFAULT_WOCHENTAG,
     DOMAIN,
-    EINKAUF_SUFFIX,
     JOURNAL_MAX,
-    NAME,
     SIGNAL_PRODUCT_ADDED,
     SIGNAL_PRODUCT_REMOVED,
     SIGNAL_UPDATED,
@@ -42,6 +40,7 @@ from .const import (
     WOCHENTAGE,
 )
 from .lager import Lager, LagerError, Produkt
+from .texte import text
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -277,12 +276,14 @@ class VorratskellerManager:
         )
         neu = 0
         for produkt, fehlt in fehlende:
-            summary = f"{produkt.name}{EINKAUF_SUFFIX}"
+            summary = f"{produkt.name}{text(self.hass, 'einkauf_suffix')}"
             if summary.casefold() in offen:
                 continue
             data: dict[str, Any] = {ATTR_ENTITY_ID: entity_id, "item": summary}
             if mit_beschreibung:
-                data["description"] = f"Es fehlen {fehlt:g} {produkt.packung}".strip()
+                data["description"] = text(
+                    self.hass, "einkauf_beschreibung", fehlt=f"{fehlt:g}", packung=produkt.packung
+                ).strip()
             await self.hass.services.async_call(
                 "todo", "add_item", data, blocking=True, context=context
             )
@@ -298,22 +299,22 @@ class VorratskellerManager:
         zeilen: list[str] = []
         ablaufend = self.lager.ablaufend(heute, self.warn_tage)
         if ablaufend:
-            zeilen.append("Bald verbrauchen:")
+            zeilen.append(text(self.hass, "bericht_ablaufend"))
             for charge, tage in ablaufend:
                 name = self.lager.produkte[charge.produkt].name
                 if tage < 0:
-                    wann = f"seit {-tage} Tagen abgelaufen"
+                    wann = text(self.hass, "bericht_abgelaufen", tage=-tage)
                 elif tage == 0:
-                    wann = "heute"
+                    wann = text(self.hass, "bericht_heute")
                 else:
-                    wann = f"in {tage} Tagen"
+                    wann = text(self.hass, "bericht_in_tagen", tage=tage)
                 zeilen.append(f"• {name}: {charge.menge:g} ({wann})")
         fehlende = self.lager.fehlende()
         if fehlende:
-            zeilen.append(f"Unter Soll: {len(fehlende)} Produkte")
+            zeilen.append(text(self.hass, "bericht_unter_soll", anzahl=len(fehlende)))
         if not zeilen:
-            zeilen.append("Alles im Soll, nichts läuft in den nächsten Wochen ab.")
-        return f"{NAME}: Wochenbericht", "\n".join(zeilen)
+            zeilen.append(text(self.hass, "bericht_alles_gut"))
+        return text(self.hass, "bericht_titel"), "\n".join(zeilen)
 
     async def async_send_bericht(self, context: Context | None = None) -> None:
         """Sende den Bericht an den eingestellten Dienst."""

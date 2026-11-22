@@ -1,0 +1,554 @@
+[
+ [
+  "Drinks",
+  112,
+  "l",
+  "Next to the left shelf, stacked near the door",
+  [
+   [
+    "Mineral water in returnable glass bottles",
+    "Crate 12 × 0.7 l, about 15 kg; stack at most 4 crates, on battens rather than directly on the floor. Swap empty crates when shopping.",
+    13,
+    "crates",
+    109.2,
+    12
+   ],
+   [
+    "Fruit juice (not from concentrate) in glass bottles",
+    "for diluting, saves sugar",
+    4,
+    "× 1 l",
+    4,
+    12
+   ]
+  ]
+ ],
+ [
+  "Grains, potatoes, pasta, rice",
+  18.5,
+  "kg",
+  "Right, second and third shelf, in buckets",
+  [
+   [
+    "Wholegrain pasta",
+    "decanted into buckets with lids",
+    12,
+    "× 500 g",
+    6,
+    18
+   ],
+   [
+    "Brown rice or parboiled rice",
+    "brown rice keeps shorter, parboiled longer",
+    4,
+    "× 1 kg",
+    4,
+    12
+   ],
+   [
+    "Rolled oats",
+    "breakfast, in daily use",
+    6,
+    "× 500 g",
+    3,
+    12
+   ],
+   [
+    "Flour (wholemeal or spelt)",
+    "",
+    2,
+    "× 1 kg",
+    2,
+    9
+   ],
+   [
+    "Wholegrain crispbread",
+    "replaces bread",
+    8,
+    "× 250 g",
+    2,
+    12
+   ],
+   [
+    "Bulgur or wholegrain couscous",
+    "ready in 10 min, saves fuel",
+    3,
+    "× 500 g",
+    1.5,
+    12
+   ]
+  ]
+ ],
+ [
+  "Vegetables, pulses",
+  22.4,
+  "kg",
+  "Left, bottom shelf",
+  [
+   [
+    "Chickpeas, kidney beans, white beans, lentils",
+    "jar or can, no added salt",
+    20,
+    "× 400 g",
+    8,
+    24
+   ],
+   [
+    "Chopped tomatoes",
+    "can or jar",
+    12,
+    "× 400 g",
+    4.8,
+    24
+   ],
+   [
+    "Sweetcorn, peas & carrots, green beans",
+    "no added salt",
+    10,
+    "× 400 g",
+    4,
+    24
+   ],
+   [
+    "Sauerkraut, lacto-fermented",
+    "jar, provides vitamin C",
+    4,
+    "× 680 g",
+    2.72,
+    18
+   ],
+   [
+    "Beetroot",
+    "jar",
+    4,
+    "× 460 g",
+    1.84,
+    18
+   ],
+   [
+    "Red lentils, dried",
+    "for stew and dal, 15 min cooking time",
+    2,
+    "× 500 g",
+    1,
+    12
+   ]
+  ]
+ ],
+ [
+  "Fruit, nuts",
+  14,
+  "kg",
+  "Left, second shelf",
+  [
+   [
+    "Canned fruit in its own juice",
+    "instead of syrup",
+    10,
+    "× 800 g",
+    8,
+    24
+   ],
+   [
+    "Apple sauce, no added sugar",
+    "jar",
+    4,
+    "× 710 g",
+    2.84,
+    18
+   ],
+   [
+    "Nuts, unsalted",
+    "walnuts, almonds, hazelnuts",
+    10,
+    "× 200 g",
+    2,
+    9
+   ],
+   [
+    "Dried fruit, unsulphured",
+    "apricots, raisins, plums",
+    6,
+    "× 200 g",
+    1.2,
+    12
+   ]
+  ]
+ ],
+ [
+  "Milk, dairy",
+  14,
+  "kg",
+  "Right, bottom shelf",
+  [
+   [
+    "UHT milk",
+    "",
+    13,
+    "× 1 l",
+    13,
+    3
+   ],
+   [
+    "Hard cheese, whole piece",
+    "fridge, in constant use",
+    4,
+    "× 250 g",
+    1,
+    2
+   ]
+  ]
+ ],
+ [
+  "Fish, meat, eggs",
+  6.7,
+  "kg",
+  "Left, third shelf",
+  [
+   [
+    "Mackerel or sardines",
+    "can, in oil or tomato; omega-3",
+    14,
+    "× 125 g",
+    1.75,
+    24
+   ],
+   [
+    "Tuna in its own juice",
+    "can",
+    12,
+    "× 150 g",
+    1.8,
+    36
+   ],
+   [
+    "Chili con carne or lentils with beef",
+    "can",
+    3,
+    "× 400 g",
+    1.2,
+    24
+   ],
+   [
+    "Poultry sausages in a jar",
+    "",
+    2,
+    "× 400 g",
+    0.8,
+    18
+   ],
+   [
+    "Eggs",
+    "fridge, restock weekly",
+    20,
+    "pcs",
+    1.2,
+    1
+   ]
+  ]
+ ],
+ [
+  "Fats, oils",
+  1.85,
+  "kg",
+  "Right, bottom shelf, dark",
+  [
+   [
+    "Rapeseed oil",
+    "best fatty acids for everyday use; small bottles so none stays open for long",
+    3,
+    "× 0.5 l",
+    1.38,
+    9
+   ],
+   [
+    "Olive oil",
+    "",
+    1,
+    "× 0.5 l",
+    0.46,
+    12
+   ]
+  ]
+ ],
+ [
+  "Other",
+  0,
+  "",
+  "Right, third shelf",
+  [
+   [
+    "Tomato paste",
+    "tube or jar",
+    4,
+    "pcs",
+    0,
+    18
+   ],
+   [
+    "Vegetable stock, low salt",
+    "",
+    2,
+    "jars",
+    0,
+    18
+   ],
+   [
+    "Honey",
+    "",
+    2,
+    "jars",
+    0,
+    24
+   ],
+   [
+    "Sugar, salt, iodised salt",
+    "use sparingly",
+    1,
+    "1 pack each",
+    0,
+    0
+   ],
+   [
+    "Coffee, tea, cocoa",
+    "as you are used to",
+    0,
+    "",
+    0,
+    12
+   ],
+   [
+    "Dark chocolate",
+    "for morale",
+    6,
+    "bars",
+    0,
+    9
+   ],
+   [
+    "Spices, dried herbs",
+    "",
+    0,
+    "",
+    0,
+    24
+   ]
+  ]
+ ],
+ [
+  "Hygiene",
+  0,
+  "",
+  "Right, fourth shelf",
+  [
+   [
+    "Toilet paper",
+    "",
+    2,
+    "× 8 rolls",
+    0,
+    0
+   ],
+   [
+    "Soap, toothpaste, toothbrushes",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Bin bags",
+    "toilet in a bag if necessary",
+    2,
+    "rolls",
+    0,
+    0
+   ],
+   [
+    "Disinfectant, wet wipes",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Kitchen roll",
+    "",
+    2,
+    "rolls",
+    0,
+    0
+   ]
+  ]
+ ],
+ [
+  "First aid kit (BBK)",
+  0,
+  "",
+  "White shelf",
+  [
+   [
+    "Dressings, plasters, scissors, tweezers, disposable gloves",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Wound and skin antiseptic, burn and wound ointment",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Painkillers and fever reducers, thermometer",
+    "check expiry dates every year",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Remedies for diarrhoea and nausea, electrolytes",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Cold remedies, nasal spray",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Regular medication for 14 days",
+    "discuss with your doctor",
+    0,
+    "",
+    0,
+    0
+   ]
+  ]
+ ],
+ [
+  "Power, light, cooking (BBK)",
+  0,
+  "",
+  "White shelf",
+  [
+   [
+    "Wind-up or battery radio",
+    "",
+    1,
+    "",
+    0,
+    0
+   ],
+   [
+    "Torches",
+    "one per person",
+    4,
+    "",
+    0,
+    0
+   ],
+   [
+    "Batteries for radio and torches",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Power banks",
+    "keep charged",
+    2,
+    "",
+    0,
+    0
+   ],
+   [
+    "Candles, lighter, matches",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Camping stove with gas cartridges",
+    "quantity is an estimate; only outdoors or well ventilated",
+    8,
+    "cartridges",
+    0,
+    0
+   ],
+   [
+    "Warm blankets",
+    "",
+    4,
+    "",
+    0,
+    0
+   ],
+   [
+    "Phone list on paper, warning app (e.g. NINA)",
+    "",
+    0,
+    "",
+    0,
+    0
+   ]
+  ]
+ ],
+ [
+  "For the room",
+  0,
+  "",
+  "White shelf",
+  [
+   [
+    "Hygrometer",
+    "buy first",
+    1,
+    "",
+    0,
+    0
+   ],
+   [
+    "Buckets with airtight lids",
+    "for dry goods",
+    6,
+    "",
+    0,
+    0
+   ],
+   [
+    "Notepad and pen at the cellar door",
+    "whatever goes out goes on the shopping list",
+    1,
+    "",
+    0,
+    0
+   ],
+   [
+    "Labels, waterproof pen",
+    "",
+    0,
+    "",
+    0,
+    0
+   ]
+  ]
+ ]
+]

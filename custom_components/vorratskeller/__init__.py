@@ -27,6 +27,7 @@ from .const import (
 from .manager import VorratskellerConfigEntry, VorratskellerManager
 from .seed import build_lager, load_checkliste
 from .services import async_setup_services
+from .texte import sprache
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: VorratskellerConfigEntry
     manager = VorratskellerManager(hass, entry)
     seed = None
     if entry.data.get(CONF_CHECKLISTE, True):
-        checkliste = await hass.async_add_executor_job(load_checkliste)
+        checkliste = await hass.async_add_executor_job(load_checkliste, sprache(hass))
         seed = partial(
             build_lager,
             checkliste,

@@ -16,12 +16,15 @@ from typing import Any
 from .const import CHECKLISTE_PERSONEN, CHECKLISTE_TAGE, GRUPPEN_ICONS
 from .lager import Gruppe, Lager, Produkt, make_id
 
-CHECKLISTE_PATH = Path(__file__).parent / "data" / "checkliste.json"
+DATA = Path(__file__).parent / "data"
+CHECKLISTE_PATH = DATA / "checkliste.json"
+CHECKLISTE_EN_PATH = DATA / "checkliste.en.json"
 
 
-def load_checkliste() -> list[list[Any]]:
-    """Lies die Checkliste (blockierend, im Executor aufrufen)."""
-    return json.loads(CHECKLISTE_PATH.read_text(encoding="utf-8"))
+def load_checkliste(sprache: str = "de") -> list[list[Any]]:
+    """Lies die Checkliste in ``de`` oder ``en`` (blockierend, im Executor aufrufen)."""
+    pfad = CHECKLISTE_PATH if sprache == "de" else CHECKLISTE_EN_PATH
+    return json.loads(pfad.read_text(encoding="utf-8"))
 
 
 def build_lager(checkliste: list[list[Any]], personen: int, tage: int) -> Lager:

@@ -51,8 +51,17 @@ def config_entry(options: dict) -> MockConfigEntry:
 
 
 @pytest.fixture
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> MockConfigEntry:
+def sprache() -> str:
+    """Systemsprache von HA; Tests können sie überschreiben."""
+    return "de"
+
+
+@pytest.fixture
+async def setup_integration(
+    hass: HomeAssistant, config_entry: MockConfigEntry, sprache: str
+) -> MockConfigEntry:
     """Integration einrichten."""
+    hass.config.language = sprache
     await hass.config.async_set_time_zone("Europe/Berlin")
     assert await async_setup_component(hass, "http", {})
     config_entry.add_to_hass(hass)
