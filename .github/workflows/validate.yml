@@ -1,7 +1,9 @@
 name: Prüfen
 
 on:
+  # Nur main und PRs prüfen: sonst läuft jeder Push auf einen PR-Branch doppelt, Tags ein drittes Mal
   push:
+    branches: [main]
   pull_request:
   schedule:
     - cron: "0 4 * * 1"
@@ -9,6 +11,11 @@ on:
 
 permissions:
   contents: read
+
+# Neuer Push bricht den laufenden Lauf desselben Branches ab
+concurrency:
+  group: pruefen-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   hassfest:
