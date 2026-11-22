@@ -74,6 +74,9 @@ ATTR_PACKUNGSMENGE: Final = "packungsmenge"
 ATTR_SOLL: Final = "soll"
 ATTR_HALTBARKEIT: Final = "haltbarkeit_monate"
 ATTR_HINWEIS: Final = "hinweis"
+ATTR_FORM: Final = "form"
+# "auto" (Auswahl in der Oberfläche) und "" bedeuten: aus Packung und Hinweis ableiten
+FORMEN: Final = ("", "auto", "glas", "dose", "flasche", "kasten", "packung", "kiste")
 
 OPEN_FOOD_FACTS_URL: Final = "https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
 OPEN_FOOD_FACTS_FIELDS: Final = "product_name,product_name_de,brands,quantity"

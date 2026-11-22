@@ -22,6 +22,7 @@ import voluptuous as vol
 from .const import (
     ATTR_BARCODE,
     ATTR_FACH,
+    ATTR_FORM,
     ATTR_GRUPPE,
     ATTR_HALTBARKEIT,
     ATTR_HINWEIS,
@@ -35,6 +36,7 @@ from .const import (
     ATTR_SOLL,
     CONF_OPEN_FOOD_FACTS,
     DOMAIN,
+    FORMEN,
     SERVICE_BARCODE_SUCHEN,
     SERVICE_BARCODE_ZUORDNEN,
     SERVICE_BERICHT_SENDEN,
@@ -107,6 +109,7 @@ PRODUKT_FELDER = {
     vol.Optional(ATTR_SOLL): _zahl(0, 100000),
     vol.Optional(ATTR_HALTBARKEIT): vol.All(vol.Coerce(int), vol.Range(min=0, max=600)),
     vol.Optional(ATTR_HINWEIS): cv.string,
+    vol.Optional(ATTR_FORM): vol.In(FORMEN),
 }
 SCHEMA_PRODUKT_ANLEGEN = vol.Schema(
     {
@@ -170,6 +173,7 @@ def produkt_info(manager: VorratskellerManager, produkt: Produkt) -> dict[str, A
         "naechstes_mhd": mhd.isoformat() if mhd else None,
         "haltbarkeit_monate": produkt.haltbarkeit_monate,
         "barcodes": list(produkt.barcodes),
+        "form": produkt.form,
     }
 
 
@@ -219,6 +223,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def produkt_anlegen(call: ServiceCall) -> ServiceResponse:
         manager = _manager(hass)
         daten = dict(call.data)
+        if daten.get(ATTR_FORM) == "auto":
+            daten[ATTR_FORM] = ""
         if barcode := daten.pop(ATTR_BARCODE, None):
             daten["barcodes"] = [barcode]
         produkt = manager.produkt_anlegen(daten, call.context.user_id)
@@ -227,6 +233,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def produkt_aendern(call: ServiceCall) -> ServiceResponse:
         manager = _manager(hass)
         daten = dict(call.data)
+        if daten.get(ATTR_FORM) == "auto":
+            daten[ATTR_FORM] = ""
         produkt = manager.resolve_produkt(daten.pop(ATTR_PRODUKT), None)
         produkt = manager.produkt_aendern(produkt, daten, call.context.user_id)
         return produkt_info(manager, produkt)

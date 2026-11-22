@@ -49,6 +49,17 @@
         "sat": "Saturday",
         "sun": "Sunday"
       }
+    },
+    "form": {
+      "options": {
+        "auto": "automatic",
+        "glas": "Jar",
+        "dose": "Can",
+        "flasche": "Bottle",
+        "kasten": "Crate",
+        "packung": "Pack",
+        "kiste": "Box"
+      }
     }
   },
   "entity": {
@@ -197,6 +208,10 @@
         "hinweis": {
           "name": "Note",
           "description": "Free text."
+        },
+        "form": {
+          "name": "Shape",
+          "description": "Container in the shelf view. Empty: derived from pack and note."
         }
       }
     },
@@ -239,6 +254,10 @@
         "hinweis": {
           "name": "Note",
           "description": "Free text."
+        },
+        "form": {
+          "name": "Shape",
+          "description": "Container in the shelf view. Empty: derived from pack and note."
         }
       }
     },

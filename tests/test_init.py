@@ -263,3 +263,30 @@ async def test_rueckgaengig_ohne_mhd(
 ) -> None:
     resp = await call(hass, "einlagern", {"produkt": "h-milch", "ohne_mhd": True})
     assert resp["mhd"] is None
+
+
+async def test_form_aendern(hass: HomeAssistant, setup_integration) -> None:
+    """Form ist optional, wird gespeichert, im Sensor gezeigt und geprüft."""
+    assert hass.states.get("sensor.vorratskeller_h_milch").attributes["form"] == ""
+    res = await hass.services.async_call(
+        DOMAIN,
+        "produkt_aendern",
+        {"produkt": "h-milch", "form": "flasche"},
+        blocking=True,
+        return_response=True,
+    )
+    assert res["form"] == "flasche"
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.vorratskeller_h_milch").attributes["form"] == "flasche"
+    res = await hass.services.async_call(
+        DOMAIN,
+        "produkt_aendern",
+        {"produkt": "h-milch", "form": "auto"},
+        blocking=True,
+        return_response=True,
+    )
+    assert res["form"] == ""
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "produkt_aendern", {"produkt": "h-milch", "form": "fass"}, blocking=True
+        )
