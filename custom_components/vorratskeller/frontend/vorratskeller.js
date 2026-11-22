@@ -1,7 +1,7 @@
 /*
  * Vorratskeller: Karte und Dashboard-Strategie für Home Assistant.
  *
- * Karte:      type: custom:vorratskeller-card, modus: kopf | regal | raum | panel | entnahme | scanner | fehlend | ablaufend | etiketten
+ * Karte:      type: custom:vorratskeller-card, modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten
  * Dashboard:  strategy: { type: custom:vorratskeller }
  *
  * Ohne Build-Schritt und ohne Fremdcode zur Laufzeit von außen: Scanner-Rückfall (zxing-wasm)
@@ -28,6 +28,32 @@ const TEXTE = {
   de: {
     name: "Vorratskeller",
     titel_dashboard: "Vorratskeller",
+    produkt_bearbeiten: "Produkt bearbeiten",
+    produkt_neu: "+ Produkt",
+    produkt_loeschen: "Produkt löschen",
+    loeschen_frage: "{name} mit Bestand {bestand} endgültig löschen?",
+    geloescht: "{name} gelöscht.",
+    ort: "Lagerort",
+    ort_haupt: "Keller",
+    alle_orte: "Alle Orte",
+    einlagern_titel: "{name} einlagern",
+    mhd_tipp: "Vorbelegt mit der üblichen Haltbarkeit ({monate} Monate). Leer lassen schätzt das MHD.",
+    einlagern_fehlgeschlagen: "Einlagern fehlgeschlagen.",
+    bearbeiten: "Bearbeiten",
+    bearbeiten_fertig: "Fertig",
+    regal_hinweis_bearbeiten: "Produkt antippen zum Bearbeiten; Stift am Regal oder Fach zum Umbenennen.",
+    name_feld: "Name",
+    soll_feld: "Soll (Packungen)",
+    packung_feld: "Packung",
+    fach_tipp: "Regal vor dem Komma, Boden danach, z. B. „Weißes Regal, oberster Boden“. Ein neuer Name legt ein neues Fach an.",
+    fach_umbenennen: "Fach „{name}“ umbenennen",
+    regal_umbenennen: "Regal „{name}“ umbenennen",
+    regal_umbenennen_tipp: "Ändert den Regalnamen in {n} Fächern; die Böden bleiben.",
+    neuer_name: "Neuer Name",
+    etikett_neu_drucken: "Der QR-Code hängt am Namen: Etiketten der umbenannten Fächer danach neu drucken.",
+    umbenannt: "{n} Fächer umbenannt. Etiketten neu drucken.",
+    produkt_gespeichert: "{name} gespeichert.",
+    speichern: "Speichern",
     etikett_format: "Etikettenbogen",
     etikett_bedarf_1: "Bedarf: {n} Etiketten, ein Bogen; {frei} Felder bleiben frei (später mit „Beginnen bei Feld“ nutzen).",
     etikett_bedarf: "Bedarf: {n} Etiketten auf {boegen} Bögen; {frei} Felder bleiben frei.",
@@ -40,13 +66,6 @@ const TEXTE = {
     format_l4776: "Avery Zweckform L4776, wetterfeste Folie, 99,1 × 42,3 mm, 12 je Blatt (empfohlen für den Keller)",
     format_3474: "Avery Zweckform 3474, Papier, 70 × 37 mm, 24 je Blatt",
     format_papier: "Normalpapier zum Ausschneiden, 60 × 60 mm",
-    view_raum: "3D",
-    modus_raum: "3D-Raum",
-    titel_raum: "Keller in 3D",
-    raum_hinweis: "Ziehen dreht, zwei Finger oder Mausrad zoomen. Antippen wählt ein Produkt.",
-    raum_laedt: "3D-Ansicht wird geladen …",
-    raum_fehler: "3D-Ansicht nicht verfügbar: {fehler}",
-    schliessen: "Schließen",
     form: "Form im Regal",
     form_auto: "automatisch ({form})",
     form_glas: "Glas",
@@ -186,6 +205,32 @@ const TEXTE = {
   en: {
     name: "Pantry (Vorratskeller)",
     titel_dashboard: "Pantry",
+    produkt_bearbeiten: "Edit product",
+    produkt_neu: "+ Product",
+    produkt_loeschen: "Delete product",
+    loeschen_frage: "Delete {name} with stock {bestand} for good?",
+    geloescht: "{name} deleted.",
+    ort: "Location",
+    ort_haupt: "Pantry",
+    alle_orte: "All locations",
+    einlagern_titel: "Store {name}",
+    mhd_tipp: "Prefilled with the usual shelf life ({monate} months). Leave empty to estimate.",
+    einlagern_fehlgeschlagen: "Storing failed.",
+    bearbeiten: "Edit",
+    bearbeiten_fertig: "Done",
+    regal_hinweis_bearbeiten: "Tap a product to edit it; pencil on a shelf or board to rename.",
+    name_feld: "Name",
+    soll_feld: "Target (packs)",
+    packung_feld: "Pack",
+    fach_tipp: "Shelf before the comma, board after it, e.g. “White shelf, top board”. A new name creates a new shelf.",
+    fach_umbenennen: "Rename shelf “{name}”",
+    regal_umbenennen: "Rename shelf unit “{name}”",
+    regal_umbenennen_tipp: "Changes the unit name in {n} shelves; boards stay.",
+    neuer_name: "New name",
+    etikett_neu_drucken: "The QR code depends on the name: reprint the labels of renamed shelves.",
+    umbenannt: "{n} shelves renamed. Reprint the labels.",
+    produkt_gespeichert: "{name} saved.",
+    speichern: "Save",
     etikett_format: "Label sheet",
     etikett_bedarf_1: "Needed: {n} labels, one sheet; {frei} positions stay free (use them later via “Start at position”).",
     etikett_bedarf: "Needed: {n} labels on {boegen} sheets; {frei} positions stay free.",
@@ -198,13 +243,6 @@ const TEXTE = {
     format_l4776: "Avery Zweckform L4776, weatherproof film, 99.1 × 42.3 mm, 12 per sheet (recommended for a cellar)",
     format_3474: "Avery Zweckform 3474, paper, 70 × 37 mm, 24 per sheet",
     format_papier: "Plain paper to cut out, 60 × 60 mm",
-    view_raum: "3D",
-    modus_raum: "3D room",
-    titel_raum: "Pantry in 3D",
-    raum_hinweis: "Drag to rotate, pinch or scroll to zoom. Tap selects a product.",
-    raum_laedt: "Loading 3D view …",
-    raum_fehler: "3D view not available: {fehler}",
-    schliessen: "Close",
     form: "Shape on the shelf",
     form_auto: "automatic ({form})",
     form_glas: "Jar",
@@ -428,7 +466,9 @@ export function produkte(hass) {
       fehlt: num(a.fehlt),
       gruppe: a.gruppe || "",
       fach: a.fach || "",
-      fach_id: makeId(a.fach || "ohne-fach"),
+      ort: a.ort || "",
+      // Lagerort gehört zur Kennung des Fachs, damit gleiche Fachnamen an zwei Orten getrennt bleiben
+      fach_id: makeId(`${a.ort ? `${a.ort} ` : ""}${a.fach || "ohne-fach"}`),
       packung: a.packung || "",
       hinweis: a.hinweis || "",
       form: a.form || "",
@@ -446,11 +486,19 @@ export function produkte(hass) {
 export function faecher(liste) {
   const map = new Map();
   for (const p of liste) {
-    if (!map.has(p.fach_id)) map.set(p.fach_id, { id: p.fach_id, name: p.fach || t("ohne_fach"), produkte: [] });
+    if (!map.has(p.fach_id))
+      map.set(p.fach_id, { id: p.fach_id, name: p.fach || t("ohne_fach"), ort: p.ort || "", produkte: [] });
     map.get(p.fach_id).produkte.push(p);
   }
-  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, LOCALE));
+  return [...map.values()].sort((a, b) => a.ort.localeCompare(b.ort, LOCALE) || a.name.localeCompare(b.name, LOCALE));
 }
+
+/** Lagerorte der Produkte; "" ist das Hauptlager. */
+export function orte(liste) {
+  return [...new Set(liste.map((p) => p.ort || ""))].sort((a, b) => (a === "" ? -1 : b === "" ? 1 : a.localeCompare(b, LOCALE)));
+}
+
+const ortName = (ort) => ort || t("ort_haupt");
 
 // Ordnungswörter der Böden, oben zuerst (deutsch und englisch)
 const BODEN_RANG = [
@@ -478,8 +526,9 @@ export function regale(liste) {
   const map = new Map();
   for (const f of faecher(liste)) {
     const { regal, boden, rang } = regalUndBoden(f.name);
-    if (!map.has(regal)) map.set(regal, { name: regal, boeden: [] });
-    map.get(regal).boeden.push({ ...f, boden, rang });
+    const key = `${f.ort}\u0000${regal}`;
+    if (!map.has(key)) map.set(key, { name: regal, ort: f.ort, boeden: [] });
+    map.get(key).boeden.push({ ...f, boden, rang });
   }
   for (const r of map.values()) r.boeden.sort((a, b) => b.rang - a.rang || a.name.localeCompare(b.name, LOCALE));
   return [...map.values()];
@@ -537,88 +586,6 @@ function gefaessSvg(art, f, id) {
       return svg(`<rect class="huelle" x="4" y="24" width="40" height="37" rx="5"/>${fuell(5.5, 25.5, 37, 34, 4)}
         <rect class="deckel" x="16" y="18" width="16" height="7" rx="3" opacity=".7"/>`);
   }
-}
-
-// --- 3D-Raum: Aufbau ohne three.js (testbar) -------------------------------
-
-const RAUM_STANDARD = { breite: 3, tiefe: 4, hoehe: 2.3 };
-// Maße der Gefäße in Metern: Breite, Höhe, Tiefe
-export const MASSE = {
-  glas: [0.09, 0.13, 0.09], dose: [0.08, 0.11, 0.08], flasche: [0.07, 0.28, 0.07],
-  kasten: [0.3, 0.28, 0.38], packung: [0.1, 0.18, 0.07], kiste: [0.22, 0.15, 0.2],
-};
-
-/** Boden-Index (0 = unten) aus dem Rang des Fachnamens bei n Böden. */
-export function bodenIndex(rang, n) {
-  if (n <= 1) return 0;
-  if (rang >= 9) return n - 1;
-  if (rang <= 1) return 0;
-  return Math.min(n - 1, rang - 1);
-}
-
-/**
- * Regale im Raum: aus der Konfiguration (name, x, z, laenge, tiefe, hoehe, boeden, drehung)
- * oder automatisch nebeneinander an der hinteren Wand. Koordinaten in Metern, x nach rechts,
- * z von der Tür in den Raum, drehung in Grad (90 = entlang einer Seitenwand).
- */
-export function raumAufbau(liste, cfg = {}) {
-  const raum = { ...RAUM_STANDARD, ...(cfg.raum || {}) };
-  const konfig = new Map((cfg.regale || []).map((k) => [String(k.name ?? "").toLowerCase(), k]));
-  let xAuto = 0.3;
-  const aufbau = regale(liste).map((r) => {
-    const k = konfig.get(r.name.toLowerCase()) || {};
-    const anzahl = r.boeden.reduce((s, b) => s + b.produkte.length, 0);
-    const maxRang = Math.max(...r.boeden.map((b) => b.rang));
-    const boeden = Number.isFinite(Number(k.boeden)) ? Math.max(0, Math.round(k.boeden)) : Math.max(3, Math.min(6, maxRang));
-    const regal = {
-      name: r.name,
-      laenge: num(k.laenge) || Math.max(0.8, Math.min(2.4, anzahl * 0.16)),
-      tiefe: num(k.tiefe) || 0.4,
-      hoehe: k.hoehe !== undefined ? num(k.hoehe) : 1.9,
-      boeden,
-      drehung: num(k.drehung),
-      x: k.x,
-      z: k.z,
-      faecher: r.boeden,
-    };
-    if (k.x === undefined || k.z === undefined) {
-      regal.drehung = 0;
-      regal.x = xAuto + regal.laenge / 2;
-      regal.z = raum.tiefe - regal.tiefe / 2 - 0.1;
-      xAuto += regal.laenge + 0.3;
-    }
-    regal.x = num(regal.x);
-    regal.z = num(regal.z);
-    return regal;
-  });
-  if (!cfg.raum) raum.breite = Math.max(raum.breite, xAuto);
-  return { raum, regale: aufbau };
-}
-
-/** Position jedes Produkts im Regal: Boden-Index und Abstand entlang des Regals. */
-export function platzieren(regal) {
-  const n = Math.max(1, regal.boeden);
-  const reihen = Array.from({ length: n }, () => []);
-  const ohneRang = [];
-  for (const fach of regal.faecher) {
-    if (fach.rang < 0 || regal.boeden === 0) ohneRang.push(...fach.produkte);
-    else reihen[bodenIndex(fach.rang, n)].push(...fach.produkte);
-  }
-  // Fächer ohne Bodenangabe: von unten nach oben auf die leersten Böden verteilen
-  for (const p of ohneRang) reihen.reduce((a, b) => (b.length < a.length ? b : a)).push(p);
-  const plaetze = [];
-  reihen.forEach((reihe, i) => {
-    const breiten = reihe.map((p) => MASSE[form(p)][0] + 0.04);
-    const summe = breiten.reduce((a, b) => a + b, 0);
-    const faktor = summe > regal.laenge ? regal.laenge / summe : 1;
-    let x = -Math.min(summe, regal.laenge) / 2;
-    reihe.forEach((p, j) => {
-      const b = breiten[j] * faktor;
-      plaetze.push({ produkt: p, boden: i, x: x + b / 2 });
-      x += b;
-    });
-  });
-  return plaetze;
 }
 
 // --- Etiketten: Bögen von Avery Zweckform ----------------------------------
@@ -694,7 +661,7 @@ function etikettenDruck(faecherListe, e, svg) {
   const html = Array.from({ length: seiten }, (_, s) =>
     `<div class="seite">${pos
       .map((p, i) => (p.seite !== s ? "" : `<div class="e" style="left:${p.x + e.x}mm;top:${p.y + e.y}mm">
-          ${svg(QR_FACH + faecherListe[i].id)}<div class="t">${esc(faecherListe[i].name)}</div></div>`))
+          ${svg(QR_FACH + faecherListe[i].id)}<div class="t">${faecherListe[i].ort ? `${esc(faecherListe[i].ort)}<br>` : ""}${esc(faecherListe[i].name)}</div></div>`))
       .join("")}</div>`,
   ).join("");
   return `<!doctype html><html lang="${esc(LOCALE)}"><head><meta charset="utf-8"><title>${esc(t("titel_etiketten"))}</title>
@@ -848,17 +815,16 @@ const STYLE = `
   .start > ha-icon { --mdc-icon-size: 56px; color: var(--primary-color); flex: none; margin-top: 4px; }
   .schritte { margin: 12px 0 4px; padding-left: 20px; display: grid; gap: 6px; }
   @media (max-width: 420px) { .start { flex-direction: column; } }
-  /* 3D-Raum */
-  .raum { position: relative; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color);
-    touch-action: none; }
-  .raum canvas { display: block; width: 100%; height: 100%; }
-  .raum .hinweis3d { position: absolute; left: 12px; top: 10px; font-size: 0.8rem; color: var(--secondary-text-color);
-    pointer-events: none; }
-  .raum .auswahl { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; gap: 12px;
-    align-items: center; flex-wrap: wrap; padding: 10px 12px; border-radius: 12px;
-    background: var(--card-background-color); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
-  .raum .auswahl .grow { flex: 1 1 160px; min-width: 0; }
-  .raum .auswahl b { display: block; }
+  /* Bearbeiten */
+  .umbenennen { border: none; background: none; color: var(--secondary-text-color); cursor: pointer;
+    padding: 4px; min-width: 32px; min-height: 32px; vertical-align: middle; --mdc-icon-size: 18px; }
+  dialog.vk { border: none; border-radius: 16px; padding: 20px; width: min(520px, calc(100vw - 32px));
+    background: var(--card-background-color); color: var(--primary-text-color); }
+  dialog.vk::backdrop { background: rgba(0, 0, 0, 0.45); }
+  dialog.vk label { display: flex; flex-direction: column; gap: 4px; margin: 10px 0 0; flex: 1 1 140px; }
+  .klein { font-size: 0.85rem; margin: 6px 0 0; }
+  .aktion.gefahr { background: none; color: var(--error-color); border: 1px solid var(--error-color); }
+  .chips.orte { margin-top: 8px; }
   /* Regal gezeichnet */
   .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
   .regal h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 500; }
@@ -921,9 +887,28 @@ const STYLE = `
 // Karte
 // ---------------------------------------------------------------------------
 
-const MODI = ["entnahme", "scanner", "fehlend", "ablaufend", "etiketten", "kopf", "regal", "panel", "raum"];
+// Bearbeiten-Modus und Ortsfilter überleben das Neuaufbauen des Dashboards (neues Produkt = neuer Sensor)
+const SITZUNG = { bearbeiten: false, ort: null };
+
+const MODI = ["entnahme", "scanner", "fehlend", "ablaufend", "etiketten", "kopf", "regal", "panel"];
 
 class VorratskellerCard extends HTMLElement {
+  get _bearbeiten() {
+    return SITZUNG.bearbeiten;
+  }
+
+  set _bearbeiten(wert) {
+    SITZUNG.bearbeiten = Boolean(wert);
+  }
+
+  get _ort() {
+    return SITZUNG.ort;
+  }
+
+  set _ort(wert) {
+    SITZUNG.ort = wert;
+  }
+
   static getStubConfig() {
     return { modus: "entnahme" };
   }
@@ -947,7 +932,6 @@ class VorratskellerCard extends HTMLElement {
                 { value: "kopf", label: t("modus_kopf", {}, lang) },
                 { value: "regal", label: t("modus_regal", {}, lang) },
                 { value: "panel", label: t("modus_panel", {}, lang) },
-                { value: "raum", label: t("modus_raum", {}, lang) },
               ],
             },
           },
@@ -992,7 +976,7 @@ class VorratskellerCard extends HTMLElement {
   }
 
   getCardSize() {
-    return this._config?.modus === "scanner" || this._config?.modus === "raum" ? 8 : 6;
+    return this._config?.modus === "scanner" ? 8 : 6;
   }
 
   getGridOptions() {
@@ -1004,11 +988,9 @@ class VorratskellerCard extends HTMLElement {
   }
 
   disconnectedCallback() {
-    // Kamera und 3D freigeben; beim erneuten Einhängen (Ansichtswechsel) neu aufbauen
+    // Kamera freigeben; beim erneuten Einhängen (Ansichtswechsel) neu aufbauen
     this._scanner?.stop();
     this._scanner = null;
-    this._raum?.freigeben();
-    this._raum = null;
     this._aufbau = false;
     this._signatur = "";
   }
@@ -1044,7 +1026,6 @@ class VorratskellerCard extends HTMLElement {
     else if (modus === "kopf") this._renderKopf(liste);
     else if (modus === "regal") this._renderRegal(liste);
     else if (modus === "panel") this._renderPanel(liste);
-    else if (modus === "raum") this._renderRaum(liste);
   }
 
   _titel(standard) {
@@ -1054,7 +1035,33 @@ class VorratskellerCard extends HTMLElement {
 
   // --- Entnahme -------------------------------------------------------------
 
+  /** Chips für die Lagerorte, nur wenn es mehr als einen gibt. */
+  _ortChips(liste, neuZeichnen) {
+    const alle = orte(liste);
+    if (alle.length < 2) {
+      this._ort = null;
+      return { html: "", liste, binden: () => {} };
+    }
+    const aktiv = this._ort;
+    const html = `<div class="chips orte" role="toolbar" aria-label="${esc(t("ort"))}">
+      <button class="chip" data-ort="*" aria-pressed="${aktiv === null || aktiv === undefined}">${esc(t("alle_orte"))}</button>
+      ${alle.map((o) => `<button class="chip" data-ort="${esc(o)}" aria-pressed="${aktiv === o}">${esc(ortName(o))}</button>`).join("")}
+    </div>`;
+    const gefiltert = aktiv === null || aktiv === undefined ? liste : liste.filter((p) => (p.ort || "") === aktiv);
+    const binden = (ziel) =>
+      ziel.querySelectorAll(".chip[data-ort]").forEach((b) =>
+        b.addEventListener("click", () => {
+          this._ort = b.dataset.ort === "*" ? null : b.dataset.ort;
+          this._fach = null;
+          neuZeichnen();
+        }),
+      );
+    return { html, liste: gefiltert, binden };
+  }
+
   _renderEntnahme(ziel, liste, { festesFach = null, titel = true } = {}) {
+    const ortWahl = festesFach ? { html: "", liste, binden: () => {} } : this._ortChips(liste, () => this._renderEntnahme(ziel, this._liste, { festesFach, titel }));
+    liste = ortWahl.liste;
     const alle = faecher(liste);
     const fach = festesFach || this._fach;
     const sichtbar = fach ? liste.filter((p) => p.fach_id === fach) : liste;
@@ -1076,9 +1083,11 @@ class VorratskellerCard extends HTMLElement {
         : null;
     ziel.innerHTML = `
       ${titel ? this._titel(t("titel_entnehmen")) : ""}
+      ${ortWahl.html}
       ${chips}
       ${sichtbar.length ? `<div class="grid">${tiles}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
-    ziel.querySelectorAll(".chip").forEach((b) =>
+    ortWahl.binden(ziel);
+    ziel.querySelectorAll(".chip[data-fach]").forEach((b) =>
       b.addEventListener("click", () => {
         this._fach = b.dataset.fach || null;
         this._renderEntnahme(ziel, this._liste);
@@ -1088,7 +1097,7 @@ class VorratskellerCard extends HTMLElement {
       t.addEventListener("click", () => this._entnehmen(t.dataset.id)),
     );
     ziel.querySelectorAll(".plus").forEach((b) =>
-      b.addEventListener("click", () => this._einlagern(b.dataset.id, 1)),
+      b.addEventListener("click", () => this._einlagernDialog(b.dataset.id)),
     );
     if (fokusSel) ziel.querySelector(fokusSel)?.focus();
   }
@@ -1287,13 +1296,22 @@ class VorratskellerCard extends HTMLElement {
 
   _renderRegal(liste, ziel = this._inhalt, { nurFach = null, titel = true } = {}) {
     let nr = 0;
+    // Bearbeiten nur in der Regal-Ansicht selbst, nicht im Wandpanel
+    const bearbeiten = titel && this._bearbeiten;
+    const ortWahl = titel ? this._ortChips(liste, () => this._renderRegal(this._liste, ziel, { nurFach, titel })) : { html: "", liste, binden: () => {} };
+    liste = ortWahl.liste;
+    const mehrereOrte = orte(this._liste).length > 1;
     const alle = regale(nurFach ? liste.filter((p) => p.fach_id === nurFach) : liste);
     const html = alle
       .map(
-        (r) => `<section class="regal">${nurFach ? "" : `<h3>${esc(r.name)}</h3>`}<div class="gestell">
+        (r) => `<section class="regal">${nurFach ? "" : `<h3>${mehrereOrte && this._ort == null ? `<span class="muted">${esc(ortName(r.ort))} · </span>` : ""}${esc(r.name)}${
+          bearbeiten ? ` <button class="umbenennen" data-ort="${esc(r.ort)}" data-regal="${esc(r.name)}" aria-label="${esc(t("regal_umbenennen", { name: r.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
+        }</h3>`}<div class="gestell">
           ${r.boeden
             .map(
-              (b) => `${b.boden ? `<div class="boden-name">${esc(b.boden)}</div>` : ""}
+              (b) => `${b.boden || bearbeiten ? `<div class="boden-name">${esc(b.boden || b.name)}${
+                bearbeiten ? ` <button class="umbenennen" data-ort="${esc(b.ort)}" data-fach="${esc(b.name)}" aria-label="${esc(t("fach_umbenennen", { name: b.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
+              }</div>` : ""}
                 <div class="fachreihe">${b.produkte.map((p) => this._gefaess(p, nr++)).join("")}</div>
                 <div class="brett"></div>`,
             )
@@ -1306,32 +1324,166 @@ class VorratskellerCard extends HTMLElement {
       ${titel ? `<div class="legende">
         <span class="s-ok">${esc(t("status_ok"))}</span><span class="s-knapp">${esc(t("status_knapp"))}</span>
         <span class="s-leer">${esc(t("status_leer"))}</span><span class="s-frei">${esc(t("status_frei"))}</span>
-        <span class="muted">${esc(t("regal_hinweis"))}</span>
-      </div>` : ""}
+        <span class="muted">${esc(t(bearbeiten ? "regal_hinweis_bearbeiten" : "regal_hinweis"))}</span>
+        ${bearbeiten ? `<button class="aktion zweit" id="neu">${esc(t("produkt_neu"))}</button>` : ""}
+        <button class="aktion ${bearbeiten ? "" : "zweit"}" id="bearbeiten" aria-pressed="${Boolean(bearbeiten)}">
+          ${esc(t(bearbeiten ? "bearbeiten_fertig" : "bearbeiten"))}</button>
+      </div>${ortWahl.html}` : ""}
       ${alle.length ? `<div class="regale">${html}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
-    ziel.querySelectorAll(".gefaess").forEach((b) => b.addEventListener("click", () => this._entnehmen(b.dataset.id)));
+    ziel.querySelectorAll(".gefaess").forEach((b) =>
+      b.addEventListener("click", () => (bearbeiten ? this._produktDialog(b.dataset.id) : this._entnehmen(b.dataset.id))),
+    );
+    ortWahl.binden(ziel);
+    ziel.querySelector("#neu")?.addEventListener("click", () => this._produktDialog(null));
+    ziel.querySelector("#bearbeiten")?.addEventListener("click", () => {
+      this._bearbeiten = !this._bearbeiten;
+      this._renderRegal(this._liste, ziel, { nurFach, titel });
+    });
+    ziel.querySelectorAll(".umbenennen").forEach((b) =>
+      b.addEventListener("click", () => this._umbenennenDialog(b.dataset.fach ?? null, b.dataset.regal ?? null, b.dataset.ort ?? "")),
+    );
     if (fokus) ziel.querySelector(`.gefaess[data-id="${CSS.escape(fokus)}"]`)?.focus();
   }
 
-  // --- 3D-Raum ---------------------------------------------------------------
+  // --- Bearbeiten: Produkt und Fach ---------------------------------------
 
-  async _renderRaum(liste) {
-    if (!this._raum) {
-      const hoehe = Math.max(240, num(this._config.hoehe) || 520);
-      this._inhalt.innerHTML = `${this._titel(t("titel_raum"))}
-        <div class="raum" style="height:${hoehe}px"><div class="hinweis3d">${esc(t("raum_laedt"))}</div></div>`;
-      const ziel = this._inhalt.querySelector(".raum");
+  _dialog(titel, inhalt, speichern, okText = t("speichern")) {
+    this.shadowRoot.querySelector("dialog.vk")?.remove();
+    const d = document.createElement("dialog");
+    d.className = "vk";
+    d.innerHTML = `<form method="dialog">
+        <h2>${esc(titel)}</h2>${inhalt}
+        <p class="fehler muted" role="alert"></p>
+        <div class="zeile">
+          <button class="aktion" value="ok">${esc(okText)}</button>
+          <button class="aktion zweit" value="abbrechen" formnovalidate>${esc(t("abbrechen"))}</button>
+        </div></form>`;
+    this.shadowRoot.appendChild(d);
+    d.querySelector("form").addEventListener("submit", async (ev) => {
+      if (ev.submitter?.value !== "ok") return;
+      ev.preventDefault();
       try {
-        const T = await import(`${BASE}/vendor/three.js`);
-        if (!this.isConnected || !ziel.isConnected) return;
-        this._raum = new Raum3D(T, ziel, this);
-        ziel.querySelector(".hinweis3d").textContent = t("raum_hinweis");
+        await speichern(d);
+        d.close();
       } catch (err) {
-        ziel.querySelector(".hinweis3d").textContent = t("raum_fehler", { fehler: fehlerText(err) });
-        return;
+        d.querySelector(".fehler").textContent = fehlerText(err);
       }
-    }
-    this._raum.zeigen(raumAufbau(liste, this._config));
+    });
+    d.addEventListener("close", () => d.remove());
+    d.showModal();
+    return d;
+  }
+
+  _produktDialog(id) {
+    const neu = id === null;
+    const p = neu
+      ? { id: null, name: "", fach: "", ort: this._ort ?? "", soll: 0, packung: "", form: "", gruppe: "", haltbarkeit: 12 }
+      : this._liste.find((x) => x.id === id);
+    if (!p) return;
+    const liste = (werte) => werte.map((w) => `<option value="${esc(w)}"></option>`).join("");
+    const formen = FORMEN.map(
+      (f) => `<option value="${f}" ${p.form === f ? "selected" : ""}>${esc(t(`form_${f}`))}</option>`,
+    ).join("");
+    const gruppen = [...new Set(this._liste.map((x) => x.gruppe).filter(Boolean))].sort((a, b) => a.localeCompare(b, LOCALE));
+    const admin = Boolean(this._hass.user?.is_admin);
+    const d = this._dialog(
+      t(neu ? "produkt_neu" : "produkt_bearbeiten"),
+      `<label>${esc(t("name_feld"))}<input name="name" required maxlength="120" value="${esc(p.name)}"></label>
+       ${neu ? `<label>${esc(t("gruppe"))}<select name="gruppe">${gruppen.map((g) => `<option value="${esc(makeId(g))}">${esc(g)}</option>`).join("")}</select></label>` : ""}
+       <div class="zeile">
+         <label style="flex:2 1 220px">${esc(t("fach"))}<input name="fach" list="vk-faecher-bearb" value="${esc(p.fach)}"></label>
+         <label>${esc(t("ort"))}<input name="ort" list="vk-orte-bearb" maxlength="60" placeholder="${esc(t("ort_haupt"))}" value="${esc(p.ort)}"></label>
+       </div>
+       <datalist id="vk-faecher-bearb">${liste([...new Set(this._liste.map((x) => x.fach).filter(Boolean))])}</datalist>
+       <datalist id="vk-orte-bearb">${liste(orte(this._liste).filter(Boolean))}</datalist>
+       <p class="muted klein">${esc(t("fach_tipp"))}</p>
+       <div class="zeile">
+         <label>${esc(t("soll_feld"))}<input name="soll" type="number" min="0" step="1" value="${esc(p.soll)}"></label>
+         <label>${esc(t("packung_feld"))}<input name="packung" placeholder="× 500 g" value="${esc(p.packung)}"></label>
+         <label>${esc(t("haltbarkeit"))}<input name="haltbar" type="number" min="0" step="1" value="${esc(p.haltbarkeit)}"></label>
+       </div>
+       <label>${esc(t("form"))}<select name="form">
+         <option value="auto">${esc(t("form_auto", { form: t(`form_${form({ ...p, form: "" })}`) }))}</option>${formen}
+       </select></label>
+       ${!neu && admin ? `<div class="zeile"><button type="button" class="aktion gefahr" id="loeschen">${esc(t("produkt_loeschen"))}</button></div>` : ""}`,
+      async (dlg) => {
+        const f = dlg.querySelector("form").elements;
+        const name = f.name.value.trim();
+        const werte = {
+          name,
+          fach: f.fach.value.trim(),
+          ort: f.ort.value.trim(),
+          soll: num(f.soll.value),
+          packung: f.packung.value.trim(),
+          haltbarkeit_monate: Math.max(0, Math.round(num(f.haltbar.value))),
+          form: f.form.value,
+        };
+        if (neu) {
+          await callService(this._hass, "produkt_anlegen", { ...werte, gruppe: f.gruppe?.value || "" });
+          toast(this, t("angelegt", { name }));
+          return;
+        }
+        const alt = { name: p.name, fach: p.fach, ort: p.ort, soll: p.soll, packung: p.packung, haltbarkeit_monate: p.haltbarkeit, form: p.form || "auto" };
+        const daten = { produkt: p.id };
+        for (const [k, v] of Object.entries(werte)) if (v !== alt[k]) daten[k] = v;
+        if (Object.keys(daten).length === 1) return;
+        await callService(this._hass, "produkt_aendern", daten);
+        toast(this, t("produkt_gespeichert", { name }));
+      },
+    );
+    d.querySelector("#loeschen")?.addEventListener("click", async () => {
+      if (!window.confirm(t("loeschen_frage", { name: p.name, bestand: fmt(p.bestand) }))) return;
+      try {
+        await callService(this._hass, "produkt_loeschen", { produkt: p.id });
+        d.close();
+        toast(this, t("geloescht", { name: p.name }));
+      } catch (err) {
+        d.querySelector(".fehler").textContent = fehlerText(err);
+      }
+    });
+  }
+
+  /** Einlagern über „+“: Menge und MHD abfragen; ohne übliche Haltbarkeit direkt eine Packung. */
+  _einlagernDialog(id) {
+    const p = this._liste.find((x) => x.id === id);
+    if (!p) return;
+    if (!p.haltbarkeit) return this._einlagern(id, 1);
+    this._dialog(
+      t("einlagern_titel", { name: p.name }),
+      `<div class="zeile">
+         <label>${esc(t("menge"))}<input name="menge" type="number" min="1" step="1" value="1" required></label>
+         <label style="flex:2 1 180px">${esc(t("mhd_einlagern"))}<input name="mhd" type="date" min="${isoHeute()}" value="${esc(plusMonate(p.haltbarkeit))}"></label>
+       </div>
+       <p class="muted klein">${esc(t("mhd_tipp", { monate: fmt(p.haltbarkeit) }))}</p>`,
+      async (dlg) => {
+        const f = dlg.querySelector("form").elements;
+        const res = await this._einlagern(id, Math.max(1, num(f.menge.value)), f.mhd.value || undefined);
+        if (!res) throw new Error(t("einlagern_fehlgeschlagen"));
+      },
+      t("einlagern"),
+    );
+  }
+
+  _umbenennenDialog(fach, regal, ort = "") {
+    const alle = faecher(this._liste).filter((f) => f.ort === ort);
+    // Regal umbenennen: alle Fächer, deren Name mit „Regal,“ beginnt oder genau „Regal“ ist
+    const betroffen = fach ? alle.filter((f) => f.name === fach) : alle.filter((f) => regalUndBoden(f.name).regal === regal);
+    const alt = fach ?? regal;
+    this._dialog(
+      t(fach ? "fach_umbenennen" : "regal_umbenennen", { name: alt }),
+      `<label>${esc(t("neuer_name"))}<input name="neu" required maxlength="120" value="${esc(alt)}"></label>
+       <p class="muted klein">${esc(t(fach ? "fach_tipp" : "regal_umbenennen_tipp", { n: betroffen.length }))}</p>
+       <p class="muted klein">${esc(t("etikett_neu_drucken"))}</p>`,
+      async (d) => {
+        const neu = d.querySelector("form").elements.neu.value.trim();
+        if (!neu || neu === alt) return;
+        for (const f of betroffen) {
+          const ziel = fach ? neu : neu + f.name.slice(regal.length);
+          await callService(this._hass, "fach_umbenennen", { alt: f.name, neu: ziel, ort });
+        }
+        toast(this, t("umbenannt", { n: betroffen.length }));
+      },
+    );
   }
 
   // --- Wandpanel ------------------------------------------------------------
@@ -1459,7 +1611,7 @@ class VorratskellerCard extends HTMLElement {
       .join("");
     const etiketten = alle
       .map(
-        (f) => `<div class="etikett">${svg(QR_FACH + f.id)}<div><strong>${esc(f.name)}</strong></div>
+        (f) => `<div class="etikett">${svg(QR_FACH + f.id)}<div>${f.ort ? `<span class="muted">${esc(f.ort)}</span><br>` : ""}<strong>${esc(f.name)}</strong></div>
           <div class="muted">${esc(t("n_produkte", { n: f.produkte.length }))}</div></div>`,
       )
       .join("");
@@ -1729,207 +1881,6 @@ class VorratskellerCard extends HTMLElement {
 }
 
 // ---------------------------------------------------------------------------
-// 3D-Raum mit three.js (erst bei Bedarf geladen)
-// ---------------------------------------------------------------------------
-
-class Raum3D {
-  constructor(T, ziel, karte) {
-    this.T = T;
-    this.ziel = ziel;
-    this.karte = karte;
-    this.szene = new T.Scene();
-    this.kamera = new T.PerspectiveCamera(55, 1, 0.05, 60);
-    this.renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    ziel.appendChild(this.renderer.domElement);
-    this.steuerung = new T.OrbitControls(this.kamera, this.renderer.domElement);
-    this.steuerung.maxPolarAngle = Math.PI * 0.49;
-    this.steuerung.minDistance = 0.6;
-    this.steuerung.maxDistance = 12;
-    this.steuerung.addEventListener("change", () => this.zeichnen());
-    this.szene.add(new T.HemisphereLight(0xffffff, 0x8a8a8a, 1.6));
-    const sonne = new T.DirectionalLight(0xffffff, 1.2);
-    sonne.position.set(2, 5, -2);
-    this.szene.add(sonne);
-    this.festes = new T.Group();
-    this.waren = new T.Group();
-    this.szene.add(this.festes, this.waren);
-    this.strahl = new T.Raycaster();
-    this.auswahlId = null;
-    this.signaturRaum = "";
-    const dom = this.renderer.domElement;
-    dom.addEventListener("pointerdown", (ev) => (this.start = [ev.clientX, ev.clientY]));
-    dom.addEventListener("pointerup", (ev) => {
-      if (!this.start || Math.hypot(ev.clientX - this.start[0], ev.clientY - this.start[1]) > 6) return;
-      this._antippen(ev);
-    });
-    this.beobachter = new ResizeObserver(() => this.groesse());
-    this.beobachter.observe(ziel);
-    this.groesse();
-  }
-
-  farbe(name, ersatz) {
-    const wert = getComputedStyle(this.karte).getPropertyValue(name).trim();
-    return new this.T.Color(wert || ersatz);
-  }
-
-  groesse() {
-    const b = this.ziel.clientWidth || 300;
-    const h = this.ziel.clientHeight || 300;
-    this.renderer.setSize(b, h, false);
-    this.kamera.aspect = b / h;
-    this.kamera.updateProjectionMatrix();
-    this.zeichnen();
-  }
-
-  zeichnen() {
-    this.renderer.render(this.szene, this.kamera);
-  }
-
-  leeren(gruppe) {
-    for (const o of [...gruppe.children]) {
-      o.traverse?.((x) => {
-        x.geometry?.dispose();
-        x.material?.dispose();
-      });
-      gruppe.remove(o);
-    }
-  }
-
-  box(b, h, t, farbe, gruppe, x, y, z) {
-    const m = new this.T.Mesh(new this.T.BoxGeometry(b, h, t), new this.T.MeshStandardMaterial({ color: farbe, roughness: 0.9 }));
-    m.position.set(x, y, z);
-    gruppe.add(m);
-    return m;
-  }
-
-  zeigen({ raum, regale }) {
-    const T = this.T;
-    // Raum und Regale nur bei geänderter Aufstellung neu bauen
-    const sig = JSON.stringify([raum, regale.map((r) => [r.name, r.x, r.z, r.laenge, r.tiefe, r.hoehe, r.boeden, r.drehung])]);
-    if (sig !== this.signaturRaum) {
-      this.signaturRaum = sig;
-      this.leeren(this.festes);
-      const boden = this.farbe("--secondary-background-color", "#e5e5e5");
-      const wand = this.farbe("--card-background-color", "#ffffff");
-      const metall = this.farbe("--secondary-text-color", "#8a8a8a");
-      this.box(raum.breite, 0.02, raum.tiefe, boden, this.festes, raum.breite / 2, -0.01, raum.tiefe / 2);
-      this.box(raum.breite, raum.hoehe, 0.04, wand, this.festes, raum.breite / 2, raum.hoehe / 2, raum.tiefe + 0.02);
-      this.box(0.04, raum.hoehe, raum.tiefe, wand, this.festes, -0.02, raum.hoehe / 2, raum.tiefe / 2);
-      this.box(0.04, raum.hoehe, raum.tiefe, wand, this.festes, raum.breite + 0.02, raum.hoehe / 2, raum.tiefe / 2);
-      this.regalGruppen = new Map();
-      for (const r of regale) {
-        const g = new T.Group();
-        // Blick von der Tür (z < 0) in den Raum: rechts im Bild ist -x, daher x spiegeln
-        g.position.set(raum.breite - r.x, 0, r.z);
-        g.rotation.y = (r.drehung * Math.PI) / 180;
-        this.festes.add(g);
-        const hoehen = this._bodenHoehen(r);
-        if (r.boeden > 0) {
-          for (const y of hoehen) this.box(r.laenge, 0.025, r.tiefe, metall, g, 0, y, 0);
-          for (const dx of [-r.laenge / 2, r.laenge / 2]) {
-            for (const dz of [-r.tiefe / 2, r.tiefe / 2]) this.box(0.03, r.hoehe, 0.03, metall, g, dx, r.hoehe / 2, dz);
-          }
-        }
-        this.regalGruppen.set(r.name, { gruppe: g, hoehen });
-      }
-      this.kamera.position.set(raum.breite / 2, 1.8, -1.2);
-      this.steuerung.target.set(raum.breite / 2, 0.8, raum.tiefe * 0.6);
-      this.steuerung.update();
-    }
-    // Waren bei jeder Änderung neu setzen (wenige Dutzend Körper)
-    this.leeren(this.waren);
-    this.koerper = [];
-    const farben = {
-      ok: this.farbe("--success-color", "#43a047"),
-      knapp: this.farbe("--warning-color", "#ffa600"),
-      leer: this.farbe("--error-color", "#db4437"),
-      frei: this.farbe("--disabled-text-color", "#9e9e9e"),
-    };
-    for (const r of regale) {
-      const { gruppe: regalGruppe, hoehen } = this.regalGruppen.get(r.name);
-      const g = new T.Group();
-      g.position.copy(regalGruppe.position);
-      g.rotation.copy(regalGruppe.rotation);
-      this.waren.add(g);
-      for (const { produkt: p, boden, x } of platzieren(r)) {
-        const [b, h, t] = MASSE[form(p)];
-        const f = p.soll > 0 ? Math.min(1, p.bestand / p.soll) : p.bestand > 0 ? 1 : 0;
-        const hoch = h * Math.max(0.15, f);
-        const rund = ["glas", "dose", "flasche"].includes(form(p));
-        const geo = rund ? new T.CylinderGeometry(b / 2, b / 2, hoch, 20) : new T.BoxGeometry(b, hoch, t);
-        const mat = new T.MeshStandardMaterial({
-          color: farben[zustand(p)],
-          roughness: 0.5,
-          transparent: f === 0,
-          opacity: f === 0 ? 0.45 : 1,
-        });
-        const m = new T.Mesh(geo, mat);
-        const y0 = r.boeden > 0 ? hoehen[boden] + 0.0125 : 0;
-        m.position.set(x, y0 + hoch / 2, 0);
-        m.userData.id = p.id;
-        if (p.id === this.auswahlId) mat.emissive = new T.Color(0x444444);
-        g.add(m);
-        this.koerper.push(m);
-      }
-    }
-    this.zeichnen();
-    if (this.auswahlId) this._auswahlZeigen(this.auswahlId);
-  }
-
-  _bodenHoehen(r) {
-    const n = Math.max(1, r.boeden);
-    if (n === 1) return [0.1];
-    const oben = Math.max(0.5, r.hoehe - 0.2);
-    return Array.from({ length: n }, (_, i) => 0.1 + (i * (oben - 0.1)) / (n - 1));
-  }
-
-  _antippen(ev) {
-    const rect = this.renderer.domElement.getBoundingClientRect();
-    const punkt = new this.T.Vector2(((ev.clientX - rect.left) / rect.width) * 2 - 1, -((ev.clientY - rect.top) / rect.height) * 2 + 1);
-    this.strahl.setFromCamera(punkt, this.kamera);
-    const treffer = this.strahl.intersectObjects(this.koerper || [], false)[0];
-    this.auswahlId = treffer?.object.userData.id ?? null;
-    for (const m of this.koerper) m.material.emissive?.set(m.userData.id === this.auswahlId ? 0x444444 : 0x000000);
-    this.zeichnen();
-    this._auswahlZeigen(this.auswahlId);
-  }
-
-  _auswahlZeigen(id) {
-    this.ziel.querySelector(".auswahl")?.remove();
-    const p = id && this.karte._liste?.find((x) => x.id === id);
-    if (!p) return;
-    const div = document.createElement("div");
-    div.className = "auswahl";
-    div.innerHTML = `<div class="grow"><b>${esc(p.name)}</b>
-        <span class="muted">${esc(p.soll ? t("von", { bestand: fmt(p.bestand), soll: fmt(p.soll) }) : fmt(p.bestand))}${
-          p.mhd ? ` · ${esc(t("mhd", { datum: datum(p.mhd) }))}` : ""
-        }</span></div>
-      <button class="aktion" data-a="raus">${esc(t("entnehmen"))}</button>
-      <button class="aktion zweit" data-a="rein">${esc(t("einlagern"))}</button>
-      <button class="aktion zweit" data-a="zu">${esc(t("schliessen"))}</button>`;
-    div.querySelector('[data-a="raus"]').addEventListener("click", () => this.karte._entnehmen(p.id));
-    div.querySelector('[data-a="rein"]').addEventListener("click", () => this.karte._einlagern(p.id, 1));
-    div.querySelector('[data-a="zu"]').addEventListener("click", () => {
-      this.auswahlId = null;
-      for (const m of this.koerper) m.material.emissive?.set(0x000000);
-      this.zeichnen();
-      div.remove();
-    });
-    this.ziel.appendChild(div);
-  }
-
-  freigeben() {
-    this.beobachter.disconnect();
-    this.steuerung.dispose();
-    this.leeren(this.waren);
-    this.leeren(this.festes);
-    this.renderer.dispose();
-    this.renderer.domElement.remove();
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Kamera und Erkennung
 // ---------------------------------------------------------------------------
 
@@ -2030,7 +1981,7 @@ class Scanner {
 // Dashboard-Strategie
 // ---------------------------------------------------------------------------
 
-export function generateDashboard(hass, config = {}) {
+export function generateDashboard(hass) {
   setzeSprache(hass);
   const liste = produkte(hass);
   const gruppen = new Map();
@@ -2087,21 +2038,6 @@ export function generateDashboard(hass, config = {}) {
     icon: "mdi:bookshelf",
     type: "panel",
     cards: [{ type: "custom:vorratskeller-card", modus: "regal" }],
-  };
-
-  const raum3d = {
-    title: t("view_raum"),
-    path: "3d",
-    icon: "mdi:cube-outline",
-    type: "panel",
-    cards: [
-      {
-        type: "custom:vorratskeller-card",
-        modus: "raum",
-        ...(config.raum ? { raum: config.raum } : {}),
-        ...(config.regale ? { regale: config.regale } : {}),
-      },
-    ],
   };
 
   const panel = {
@@ -2180,12 +2116,12 @@ export function generateDashboard(hass, config = {}) {
       ],
     };
   }
-  return { title: t("name"), views: [uebersicht, regal, raum3d, keller, scanner, bestand, einkauf, etiketten, panel] };
+  return { title: t("name"), views: [uebersicht, regal, keller, scanner, bestand, einkauf, etiketten, panel] };
 }
 
 class VorratskellerStrategy extends HTMLElement {
-  static async generate(config, hass) {
-    return generateDashboard(hass, config || {});
+  static async generate(_config, hass) {
+    return generateDashboard(hass);
   }
 
   /** Vorschlag für Titel und Symbol im Dialog „Neues Dashboard“ (HA-Frontend ab 2026.10). */

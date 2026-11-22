@@ -227,3 +227,18 @@ def test_laden_repariert_ungueltige_zahlen(lager: Lager) -> None:
     assert again.produkte["h-milch"].soll == 0
     assert again.produkte["h-milch"].packungsmenge == 0
     assert again.fehlende() == []
+
+
+def test_ueberschuss_und_fach_umbenennen_je_ort(lager: Lager) -> None:
+    lager.einlagern("h-milch", 16, date(2027, 1, 10), jetzt=JETZT)
+    assert lager.ueberschuss(date(2026, 11, 22), 180) == [(lager.produkte["h-milch"], 2, 49)]
+    assert lager.ueberschuss(date(2026, 11, 22), 30) == []
+    lager.produkte["h-milch"].fach = "Schrank, oben"
+    lager.produkte["kaffee"] = Produkt(
+        id="kaffee", name="Kaffee", fach="Schrank, oben", ort="Küche"
+    )
+    assert lager.fach_umbenennen("Schrank, oben", "Schrank, Mitte", ort="Küche", jetzt=JETZT) == 1
+    assert lager.produkte["h-milch"].fach == "Schrank, oben"
+    assert lager.produkte["kaffee"].fach == "Schrank, Mitte"
+    assert lager.fach_umbenennen("Schrank, oben", "Regal", ort="", jetzt=JETZT) == 1
+    assert Lager.from_dict(lager.to_dict()).produkte["kaffee"].ort == "Küche"

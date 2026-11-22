@@ -87,31 +87,22 @@ Minimum version: Home Assistant 2026.10.
 | Stock | all products by group |
 | Shopping | what is missing to reach the target |
 | Labels | one QR code per shelf to print |
-| 3D | the pantry as a 3D model with coloured products on the shelves; dimensions optional in YAML (see below) |
 | Panel | for a wall tablet: big numbers, what to use first and what to buy, each shelf as a field in the colour of its scarcest product; tap opens the shelf |
 
 The card is also available on its own: `type: custom:vorratskeller-card` with
-`modus: kopf | regal | raum | panel | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, 3D room, wall panel, take out, scanner, missing, expiring, labels)
+`modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, wall panel, take out, scanner, missing, expiring, labels)
 and optionally `fach: <shelf id>`.
 
-### 3D view
+### Editing products and shelves
 
-The **3D** view places the shelves side by side along the back wall; boards and positions come from the shelf
-names (“Left, third shelf”). If you know your room's dimensions, add them to the dashboard configuration (raw
-configuration editor), in metres; `x` to the right, `z` from the door into the room, `drehung: 90` for shelves
-along a side wall, `boeden: 0` for stacks on the floor:
+In the **Shelves** tab, “Edit” switches to edit mode: tapping a product opens name, shelf, target, pack and shape
+(e.g. bottle). The pencil next to a shelf unit or board renames it; the unit is the part of the shelf name before
+the comma. The QR code depends on the name, so reprint the labels of renamed shelves. In automations:
+`vorratskeller.fach_umbenennen` with `alt` and `neu`.
 
-```yaml
-strategy:
-  type: custom:vorratskeller
-  raum: { breite: 3, tiefe: 4, hoehe: 2.25 }
-  regale:
-    - { name: Left, x: 0.25, z: 2.55, laenge: 2.4, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
-    - { name: Right, x: 2.75, z: 2.95, laenge: 1.6, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
-```
-
-Tap selects a product and shows stock, best-before date and the Take out and Store buttons. The 3D library
-(three.js) ships with the integration and only loads when the view is opened.
+Edit mode also offers “+ Product” for items without a barcode, deleting (administrators only), and a second
+storage location per product (e.g. kitchen) with location chips. “+” when taking out asks for quantity and
+best-before date, prefilled from the usual shelf life.
 
 ### Labels
 
@@ -147,6 +138,14 @@ position” uses partly used sheets. Choose 100 % scale and no margins in the pr
 
 Service and field descriptions are translated in the Home Assistant UI.
 
+### Blueprint for push notifications
+
+[![Import blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fsunnyhd%2Fha-vorratskeller%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fvorratskeller%2Fpush_vorrat.yaml)
+
+Choose recipients (`notify` entities), time, weekdays and how many days before the best-before date to report;
+optionally include products below target and send only when there is something to report. The blueprint texts
+are in German.
+
 ### Example: warning when supplies run low
 
 ```yaml
@@ -179,5 +178,5 @@ Removing the integration keeps it; setting it up again loads it.
 
 ## Licence
 
-MIT, see [`LICENSE`](LICENSE). Bundled libraries: MIT (barcode-detector, zxing-wasm, qrcode-generator, three.js)
+MIT, see [`LICENSE`](LICENSE). Bundled libraries: MIT (barcode-detector, zxing-wasm, qrcode-generator)
 and Apache 2.0 (zxing-cpp).

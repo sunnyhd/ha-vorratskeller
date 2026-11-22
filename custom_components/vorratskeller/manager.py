@@ -228,6 +228,10 @@ class VorratskellerManager:
         """Ändere ein Produkt."""
         return self._run(self.lager.produkt_aendern, produkt.id, daten, user_id=user_id)
 
+    def fach_umbenennen(self, alt: str, neu: str, ort: str | None, user_id: str | None) -> int:
+        """Benenne ein Fach in allen Produkten um."""
+        return self._run(self.lager.fach_umbenennen, alt, neu, ort=ort, user_id=user_id)
+
     def produkt_loeschen(self, produkt: Produkt, user_id: str | None) -> None:
         """Lösche ein Produkt."""
         self._run(self.lager.produkt_loeschen, produkt.id, user_id=user_id)
@@ -309,9 +313,23 @@ class VorratskellerManager:
                 else:
                     wann = text(self.hass, "bericht_in_tagen", tage=tage)
                 zeilen.append(f"• {name}: {charge.menge:g} ({wann})")
-        fehlende = self.lager.fehlende()
+        ablaufend_ids = {charge.produkt for charge, _ in ablaufend}
+        ueberschuss = [
+            u for u in self.lager.ueberschuss(heute, 180) if u[0].id not in ablaufend_ids
+        ][:5]
+        if ueberschuss:
+            zeilen.append(text(self.hass, "bericht_ueberschuss"))
+            for produkt, mehr, tage in ueberschuss:
+                zeilen.append(
+                    f"• {produkt.name}: +{mehr:g} "
+                    f"({text(self.hass, 'bericht_in_tagen', tage=tage)})"
+                )
+        fehlende = sorted(self.lager.fehlende(), key=lambda x: -x[1])
         if fehlende:
             zeilen.append(text(self.hass, "bericht_unter_soll", anzahl=len(fehlende)))
+            namen = ", ".join(p.name for p, _ in fehlende[:5])
+            rest = len(fehlende) - 5
+            zeilen.append(namen + (text(self.hass, "bericht_und_mehr", n=rest) if rest > 0 else ""))
         if not zeilen:
             zeilen.append(text(self.hass, "bericht_alles_gut"))
         return text(self.hass, "bericht_titel"), "\n".join(zeilen)

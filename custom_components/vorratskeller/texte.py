@@ -17,6 +17,8 @@ TEXTE: dict[str, dict[str, str]] = {
         "bericht_heute": "heute",
         "bericht_in_tagen": "in {tage} Tagen",
         "bericht_unter_soll": "Unter Soll: {anzahl} Produkte",
+        "bericht_ueberschuss": "Mehr als Soll, gut zum Aufbrauchen:",
+        "bericht_und_mehr": " und {n} weitere",
         "bericht_alles_gut": "Alles im Soll, nichts läuft in den nächsten Wochen ab.",
         # Einheiten übersetzt HA nur auf Englisch, daher hier nach Systemsprache
         "einheit_produkte": "Produkte",
@@ -31,6 +33,8 @@ TEXTE: dict[str, dict[str, str]] = {
         "bericht_heute": "today",
         "bericht_in_tagen": "in {tage} days",
         "bericht_unter_soll": "Below target: {anzahl} products",
+        "bericht_ueberschuss": "Above target, good to use up:",
+        "bericht_und_mehr": " and {n} more",
         "bericht_alles_gut": "Everything at target, nothing expires in the coming weeks.",
         "einheit_produkte": "products",
         "einheit_chargen": "batches",

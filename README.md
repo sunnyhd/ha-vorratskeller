@@ -104,11 +104,10 @@ Die Strategie baut das ganze Dashboard aus den Entitäten, ähnlich wie das Ener
 | Bestand | alle Produkte nach Gruppen |
 | Einkauf | was bis zum Soll fehlt |
 | Etiketten | ein QR-Code je Fach zum Ausdrucken |
-| 3D | der Keller als 3D-Modell, Produkte farbig im Regal; Maße optional in YAML (siehe unten) |
 | Panel | für das Tablet an der Kellertür: große Zahlen, was zuerst verbraucht und was eingekauft werden muss, jedes Fach als Feld in der Farbe seines knappsten Produkts; antippen zeigt das Fach |
 
 Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
-`modus: kopf | regal | raum | panel | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
+`modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
 
 ### Scanner
 
@@ -124,26 +123,19 @@ Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
 
 ![Regal-Etiketten mit QR-Code je Fach](docs/bilder/etiketten.png)
 
-### 3D-Ansicht
+### Produkte und Fächer bearbeiten
 
-Die Ansicht **3D** stellt die Regale automatisch nebeneinander an die hintere Wand; Böden und Plätze ergeben
-sich aus den Fachnamen („Links, dritter Boden“). Wer die Maße seines Raums kennt, gibt sie in der
-Dashboard-Konfiguration an (Raw-Konfigurationseditor), in Metern; `x` nach rechts, `z` von der Tür in den Raum,
-`drehung: 90` für Regale an einer Seitenwand, `boeden: 0` für Stapel auf dem Boden:
+Im Reiter **Regal** schaltet „Bearbeiten“ in den Bearbeiten-Modus: Ein Tipp auf ein Produkt öffnet Name, Fach,
+Soll, Packung und Form im Regal (z. B. Flasche). Der Stift neben einem Regal oder Boden benennt es um; das Regal ist
+der Teil des Fachnamens vor dem Komma, der Boden der Teil danach. Weil der QR-Code am Fachnamen hängt, danach die
+Etiketten der umbenannten Fächer neu drucken. In Automationen: `vorratskeller.fach_umbenennen` mit `alt` und `neu`.
 
-```yaml
-strategy:
-  type: custom:vorratskeller
-  raum: { breite: 3, tiefe: 4, hoehe: 2.25 }
-  regale:
-    - { name: Links, x: 0.25, z: 2.55, laenge: 2.4, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
-    - { name: Rechts, x: 2.75, z: 2.95, laenge: 1.6, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
-    - { name: Weißes Regal, x: 2.72, z: 1.45, laenge: 1.0, tiefe: 0.45, hoehe: 1.85, boeden: 4, drehung: 90 }
-    - { name: Neben dem linken Regal, x: 0.26, z: 0.75, laenge: 1.2, tiefe: 0.42, boeden: 0, drehung: 90 }
-```
-
-Antippen wählt ein Produkt; darunter erscheinen Bestand, MHD und die Knöpfe Entnehmen und Einlagern.
-Die 3D-Bibliothek (three.js) liefert die Integration selbst aus und lädt sie erst beim Öffnen der Ansicht.
+- **Neues Produkt ohne Barcode** (Eier, Obst, Selbstgemachtes): im Bearbeiten-Modus „+ Produkt“.
+- **Löschen:** im Bearbeiten-Dialog, nur für Administratoren, mit Rückfrage.
+- **Lagerort:** Produkte können an einem zweiten Ort liegen, z. B. „Küche“ (leer = Keller). Gibt es mehr als
+  einen Ort, filtern Chips in Regal und Entnehmen nach Ort; Etiketten zeigen den Ort mit an.
+- **Einlagern mit MHD:** „+“ beim Entnehmen fragt Menge und MHD ab, vorbelegt mit der üblichen Haltbarkeit.
+  Produkte ohne MHD (Haltbarkeit 0) lagern weiter mit einem Tipp ein.
 
 ### Etiketten
 
@@ -187,7 +179,8 @@ Reichweite je Gruppe = vorhandene Menge (Packungen × Packungsmenge in kg oder l
 | `vorratskeller.inventur` | gezählten Bestand setzen |
 | `vorratskeller.barcode_zuordnen` | Barcode einem Produkt zuordnen (wird bei einem anderen Produkt entfernt) |
 | `vorratskeller.barcode_suchen` | Produkt zum Barcode, sonst Vorschlag von Open Food Facts (Antwort) |
-| `vorratskeller.produkt_anlegen` / `produkt_aendern` / `produkt_loeschen` | Stammdaten |
+| `vorratskeller.produkt_anlegen` / `produkt_aendern` / `produkt_loeschen` | Stammdaten, mit `form` und `ort` |
+| `vorratskeller.fach_umbenennen` | Fach in allen Produkten umbenennen (`alt`, `neu`, optional `ort`) |
 | `vorratskeller.einkaufsliste_abgleichen` | fehlende Produkte auf die Einkaufsliste |
 | `vorratskeller.bericht_senden` | Wochenbericht sofort senden |
 
@@ -198,8 +191,17 @@ Alle Änderungen landen mit Zeit und Benutzer im Journal.
 - **Einkaufsliste:** Fällt ein Produkt unter Soll, kommt es als „Name (Vorrat)“ auf die
   gewählte Liste. Ein offener Eintrag mit gleichem Text verhindert Dubletten; ist er
   abgehakt und das Produkt fehlt erneut, kommt es wieder auf die Liste.
-- **Wochenbericht:** am gewählten Tag zur gewählten Uhrzeit, was bald abläuft und wie viele
-  Produkte unter Soll sind.
+- **Wochenbericht:** am gewählten Tag zur gewählten Uhrzeit, was bald abläuft, was über Soll liegt und bald
+  aufgebraucht werden sollte, und welche Produkte unter Soll sind.
+
+### Blueprint für Push-Nachrichten
+
+[![Blueprint importieren](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fsunnyhd%2Fha-vorratskeller%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fvorratskeller%2Fpush_vorrat.yaml)
+
+Für eigene Tage und Uhrzeiten, mehrere Empfänger und Nachrichten nur dann, wenn es etwas zu melden gibt:
+Blueprint importieren, dann unter Einstellungen → Automationen → Blueprints eine Automation daraus anlegen.
+Einstellbar: Empfänger (`notify`-Entitäten), Uhrzeit, Wochentage, ab wie vielen Tagen vor dem MHD gemeldet wird,
+fehlende Produkte mitschicken. Die Texte des Blueprints sind deutsch.
 
 ### Beispiel: Warnung, wenn der Vorrat knapp wird
 
@@ -258,4 +260,4 @@ Lizenzen in `frontend/vendor/LICENSES.md`.
 ## Lizenz
 
 MIT, siehe [`LICENSE`](LICENSE). Mitgelieferte Bibliotheken: MIT (barcode-detector, zxing-wasm,
-qrcode-generator, three.js) und Apache 2.0 (zxing-cpp).
+qrcode-generator) und Apache 2.0 (zxing-cpp).

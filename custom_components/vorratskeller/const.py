@@ -57,6 +57,9 @@ SERVICE_BARCODE_ZUORDNEN: Final = "barcode_zuordnen"
 SERVICE_BARCODE_SUCHEN: Final = "barcode_suchen"
 SERVICE_PRODUKT_ANLEGEN: Final = "produkt_anlegen"
 SERVICE_PRODUKT_AENDERN: Final = "produkt_aendern"
+SERVICE_FACH_UMBENENNEN: Final = "fach_umbenennen"
+ATTR_ALT: Final = "alt"
+ATTR_NEU: Final = "neu"
 SERVICE_PRODUKT_LOESCHEN: Final = "produkt_loeschen"
 SERVICE_BERICHT_SENDEN: Final = "bericht_senden"
 SERVICE_EINKAUFSLISTE_ABGLEICHEN: Final = "einkaufsliste_abgleichen"
@@ -75,6 +78,7 @@ ATTR_SOLL: Final = "soll"
 ATTR_HALTBARKEIT: Final = "haltbarkeit_monate"
 ATTR_HINWEIS: Final = "hinweis"
 ATTR_FORM: Final = "form"
+ATTR_ORT: Final = "ort"
 # "auto" (Auswahl in der Oberfläche) und "" bedeuten: aus Packung und Hinweis ableiten
 FORMEN: Final = ("", "auto", "glas", "dose", "flasche", "kasten", "packung", "kiste")
 

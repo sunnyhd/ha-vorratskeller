@@ -1,0 +1,122 @@
+blueprint:
+  name: "Vorratskeller: Push-Nachricht"
+  description: >-
+    Schickt zu festen Zeiten eine Nachricht, was bald abläuft und was unter Soll ist.
+    Ergänzt den Wochenbericht der Integration: eigene Tage, eigene Uhrzeit, mehrere Empfänger,
+    und auf Wunsch nur dann, wenn es etwas zu melden gibt.
+    Sends a message at set times listing what expires soon and what is below target.
+  domain: automation
+  source_url: https://github.com/sunnyhd/ha-vorratskeller/blob/main/blueprints/automation/vorratskeller/push_vorrat.yaml
+  input:
+    empfaenger:
+      name: Empfänger
+      description: Benachrichtigungs-Entitäten, z. B. die Handys der Familie (notify.…).
+      selector:
+        entity:
+          domain: notify
+          multiple: true
+    uhrzeit:
+      name: Uhrzeit
+      default: "18:00:00"
+      selector:
+        time: {}
+    wochentage:
+      name: Wochentage
+      default: [mon, tue, wed, thu, fri, sat, sun]
+      selector:
+        select:
+          multiple: true
+          options:
+            - { label: Montag, value: mon }
+            - { label: Dienstag, value: tue }
+            - { label: Mittwoch, value: wed }
+            - { label: Donnerstag, value: thu }
+            - { label: Freitag, value: fri }
+            - { label: Samstag, value: sat }
+            - { label: Sonntag, value: sun }
+    ablaufend_sensor:
+      name: Sensor „Bald ablaufend“
+      default: sensor.vorratskeller_bald_ablaufend
+      selector:
+        entity:
+          integration: vorratskeller
+          domain: sensor
+    fehlend_sensor:
+      name: Sensor „Fehlende Produkte“
+      default: sensor.vorratskeller_fehlende_produkte
+      selector:
+        entity:
+          integration: vorratskeller
+          domain: sensor
+    tage:
+      name: Ablauf melden ab
+      description: Chargen melden, deren MHD in höchstens so vielen Tagen erreicht ist (abgelaufene immer).
+      default: 7
+      selector:
+        number:
+          min: 0
+          max: 90
+          unit_of_measurement: Tage
+          mode: box
+    fehlende_melden:
+      name: Fehlende Produkte mitschicken
+      default: false
+      selector:
+        boolean: {}
+    nur_wenn_etwas:
+      name: Nur senden, wenn es etwas zu melden gibt
+      default: true
+      selector:
+        boolean: {}
+    titel:
+      name: Titel
+      default: Vorratskeller
+      selector:
+        text: {}
+
+mode: single
+
+triggers:
+  - trigger: time
+    at: !input uhrzeit
+
+variables:
+  wochentage: !input wochentage
+  ablaufend_sensor: !input ablaufend_sensor
+  fehlend_sensor: !input fehlend_sensor
+  tage: !input tage
+  fehlende_melden: !input fehlende_melden
+  nur_wenn_etwas: !input nur_wenn_etwas
+  chargen: >-
+    {{ (state_attr(ablaufend_sensor, 'chargen') or [])
+       | selectattr('tage', 'le', tage | int) | list }}
+  fehlende: "{{ state_attr(fehlend_sensor, 'produkte') or [] if fehlende_melden else [] }}"
+  zeilen: >-
+    {% set z = namespace(l=[]) %}
+    {% if chargen %}{% set z.l = z.l + ['Bald verbrauchen:'] %}{% endif %}
+    {% for c in chargen | sort(attribute='tage') %}
+      {% if c.tage < 0 %}{% set wann = 'seit ' ~ (0 - c.tage) ~ ' Tagen abgelaufen' %}
+      {% elif c.tage == 0 %}{% set wann = 'heute' %}
+      {% else %}{% set wann = 'in ' ~ c.tage ~ ' Tagen' %}{% endif %}
+      {% set z.l = z.l + ['• ' ~ c.name ~ ': ' ~ ('%g' | format(c.menge | float)) ~ ' (' ~ wann ~ ')'] %}
+    {% endfor %}
+    {% if fehlende %}
+      {% set z.l = z.l + ['Unter Soll (' ~ (fehlende | count) ~ '): '
+          ~ (fehlende | map(attribute='name') | list)[:8] | join(', ')
+          ~ (' …' if fehlende | count > 8 else '')] %}
+    {% endif %}
+    {{ z.l | join('\n') }}
+
+conditions:
+  - condition: template
+    value_template: "{{ ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][now().weekday()] in wochentage }}"
+  - condition: template
+    value_template: "{{ not nur_wenn_etwas or (zeilen | trim) != '' }}"
+
+actions:
+  - action: notify.send_message
+    target:
+      entity_id: !input empfaenger
+    data:
+      title: !input titel
+      message: "{{ zeilen if (zeilen | trim) else 'Alles im Soll, nichts läuft bald ab.' }}"

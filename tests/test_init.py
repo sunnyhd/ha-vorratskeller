@@ -290,3 +290,23 @@ async def test_form_aendern(hass: HomeAssistant, setup_integration) -> None:
         await hass.services.async_call(
             DOMAIN, "produkt_aendern", {"produkt": "h-milch", "form": "fass"}, blocking=True
         )
+
+
+async def test_fach_umbenennen(hass: HomeAssistant, setup_integration) -> None:
+    """Alle Produkte eines Fachs bekommen den neuen Namen; Fehler bei unbekanntem Fach."""
+    alt = hass.states.get("sensor.vorratskeller_h_milch").attributes["fach"]
+    res = await hass.services.async_call(
+        DOMAIN,
+        "fach_umbenennen",
+        {"alt": alt, "neu": "Neues Regal, oberster Boden"},
+        blocking=True,
+        return_response=True,
+    )
+    assert res["produkte"] >= 1
+    await hass.async_block_till_done()
+    fach = hass.states.get("sensor.vorratskeller_h_milch").attributes["fach"]
+    assert fach == "Neues Regal, oberster Boden"
+    with pytest.raises(ServiceValidationError):
+        await hass.services.async_call(
+            DOMAIN, "fach_umbenennen", {"alt": "Gibt es nicht", "neu": "X"}, blocking=True
+        )
