@@ -278,6 +278,14 @@ async def test_form_aendern(hass: HomeAssistant, setup_integration) -> None:
     assert res["form"] == "flasche"
     await hass.async_block_till_done()
     assert hass.states.get("sensor.vorratskeller_h_milch").attributes["form"] == "flasche"
+    res = await hass.services.async_call(
+        DOMAIN,
+        "produkt_aendern",
+        {"produkt": "h-milch", "form": "auto"},
+        blocking=True,
+        return_response=True,
+    )
+    assert res["form"] == ""
     with pytest.raises(vol.Invalid):
         await hass.services.async_call(
             DOMAIN, "produkt_aendern", {"produkt": "h-milch", "form": "fass"}, blocking=True

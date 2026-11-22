@@ -52,7 +52,7 @@
     },
     "form": {
       "options": {
-        "": "automatic",
+        "auto": "automatic",
         "glas": "Jar",
         "dose": "Can",
         "flasche": "Bottle",

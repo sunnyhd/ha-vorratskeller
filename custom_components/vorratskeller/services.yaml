@@ -111,7 +111,7 @@ produkt_anlegen:
       selector:
         select:
           translation_key: form
-          options: ["", "glas", "dose", "flasche", "kasten", "packung", "kiste"]
+          options: ["auto", "glas", "dose", "flasche", "kasten", "packung", "kiste"]
 
 produkt_aendern:
   fields:

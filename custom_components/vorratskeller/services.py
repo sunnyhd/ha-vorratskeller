@@ -223,6 +223,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def produkt_anlegen(call: ServiceCall) -> ServiceResponse:
         manager = _manager(hass)
         daten = dict(call.data)
+        if daten.get(ATTR_FORM) == "auto":
+            daten[ATTR_FORM] = ""
         if barcode := daten.pop(ATTR_BARCODE, None):
             daten["barcodes"] = [barcode]
         produkt = manager.produkt_anlegen(daten, call.context.user_id)
@@ -231,6 +233,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def produkt_aendern(call: ServiceCall) -> ServiceResponse:
         manager = _manager(hass)
         daten = dict(call.data)
+        if daten.get(ATTR_FORM) == "auto":
+            daten[ATTR_FORM] = ""
         produkt = manager.resolve_produkt(daten.pop(ATTR_PRODUKT), None)
         produkt = manager.produkt_aendern(produkt, daten, call.context.user_id)
         return produkt_info(manager, produkt)
