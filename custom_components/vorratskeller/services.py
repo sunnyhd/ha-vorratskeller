@@ -20,6 +20,7 @@ from homeassistant.loader import async_get_integration
 import voluptuous as vol
 
 from .const import (
+    ATTR_ALT,
     ATTR_BARCODE,
     ATTR_FACH,
     ATTR_FORM,
@@ -29,6 +30,7 @@ from .const import (
     ATTR_MENGE,
     ATTR_MHD,
     ATTR_NAME,
+    ATTR_NEU,
     ATTR_OHNE_MHD,
     ATTR_PACKUNG,
     ATTR_PACKUNGSMENGE,
@@ -43,6 +45,7 @@ from .const import (
     SERVICE_EINKAUFSLISTE_ABGLEICHEN,
     SERVICE_EINLAGERN,
     SERVICE_ENTNEHMEN,
+    SERVICE_FACH_UMBENENNEN,
     SERVICE_INVENTUR,
     SERVICE_PRODUKT_AENDERN,
     SERVICE_PRODUKT_ANLEGEN,
@@ -126,6 +129,12 @@ SCHEMA_PRODUKT_AENDERN = vol.Schema(
     }
 )
 SCHEMA_PRODUKT_LOESCHEN = vol.Schema({vol.Required(ATTR_PRODUKT): cv.string})
+SCHEMA_FACH_UMBENENNEN = vol.Schema(
+    {
+        vol.Required(ATTR_ALT): cv.string,
+        vol.Required(ATTR_NEU): vol.All(cv.string, vol.Length(min=1, max=120)),
+    }
+)
 
 
 def _manager(hass: HomeAssistant) -> VorratskellerManager:
@@ -244,6 +253,12 @@ def async_setup_services(hass: HomeAssistant) -> None:
         produkt = manager.resolve_produkt(call.data[ATTR_PRODUKT], None)
         manager.produkt_loeschen(produkt, call.context.user_id)
 
+    async def fach_umbenennen(call: ServiceCall) -> ServiceResponse:
+        anzahl = _manager(hass).fach_umbenennen(
+            call.data[ATTR_ALT], call.data[ATTR_NEU], call.context.user_id
+        )
+        return {"produkte": anzahl}
+
     async def bericht_senden(call: ServiceCall) -> None:
         await _manager(hass).async_send_bericht(call.context)
 
@@ -297,6 +312,13 @@ def async_setup_services(hass: HomeAssistant) -> None:
         SERVICE_PRODUKT_LOESCHEN,
         _recht(hass, produkt_loeschen, admin=True),
         SCHEMA_PRODUKT_LOESCHEN,
+    )
+    register(
+        DOMAIN,
+        SERVICE_FACH_UMBENENNEN,
+        _recht(hass, fach_umbenennen),
+        SCHEMA_FACH_UMBENENNEN,
+        SupportsResponse.OPTIONAL,
     )
     register(DOMAIN, SERVICE_BERICHT_SENDEN, _recht(hass, bericht_senden), vol.Schema({}))
     register(

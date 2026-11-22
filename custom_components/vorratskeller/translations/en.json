@@ -278,6 +278,20 @@
     "einkaufsliste_abgleichen": {
       "name": "Sync shopping list",
       "description": "Adds missing products to the shopping list."
+    },
+    "fach_umbenennen": {
+      "name": "Rename shelf",
+      "description": "Renames a shelf for all its products. Reprint the shelf label afterwards.",
+      "fields": {
+        "alt": {
+          "name": "Current name",
+          "description": "Shelf name as stored on the products."
+        },
+        "neu": {
+          "name": "New name",
+          "description": "Shelf before the comma, board after it, e.g. “White shelf, top board”."
+        }
+      }
     }
   },
   "exceptions": {
@@ -307,6 +321,12 @@
     },
     "notify_target_missing": {
       "message": "Notification target {ziel} does not exist."
+    },
+    "unknown_fach": {
+      "message": "There is no shelf “{fach}”."
+    },
+    "invalid_fach": {
+      "message": "The shelf name must not be empty."
     }
   }
 }

@@ -123,6 +123,13 @@ Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
 
 ![Regal-Etiketten mit QR-Code je Fach](docs/bilder/etiketten.png)
 
+### Produkte und Fächer bearbeiten
+
+Im Reiter **Regal** schaltet „Bearbeiten“ in den Bearbeiten-Modus: Ein Tipp auf ein Produkt öffnet Name, Fach,
+Soll, Packung und Form im Regal (z. B. Flasche). Der Stift neben einem Regal oder Boden benennt es um; das Regal ist
+der Teil des Fachnamens vor dem Komma, der Boden der Teil danach. Weil der QR-Code am Fachnamen hängt, danach die
+Etiketten der umbenannten Fächer neu drucken. In Automationen: `vorratskeller.fach_umbenennen` mit `alt` und `neu`.
+
 ### Etiketten
 
 Die Ansicht **Etiketten** druckt einen QR-Code je Fach auf Etikettenbögen von Avery Zweckform:

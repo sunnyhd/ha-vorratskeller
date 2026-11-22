@@ -418,6 +418,21 @@ class Lager:
         self._log("produkt_aendern", produkt_id, jetzt=jetzt, user_id=user_id)
         return produkt
 
+    def fach_umbenennen(
+        self, alt: str, neu: str, *, jetzt: datetime, user_id: str | None = None
+    ) -> int:
+        """Benenne ein Fach in allen Produkten um; Anzahl der geänderten Produkte."""
+        alt, neu = str(alt).strip(), str(neu).strip()
+        if not neu:
+            raise LagerError("invalid_fach")
+        treffer = [p for p in self.produkte.values() if p.fach.strip() == alt]
+        if not treffer:
+            raise LagerError("unknown_fach", fach=alt)
+        for produkt in treffer:
+            produkt.fach = neu
+        self._log("fach_umbenennen", None, jetzt=jetzt, user_id=user_id, alt=alt, neu=neu)
+        return len(treffer)
+
     def produkt_loeschen(
         self, produkt_id: str, *, jetzt: datetime, user_id: str | None = None
     ) -> None:

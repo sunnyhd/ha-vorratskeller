@@ -28,6 +28,22 @@ const TEXTE = {
   de: {
     name: "Vorratskeller",
     titel_dashboard: "Vorratskeller",
+    produkt_bearbeiten: "Produkt bearbeiten",
+    bearbeiten: "Bearbeiten",
+    bearbeiten_fertig: "Fertig",
+    regal_hinweis_bearbeiten: "Produkt antippen zum Bearbeiten; Stift am Regal oder Fach zum Umbenennen.",
+    name_feld: "Name",
+    soll_feld: "Soll (Packungen)",
+    packung_feld: "Packung",
+    fach_tipp: "Regal vor dem Komma, Boden danach, z. B. „Weißes Regal, oberster Boden“. Ein neuer Name legt ein neues Fach an.",
+    fach_umbenennen: "Fach „{name}“ umbenennen",
+    regal_umbenennen: "Regal „{name}“ umbenennen",
+    regal_umbenennen_tipp: "Ändert den Regalnamen in {n} Fächern; die Böden bleiben.",
+    neuer_name: "Neuer Name",
+    etikett_neu_drucken: "Der QR-Code hängt am Namen: Etiketten der umbenannten Fächer danach neu drucken.",
+    umbenannt: "{n} Fächer umbenannt. Etiketten neu drucken.",
+    produkt_gespeichert: "{name} gespeichert.",
+    speichern: "Speichern",
     etikett_format: "Etikettenbogen",
     etikett_bedarf_1: "Bedarf: {n} Etiketten, ein Bogen; {frei} Felder bleiben frei (später mit „Beginnen bei Feld“ nutzen).",
     etikett_bedarf: "Bedarf: {n} Etiketten auf {boegen} Bögen; {frei} Felder bleiben frei.",
@@ -179,6 +195,22 @@ const TEXTE = {
   en: {
     name: "Pantry (Vorratskeller)",
     titel_dashboard: "Pantry",
+    produkt_bearbeiten: "Edit product",
+    bearbeiten: "Edit",
+    bearbeiten_fertig: "Done",
+    regal_hinweis_bearbeiten: "Tap a product to edit it; pencil on a shelf or board to rename.",
+    name_feld: "Name",
+    soll_feld: "Target (packs)",
+    packung_feld: "Pack",
+    fach_tipp: "Shelf before the comma, board after it, e.g. “White shelf, top board”. A new name creates a new shelf.",
+    fach_umbenennen: "Rename shelf “{name}”",
+    regal_umbenennen: "Rename shelf unit “{name}”",
+    regal_umbenennen_tipp: "Changes the unit name in {n} shelves; boards stay.",
+    neuer_name: "New name",
+    etikett_neu_drucken: "The QR code depends on the name: reprint the labels of renamed shelves.",
+    umbenannt: "{n} shelves renamed. Reprint the labels.",
+    produkt_gespeichert: "{name} saved.",
+    speichern: "Save",
     etikett_format: "Label sheet",
     etikett_bedarf_1: "Needed: {n} labels, one sheet; {frei} positions stay free (use them later via “Start at position”).",
     etikett_bedarf: "Needed: {n} labels on {boegen} sheets; {frei} positions stay free.",
@@ -752,6 +784,14 @@ const STYLE = `
   .start > ha-icon { --mdc-icon-size: 56px; color: var(--primary-color); flex: none; margin-top: 4px; }
   .schritte { margin: 12px 0 4px; padding-left: 20px; display: grid; gap: 6px; }
   @media (max-width: 420px) { .start { flex-direction: column; } }
+  /* Bearbeiten */
+  .umbenennen { border: none; background: none; color: var(--secondary-text-color); cursor: pointer;
+    padding: 4px; min-width: 32px; min-height: 32px; vertical-align: middle; --mdc-icon-size: 18px; }
+  dialog.vk { border: none; border-radius: 16px; padding: 20px; width: min(520px, calc(100vw - 32px));
+    background: var(--card-background-color); color: var(--primary-text-color); }
+  dialog.vk::backdrop { background: rgba(0, 0, 0, 0.45); }
+  dialog.vk label { display: flex; flex-direction: column; gap: 4px; margin: 10px 0 0; flex: 1 1 140px; }
+  .klein { font-size: 0.85rem; margin: 6px 0 0; }
   /* Regal gezeichnet */
   .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
   .regal h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 500; }
@@ -1176,13 +1216,19 @@ class VorratskellerCard extends HTMLElement {
 
   _renderRegal(liste, ziel = this._inhalt, { nurFach = null, titel = true } = {}) {
     let nr = 0;
+    // Bearbeiten nur in der Regal-Ansicht selbst, nicht im Wandpanel
+    const bearbeiten = titel && this._bearbeiten;
     const alle = regale(nurFach ? liste.filter((p) => p.fach_id === nurFach) : liste);
     const html = alle
       .map(
-        (r) => `<section class="regal">${nurFach ? "" : `<h3>${esc(r.name)}</h3>`}<div class="gestell">
+        (r) => `<section class="regal">${nurFach ? "" : `<h3>${esc(r.name)}${
+          bearbeiten ? ` <button class="umbenennen" data-regal="${esc(r.name)}" aria-label="${esc(t("regal_umbenennen", { name: r.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
+        }</h3>`}<div class="gestell">
           ${r.boeden
             .map(
-              (b) => `${b.boden ? `<div class="boden-name">${esc(b.boden)}</div>` : ""}
+              (b) => `${b.boden || bearbeiten ? `<div class="boden-name">${esc(b.boden || b.name)}${
+                bearbeiten ? ` <button class="umbenennen" data-fach="${esc(b.name)}" aria-label="${esc(t("fach_umbenennen", { name: b.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
+              }</div>` : ""}
                 <div class="fachreihe">${b.produkte.map((p) => this._gefaess(p, nr++)).join("")}</div>
                 <div class="brett"></div>`,
             )
@@ -1195,11 +1241,111 @@ class VorratskellerCard extends HTMLElement {
       ${titel ? `<div class="legende">
         <span class="s-ok">${esc(t("status_ok"))}</span><span class="s-knapp">${esc(t("status_knapp"))}</span>
         <span class="s-leer">${esc(t("status_leer"))}</span><span class="s-frei">${esc(t("status_frei"))}</span>
-        <span class="muted">${esc(t("regal_hinweis"))}</span>
+        <span class="muted">${esc(t(bearbeiten ? "regal_hinweis_bearbeiten" : "regal_hinweis"))}</span>
+        <button class="aktion ${bearbeiten ? "" : "zweit"}" id="bearbeiten" aria-pressed="${Boolean(bearbeiten)}">
+          ${esc(t(bearbeiten ? "bearbeiten_fertig" : "bearbeiten"))}</button>
       </div>` : ""}
       ${alle.length ? `<div class="regale">${html}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
-    ziel.querySelectorAll(".gefaess").forEach((b) => b.addEventListener("click", () => this._entnehmen(b.dataset.id)));
+    ziel.querySelectorAll(".gefaess").forEach((b) =>
+      b.addEventListener("click", () => (bearbeiten ? this._produktDialog(b.dataset.id) : this._entnehmen(b.dataset.id))),
+    );
+    ziel.querySelector("#bearbeiten")?.addEventListener("click", () => {
+      this._bearbeiten = !this._bearbeiten;
+      this._renderRegal(this._liste, ziel, { nurFach, titel });
+    });
+    ziel.querySelectorAll(".umbenennen").forEach((b) =>
+      b.addEventListener("click", () => this._umbenennenDialog(b.dataset.fach ?? null, b.dataset.regal ?? null)),
+    );
     if (fokus) ziel.querySelector(`.gefaess[data-id="${CSS.escape(fokus)}"]`)?.focus();
+  }
+
+  // --- Bearbeiten: Produkt und Fach ---------------------------------------
+
+  _dialog(titel, inhalt, speichern) {
+    this.shadowRoot.querySelector("dialog.vk")?.remove();
+    const d = document.createElement("dialog");
+    d.className = "vk";
+    d.innerHTML = `<form method="dialog">
+        <h2>${esc(titel)}</h2>${inhalt}
+        <p class="fehler muted" role="alert"></p>
+        <div class="zeile">
+          <button class="aktion" value="ok">${esc(t("speichern"))}</button>
+          <button class="aktion zweit" value="abbrechen" formnovalidate>${esc(t("abbrechen"))}</button>
+        </div></form>`;
+    this.shadowRoot.appendChild(d);
+    d.querySelector("form").addEventListener("submit", async (ev) => {
+      if (ev.submitter?.value !== "ok") return;
+      ev.preventDefault();
+      try {
+        await speichern(d);
+        d.close();
+      } catch (err) {
+        d.querySelector(".fehler").textContent = fehlerText(err);
+      }
+    });
+    d.addEventListener("close", () => d.remove());
+    d.showModal();
+    return d;
+  }
+
+  _produktDialog(id) {
+    const p = this._liste.find((x) => x.id === id);
+    if (!p) return;
+    const faecherListe = faecher(this._liste)
+      .map((f) => `<option value="${esc(f.name)}"></option>`)
+      .join("");
+    const formen = FORMEN.map(
+      (f) => `<option value="${f}" ${p.form === f ? "selected" : ""}>${esc(t(`form_${f}`))}</option>`,
+    ).join("");
+    this._dialog(
+      t("produkt_bearbeiten"),
+      `<label>${esc(t("name_feld"))}<input name="name" required maxlength="120" value="${esc(p.name)}"></label>
+       <label>${esc(t("fach"))}<input name="fach" list="vk-faecher-bearb" value="${esc(p.fach)}"></label>
+       <datalist id="vk-faecher-bearb">${faecherListe}</datalist>
+       <p class="muted klein">${esc(t("fach_tipp"))}</p>
+       <div class="zeile">
+         <label>${esc(t("soll_feld"))}<input name="soll" type="number" min="0" step="1" value="${esc(p.soll)}"></label>
+         <label>${esc(t("packung_feld"))}<input name="packung" value="${esc(p.packung)}"></label>
+       </div>
+       <label>${esc(t("form"))}<select name="form">
+         <option value="auto">${esc(t("form_auto", { form: t(`form_${form({ ...p, form: "" })}`) }))}</option>${formen}
+       </select></label>`,
+      async (d) => {
+        const f = d.querySelector("form").elements;
+        const daten = { produkt: p.id };
+        const name = f.name.value.trim();
+        if (name !== p.name) daten.name = name;
+        if (f.fach.value.trim() !== p.fach) daten.fach = f.fach.value.trim();
+        if (num(f.soll.value) !== p.soll) daten.soll = num(f.soll.value);
+        if (f.packung.value !== p.packung) daten.packung = f.packung.value;
+        if (f.form.value !== (p.form || "auto")) daten.form = f.form.value;
+        if (Object.keys(daten).length === 1) return;
+        await callService(this._hass, "produkt_aendern", daten);
+        toast(this, t("produkt_gespeichert", { name: daten.name ?? p.name }));
+      },
+    );
+  }
+
+  _umbenennenDialog(fach, regal) {
+    const alle = faecher(this._liste);
+    // Regal umbenennen: alle Fächer, deren Name mit „Regal,“ beginnt oder genau „Regal“ ist
+    const betroffen = fach ? alle.filter((f) => f.name === fach) : alle.filter((f) => regalUndBoden(f.name).regal === regal);
+    const alt = fach ?? regal;
+    this._dialog(
+      t(fach ? "fach_umbenennen" : "regal_umbenennen", { name: alt }),
+      `<label>${esc(t("neuer_name"))}<input name="neu" required maxlength="120" value="${esc(alt)}"></label>
+       <p class="muted klein">${esc(t(fach ? "fach_tipp" : "regal_umbenennen_tipp", { n: betroffen.length }))}</p>
+       <p class="muted klein">${esc(t("etikett_neu_drucken"))}</p>`,
+      async (d) => {
+        const neu = d.querySelector("form").elements.neu.value.trim();
+        if (!neu || neu === alt) return;
+        for (const f of betroffen) {
+          const ziel = fach ? neu : neu + f.name.slice(regal.length);
+          await callService(this._hass, "fach_umbenennen", { alt: f.name, neu: ziel });
+        }
+        toast(this, t("umbenannt", { n: betroffen.length }));
+      },
+    );
   }
 
   // --- Wandpanel ------------------------------------------------------------

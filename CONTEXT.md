@@ -67,7 +67,8 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
   inoffiziell; fehlt nur, falls HA den Dialog ändert).
 - 0.5.x: Etikettendruck für Avery Zweckform L4776 (wetterfest) und 3474, Ränder mittig gerechnet, Versatz,
   Startfeld, Bedarf an Etiketten und Bögen. Die 3D-Ansicht aus 0.5.0 ist in 0.5.2 wieder entfernt (KB), samt three.js;
-  der Stand liegt im Git-Verlauf (Commit 7bd3770).
+  der Stand liegt im Git-Verlauf (Commit 7bd3770). Ebenfalls 0.5.2: Bearbeiten-Modus im Reiter Regal (Produkt-Dialog,
+  Regal/Fach umbenennen), Dienst `fach_umbenennen`.
 - Releases bis v0.5.2 erstellt; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
   „testen später“): Kamera, Etikettendruck auf echtem Bogen, Panel am Tablet.
 - Zurückgestellt (KB): Amazon-Affiliate-Link zu den Zweckform-Bögen. Hinweis: Partnerlinks laut

@@ -228,6 +228,10 @@ class VorratskellerManager:
         """Ändere ein Produkt."""
         return self._run(self.lager.produkt_aendern, produkt.id, daten, user_id=user_id)
 
+    def fach_umbenennen(self, alt: str, neu: str, user_id: str | None) -> int:
+        """Benenne ein Fach in allen Produkten um."""
+        return self._run(self.lager.fach_umbenennen, alt, neu, user_id=user_id)
+
     def produkt_loeschen(self, produkt: Produkt, user_id: str | None) -> None:
         """Lösche ein Produkt."""
         self._run(self.lager.produkt_loeschen, produkt.id, user_id=user_id)

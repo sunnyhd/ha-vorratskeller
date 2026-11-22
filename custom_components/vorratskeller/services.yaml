@@ -132,6 +132,19 @@ produkt_aendern:
     hinweis: *hinweis
     form: *form
 
+fach_umbenennen:
+  fields:
+    alt:
+      required: true
+      example: "Weißes Regal"
+      selector:
+        text:
+    neu:
+      required: true
+      example: "Weißes Regal, oberster Boden"
+      selector:
+        text:
+
 produkt_loeschen:
   fields:
     produkt:

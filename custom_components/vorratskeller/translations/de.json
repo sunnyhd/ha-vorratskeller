@@ -278,6 +278,20 @@
     "einkaufsliste_abgleichen": {
       "name": "Einkaufsliste abgleichen",
       "description": "Setzt fehlende Produkte auf die Einkaufsliste."
+    },
+    "fach_umbenennen": {
+      "name": "Fach umbenennen",
+      "description": "Benennt ein Fach in allen Produkten um. Das Etikett des Fachs danach neu drucken.",
+      "fields": {
+        "alt": {
+          "name": "Bisheriger Name",
+          "description": "Name des Fachs, wie er bei den Produkten steht."
+        },
+        "neu": {
+          "name": "Neuer Name",
+          "description": "Regal vor dem Komma, Boden danach, z. B. „Weißes Regal, oberster Boden“."
+        }
+      }
     }
   },
   "exceptions": {
@@ -307,6 +321,12 @@
     },
     "notify_target_missing": {
       "message": "Ziel {ziel} für Push-Nachrichten gibt es nicht."
+    },
+    "unknown_fach": {
+      "message": "Ein Fach „{fach}“ gibt es nicht."
+    },
+    "invalid_fach": {
+      "message": "Der Name des Fachs darf nicht leer sein."
     }
   }
 }

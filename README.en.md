@@ -93,6 +93,13 @@ The card is also available on its own: `type: custom:vorratskeller-card` with
 `modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, wall panel, take out, scanner, missing, expiring, labels)
 and optionally `fach: <shelf id>`.
 
+### Editing products and shelves
+
+In the **Shelves** tab, “Edit” switches to edit mode: tapping a product opens name, shelf, target, pack and shape
+(e.g. bottle). The pencil next to a shelf unit or board renames it; the unit is the part of the shelf name before
+the comma. The QR code depends on the name, so reprint the labels of renamed shelves. In automations:
+`vorratskeller.fach_umbenennen` with `alt` and `neu`.
+
 ### Labels
 
 The **Labels** view prints one QR code per shelf on Avery Zweckform label sheets: L4776 (99.1 × 42.3 mm,
