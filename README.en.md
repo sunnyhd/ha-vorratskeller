@@ -47,7 +47,9 @@
   </tr>
 </table>
 
-![Shelf view: shelves drawn as a rack, products as coloured blocks](docs/bilder/regal.png)
+![Shelf view: shelves drawn as a rack, products as jars, cans and bottles](docs/bilder/regal.png)
+
+![Panel for a wall tablet](docs/bilder/panel.png)
 
 ## Installation
 
@@ -79,15 +81,16 @@ Minimum version: Home Assistant 2026.10.
 | View | Content |
 |---|---|
 | Overview | ring with stock level, days of supply, fill level per group, batches expiring soon, products below target, history |
-| Shelves | the shelves drawn as a rack, each product a coloured block (green at target, orange low, red empty); a tap takes out one pack |
+| Shelves | the shelves drawn as a rack, each product as jar, can, bottle or pack, filled by stock (green at target, orange low, red empty); a tap takes out one pack |
 | Take out | one tile per product, filterable by shelf. A tap takes out one pack (with “Undo”), **+** stores one |
 | Scanner | camera or manual entry: barcode (EAN) or shelf code |
 | Stock | all products by group |
 | Shopping | what is missing to reach the target |
 | Labels | one QR code per shelf to print |
+| Panel | for a wall tablet: big numbers, what to use first and what to buy, each shelf as a field in the colour of its scarcest product; tap opens the shelf |
 
 The card is also available on its own: `type: custom:vorratskeller-card` with
-`modus: kopf | regal | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, take out, scanner, missing, expiring, labels)
+`modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, wall panel, take out, scanner, missing, expiring, labels)
 and optionally `fach: <shelf id>`.
 
 ## Entities

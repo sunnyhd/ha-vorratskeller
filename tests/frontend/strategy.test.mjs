@@ -46,7 +46,7 @@ test("Fächer gruppieren", () => {
 test("Dashboard enthält alle Ansichten und Karten", async () => {
   const Strategy = defined.get("ll-strategy-dashboard-vorratskeller");
   const dash = await Strategy.generate({}, hass);
-  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "regal", "keller", "scanner", "bestand", "einkauf", "etiketten"]);
+  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "regal", "keller", "scanner", "bestand", "einkauf", "etiketten", "panel"]);
   const bestand = dash.views.find((v) => v.path === "bestand");
   assert.equal(bestand.sections.length, 2);
   assert.equal(bestand.sections[0].cards[0].heading, "Fisch, Fleisch, Eier");
@@ -76,7 +76,7 @@ test("Englisch, wenn der Benutzer HA auf Englisch nutzt", async () => {
   const dash = mod.generateDashboard(en);
   assert.deepEqual(
     dash.views.map((v) => v.title),
-    ["Overview", "Shelves", "Take out", "Scanner", "Stock", "Shopping", "Labels"],
+    ["Overview", "Shelves", "Take out", "Scanner", "Stock", "Shopping", "Labels", "Panel"],
   );
   assert.equal(mod.t("in_tagen", { tage: 3 }), "in 3 days");
   const leer = mod.generateDashboard({ states: {}, entities: {}, locale: { language: "en-GB" } });
@@ -99,4 +99,16 @@ test("Regale und Böden aus den Fachnamen, oben zuerst", () => {
   assert.equal(mod.zustand({ soll: 4, bestand: 2, fehlt: 2 }), "knapp");
   assert.equal(mod.zustand({ soll: 4, bestand: 4, fehlt: 0 }), "ok");
   assert.equal(mod.zustand({ soll: 0, bestand: 1, fehlt: 0 }), "frei");
+});
+
+test("Gefäßform aus Packung und Hinweis", () => {
+  const f = (name, packung = "", hinweis = "") => mod.form({ name, packung, hinweis });
+  assert.equal(f("Mineralwasser", "Kästen"), "kasten");
+  assert.equal(f("Thunfisch", "× 150 g", "Dose"), "dose");
+  assert.equal(f("Rote Bete", "× 460 g", "Glas"), "glas");
+  assert.equal(f("H-Milch", "× 1 l"), "flasche");
+  assert.equal(f("Rapsöl", "× 0,5 l"), "flasche");
+  assert.equal(f("Haferflocken", "× 500 g"), "packung");
+  assert.equal(f("Taschenlampen"), "kiste");
+  assert.equal(f("Chopped tomatoes", "× 400 g", "can or jar"), "dose");
 });
