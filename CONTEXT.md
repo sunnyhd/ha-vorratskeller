@@ -22,7 +22,7 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
   Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal.
 
-## Aufbau (Version 0.3.0, Stand 2026-11-22, auf `main`)
+## Aufbau (Version 0.5.0, Stand 2026-11-22, auf `main`)
 - `custom_components/vorratskeller/`: `lager.py` (Fachlogik ohne HA: Produkte, Chargen, FIFO, Inventur,
   Reichweite, Journal), `seed.py` (Erstbefüllung aus `data/checkliste.json`, Soll auf Personen/Tage umgerechnet),
   `manager.py` (Store `.storage/vorratskeller`, Einkaufsliste, Wochenbericht, Mitternachts-Aktualisierung),
@@ -61,10 +61,19 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
   0.3.0 (PR #5): Karte `kopf` (Ring, Reichweite, Gruppen-Balken) und `regal` (Regal/Boden aus Fachnamen), Ansicht Regal.
   #4 und #5 ohne Codex-Review gemergt (Codex-Limit; KB 2026-11-22). Offene Prüffälle: Einkaufsliste nach
   Sprachwechsel (Suffix ändert sich, Dubletten möglich), Statistik-Einheit der Zähler-Sensoren bei Sprachwechsel.
-- Release v0.1.0 erstellt; KB: Release v0.3.0. Installiert zu Hause (KB, 2026-11-22), Dashboard angelegt.
+- 0.4.x: Übersicht als Satz mit Ring und Gruppen-Ringen, gezeichnetes Regal (Gefäßform aus Packung/Hinweis,
+  Feld `form` je Produkt überschreibbar), Ansicht Panel für das Tablet, leerer Start mit Anleitung,
+  Dialog „Neues Dashboard“: `getCreateSuggestions` (Titel, Symbol) und Vorschaubild (in dashboard-card gesetzt,
+  inoffiziell; fehlt nur, falls HA den Dialog ändert).
+- 0.5.0: Ansicht 3D (Karte `raum`, three.js 0.187 lokal unter `vendor/three.js`, lazy), Aufstellung automatisch
+  oder per `raum`/`regale` in der Strategie-Konfiguration (KB-Keller als Beispiel in der README);
+  Etikettendruck für Avery Zweckform L4776 (wetterfest) und 3474, Ränder mittig gerechnet, Versatz und Startfeld.
+- Releases bis v0.4.1 erstellt; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
+  „testen später“): Kamera, Etikettendruck auf echtem Bogen, Panel am Tablet, 3D am Handy.
+- Zurückgestellt (KB): Amazon-Affiliate-Link zu den Zweckform-Bögen. Hinweis: Partnerlinks laut
+  Amazon-Richtlinien nicht in clientseitiger Software, also nur in der README; braucht KBs Partner-Tag.
 - Dialog „Dashboard hinzufügen“: Titel und Symbol lassen sich nicht vorbelegen, kein Vorschaubild für
   Community-Dashboards (HA-Frontend 2026.11 geprüft).
-- KB, später: 3D-Modell als eigene Karte (Raum per YAML, three.js lazy), Stufe 2, nicht beauftragt.
 - KB, später (2026-11-22 vertagt): Gerät an der Kellertür. a) altes Fire nur für Entnahme-Kacheln, b) eigenes
   ELC SMT101 privat gekauft, c) Pilot-Panel der Firma (abgeraten: Firmengerät; Raum-Panel-App ist Firmencode mit
   Kamera aus). Vorschlag: Wandgerät nur Entnahme, Scannen beim Einräumen mit den Handys (Rückkamera, https).

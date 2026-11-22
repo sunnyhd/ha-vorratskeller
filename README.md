@@ -104,10 +104,11 @@ Die Strategie baut das ganze Dashboard aus den Entitäten, ähnlich wie das Ener
 | Bestand | alle Produkte nach Gruppen |
 | Einkauf | was bis zum Soll fehlt |
 | Etiketten | ein QR-Code je Fach zum Ausdrucken |
+| 3D | der Keller als 3D-Modell, Produkte farbig im Regal; Maße optional in YAML (siehe unten) |
 | Panel | für das Tablet an der Kellertür: große Zahlen, was zuerst verbraucht und was eingekauft werden muss, jedes Fach als Feld in der Farbe seines knappsten Produkts; antippen zeigt das Fach |
 
 Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
-`modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
+`modus: kopf | regal | raum | panel | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
 
 ### Scanner
 
@@ -122,6 +123,41 @@ Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
   die Integration selbst aus; es wird nichts von einem CDN geladen.
 
 ![Regal-Etiketten mit QR-Code je Fach](docs/bilder/etiketten.png)
+
+### 3D-Ansicht
+
+Die Ansicht **3D** stellt die Regale automatisch nebeneinander an die hintere Wand; Böden und Plätze ergeben
+sich aus den Fachnamen („Links, dritter Boden“). Wer die Maße seines Raums kennt, gibt sie in der
+Dashboard-Konfiguration an (Raw-Konfigurationseditor), in Metern; `x` nach rechts, `z` von der Tür in den Raum,
+`drehung: 90` für Regale an einer Seitenwand, `boeden: 0` für Stapel auf dem Boden:
+
+```yaml
+strategy:
+  type: custom:vorratskeller
+  raum: { breite: 3, tiefe: 4, hoehe: 2.25 }
+  regale:
+    - { name: Links, x: 0.25, z: 2.55, laenge: 2.4, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
+    - { name: Rechts, x: 2.75, z: 2.95, laenge: 1.6, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
+    - { name: Weißes Regal, x: 2.72, z: 1.45, laenge: 1.0, tiefe: 0.45, hoehe: 1.85, boeden: 4, drehung: 90 }
+    - { name: Neben dem linken Regal, x: 0.26, z: 0.75, laenge: 1.2, tiefe: 0.42, boeden: 0, drehung: 90 }
+```
+
+Antippen wählt ein Produkt; darunter erscheinen Bestand, MHD und die Knöpfe Entnehmen und Einlagern.
+Die 3D-Bibliothek (three.js) liefert die Integration selbst aus und lädt sie erst beim Öffnen der Ansicht.
+
+### Etiketten
+
+Die Ansicht **Etiketten** druckt einen QR-Code je Fach auf Etikettenbögen von Avery Zweckform:
+
+| Bogen | Format | Je Blatt | Wofür |
+|---|---|---|---|
+| L4776 | 99,1 × 42,3 mm, wetterfeste Folie | 12 | Keller und feuchte Räume (empfohlen) |
+| 3474 | 70 × 37 mm, Papier | 24 | trockene Räume |
+| Normalpapier | 60 × 60 mm | 12 | zum Ausschneiden |
+
+Die Ränder sind mittig auf A4 gerechnet. Zum Ausrichten zuerst mit „Rahmen mitdrucken“ auf Normalpapier drucken,
+gegen den Bogen ins Licht halten und Abweichungen mit dem Versatz in mm ausgleichen. „Beginnen bei Feld“
+nutzt angebrochene Bögen. Im Druckdialog Skalierung 100 % und keine Ränder wählen.
 
 ## Entitäten
 
@@ -216,4 +252,4 @@ Lizenzen in `frontend/vendor/LICENSES.md`.
 ## Lizenz
 
 MIT, siehe [`LICENSE`](LICENSE). Mitgelieferte Bibliotheken: MIT (barcode-detector, zxing-wasm,
-qrcode-generator) und Apache 2.0 (zxing-cpp).
+qrcode-generator, three.js) und Apache 2.0 (zxing-cpp).
