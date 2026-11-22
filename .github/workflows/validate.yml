@@ -35,7 +35,7 @@ jobs:
       - name: Abhängigkeiten
         run: |
           uv venv --python 3.14 .venv
-          uv pip install --python .venv/bin/python pytest-homeassistant-custom-component==0.13.375 ruff
+          uv pip install --python .venv/bin/python pytest-homeassistant-custom-component==0.13.375 home-assistant-frontend==20260930.5 ruff
       - name: Ruff
         run: |
           .venv/bin/ruff check custom_components tests
