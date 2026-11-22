@@ -22,7 +22,7 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
   Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal.
 
-## Aufbau (Version 0.5.0, Stand 2026-11-22, auf `main`)
+## Aufbau (Version 0.5.2, Stand 2026-11-22, auf `main`)
 - `custom_components/vorratskeller/`: `lager.py` (Fachlogik ohne HA: Produkte, Chargen, FIFO, Inventur,
   Reichweite, Journal), `seed.py` (Erstbefüllung aus `data/checkliste.json`, Soll auf Personen/Tage umgerechnet),
   `manager.py` (Store `.storage/vorratskeller`, Einkaufsliste, Wochenbericht, Mitternachts-Aktualisierung),
@@ -65,11 +65,11 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
   Feld `form` je Produkt überschreibbar), Ansicht Panel für das Tablet, leerer Start mit Anleitung,
   Dialog „Neues Dashboard“: `getCreateSuggestions` (Titel, Symbol) und Vorschaubild (in dashboard-card gesetzt,
   inoffiziell; fehlt nur, falls HA den Dialog ändert).
-- 0.5.0: Ansicht 3D (Karte `raum`, three.js 0.187 lokal unter `vendor/three.js`, lazy), Aufstellung automatisch
-  oder per `raum`/`regale` in der Strategie-Konfiguration (KB-Keller als Beispiel in der README);
-  Etikettendruck für Avery Zweckform L4776 (wetterfest) und 3474, Ränder mittig gerechnet, Versatz und Startfeld.
-- Releases bis v0.4.1 erstellt; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
-  „testen später“): Kamera, Etikettendruck auf echtem Bogen, Panel am Tablet, 3D am Handy.
+- 0.5.x: Etikettendruck für Avery Zweckform L4776 (wetterfest) und 3474, Ränder mittig gerechnet, Versatz,
+  Startfeld, Bedarf an Etiketten und Bögen. Die 3D-Ansicht aus 0.5.0 ist in 0.5.2 wieder entfernt (KB), samt three.js;
+  der Stand liegt im Git-Verlauf (Commit 7bd3770).
+- Releases bis v0.5.2 erstellt; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
+  „testen später“): Kamera, Etikettendruck auf echtem Bogen, Panel am Tablet.
 - Zurückgestellt (KB): Amazon-Affiliate-Link zu den Zweckform-Bögen. Hinweis: Partnerlinks laut
   Amazon-Richtlinien nicht in clientseitiger Software, also nur in der README; braucht KBs Partner-Tag.
 - Dialog „Dashboard hinzufügen“: Titel und Symbol lassen sich nicht vorbelegen, kein Vorschaubild für

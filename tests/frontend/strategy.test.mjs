@@ -46,7 +46,7 @@ test("Fächer gruppieren", () => {
 test("Dashboard enthält alle Ansichten und Karten", async () => {
   const Strategy = defined.get("ll-strategy-dashboard-vorratskeller");
   const dash = await Strategy.generate({}, hass);
-  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "regal", "3d", "keller", "scanner", "bestand", "einkauf", "etiketten", "panel"]);
+  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "regal", "keller", "scanner", "bestand", "einkauf", "etiketten", "panel"]);
   const bestand = dash.views.find((v) => v.path === "bestand");
   assert.equal(bestand.sections.length, 2);
   assert.equal(bestand.sections[0].cards[0].heading, "Fisch, Fleisch, Eier");
@@ -76,7 +76,7 @@ test("Englisch, wenn der Benutzer HA auf Englisch nutzt", async () => {
   const dash = mod.generateDashboard(en);
   assert.deepEqual(
     dash.views.map((v) => v.title),
-    ["Overview", "Shelves", "3D", "Take out", "Scanner", "Stock", "Shopping", "Labels", "Panel"],
+    ["Overview", "Shelves", "Take out", "Scanner", "Stock", "Shopping", "Labels", "Panel"],
   );
   assert.equal(mod.t("in_tagen", { tage: 3 }), "in 3 days");
   const leer = mod.generateDashboard({ states: {}, entities: {}, locale: { language: "en-GB" } });
@@ -128,31 +128,6 @@ test("Ohne Bestand kein Verlauf in der Übersicht", () => {
   const typen = (d) => d.views[0].sections.flatMap((x) => x.cards.map((c) => c.type));
   assert.ok(!typen(mod.generateDashboard(leer)).includes("history-graph"));
   assert.ok(typen(mod.generateDashboard(hass)).includes("history-graph"));
-});
-
-test("3D: Böden, Aufstellung und Plätze", () => {
-  assert.equal(mod.bodenIndex(0, 5), 0);
-  assert.equal(mod.bodenIndex(2, 5), 1);
-  assert.equal(mod.bodenIndex(3, 5), 2);
-  assert.equal(mod.bodenIndex(9, 5), 4);
-  assert.equal(mod.bodenIndex(4, 3), 2);
-  const p = (id, fach, packung = "× 400 g", hinweis = "Dose") =>
-    ({ id, name: id, fach, fach_id: mod.makeId(fach), packung, hinweis, bestand: 1, soll: 2, fehlt: 1 });
-  const liste = [p("a", "Links, unterster Boden"), p("b", "Links, dritter Boden"), p("c", "Weißes Regal", "", "")];
-  const auto = mod.raumAufbau(liste);
-  assert.deepEqual(auto.regale.map((r) => r.name), ["Links", "Weißes Regal"]);
-  assert.ok(auto.regale[1].x > auto.regale[0].x);
-  const cfg = { raum: { breite: 3, tiefe: 4 }, regale: [{ name: "links", x: 0.25, z: 2.55, laenge: 2.4, boeden: 5, drehung: 90 }] };
-  const fest = mod.raumAufbau(liste, cfg);
-  assert.equal(fest.regale[0].boeden, 5);
-  assert.equal(fest.regale[0].drehung, 90);
-  const plaetze = mod.platzieren(fest.regale[0]);
-  assert.deepEqual(plaetze.map((x) => [x.produkt.id, x.boden]), [["a", 0], ["b", 2]]);
-  // viele Produkte werden auf die Regallänge gestaucht
-  const viele = Array.from({ length: 40 }, (_, i) => p(`p${i}`, "Rechts, dritter Boden"));
-  const r = mod.raumAufbau(viele, { regale: [{ name: "Rechts", x: 1, z: 1, laenge: 1 }] }).regale[0];
-  const xs = mod.platzieren(r).map((x) => x.x);
-  assert.ok(Math.min(...xs) >= -0.5 && Math.max(...xs) <= 0.5);
 });
 
 test("Etiketten: Positionen auf dem Bogen", () => {

@@ -87,31 +87,11 @@ Minimum version: Home Assistant 2026.10.
 | Stock | all products by group |
 | Shopping | what is missing to reach the target |
 | Labels | one QR code per shelf to print |
-| 3D | the pantry as a 3D model with coloured products on the shelves; dimensions optional in YAML (see below) |
 | Panel | for a wall tablet: big numbers, what to use first and what to buy, each shelf as a field in the colour of its scarcest product; tap opens the shelf |
 
 The card is also available on its own: `type: custom:vorratskeller-card` with
-`modus: kopf | regal | raum | panel | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, 3D room, wall panel, take out, scanner, missing, expiring, labels)
+`modus: kopf | regal | panel | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, wall panel, take out, scanner, missing, expiring, labels)
 and optionally `fach: <shelf id>`.
-
-### 3D view
-
-The **3D** view places the shelves side by side along the back wall; boards and positions come from the shelf
-names (“Left, third shelf”). If you know your room's dimensions, add them to the dashboard configuration (raw
-configuration editor), in metres; `x` to the right, `z` from the door into the room, `drehung: 90` for shelves
-along a side wall, `boeden: 0` for stacks on the floor:
-
-```yaml
-strategy:
-  type: custom:vorratskeller
-  raum: { breite: 3, tiefe: 4, hoehe: 2.25 }
-  regale:
-    - { name: Left, x: 0.25, z: 2.55, laenge: 2.4, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
-    - { name: Right, x: 2.75, z: 2.95, laenge: 1.6, tiefe: 0.4, hoehe: 2.0, boeden: 5, drehung: 90 }
-```
-
-Tap selects a product and shows stock, best-before date and the Take out and Store buttons. The 3D library
-(three.js) ships with the integration and only loads when the view is opened.
 
 ### Labels
 
@@ -179,5 +159,5 @@ Removing the integration keeps it; setting it up again loads it.
 
 ## Licence
 
-MIT, see [`LICENSE`](LICENSE). Bundled libraries: MIT (barcode-detector, zxing-wasm, qrcode-generator, three.js)
+MIT, see [`LICENSE`](LICENSE). Bundled libraries: MIT (barcode-detector, zxing-wasm, qrcode-generator)
 and Apache 2.0 (zxing-cpp).
