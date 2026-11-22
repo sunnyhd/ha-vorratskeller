@@ -47,6 +47,8 @@
   </tr>
 </table>
 
+![Shelf view: shelves drawn as a rack, products as coloured blocks](docs/bilder/regal.png)
+
 ## Installation
 
 1. **Add the repository**
@@ -76,7 +78,8 @@ Minimum version: Home Assistant 2026.10.
 
 | View | Content |
 |---|---|
-| Overview | stock level, days of supply, products below target, batches expiring soon, history |
+| Overview | ring with stock level, days of supply, fill level per group, batches expiring soon, products below target, history |
+| Shelves | the shelves drawn as a rack, each product a coloured block (green at target, orange low, red empty); a tap takes out one pack |
 | Take out | one tile per product, filterable by shelf. A tap takes out one pack (with “Undo”), **+** stores one |
 | Scanner | camera or manual entry: barcode (EAN) or shelf code |
 | Stock | all products by group |
@@ -84,7 +87,7 @@ Minimum version: Home Assistant 2026.10.
 | Labels | one QR code per shelf to print |
 
 The card is also available on its own: `type: custom:vorratskeller-card` with
-`modus: entnahme | scanner | fehlend | ablaufend | etiketten` (take out, scanner, missing, expiring, labels)
+`modus: kopf | regal | entnahme | scanner | fehlend | ablaufend | etiketten` (overview, shelves, take out, scanner, missing, expiring, labels)
 and optionally `fach: <shelf id>`.
 
 ## Entities

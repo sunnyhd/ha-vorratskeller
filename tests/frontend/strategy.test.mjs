@@ -46,7 +46,7 @@ test("Fächer gruppieren", () => {
 test("Dashboard enthält alle Ansichten und Karten", async () => {
   const Strategy = defined.get("ll-strategy-dashboard-vorratskeller");
   const dash = await Strategy.generate({}, hass);
-  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "keller", "scanner", "bestand", "einkauf", "etiketten"]);
+  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "regal", "keller", "scanner", "bestand", "einkauf", "etiketten"]);
   const bestand = dash.views.find((v) => v.path === "bestand");
   assert.equal(bestand.sections.length, 2);
   assert.equal(bestand.sections[0].cards[0].heading, "Fisch, Fleisch, Eier");
@@ -76,7 +76,7 @@ test("Englisch, wenn der Benutzer HA auf Englisch nutzt", async () => {
   const dash = mod.generateDashboard(en);
   assert.deepEqual(
     dash.views.map((v) => v.title),
-    ["Overview", "Take out", "Scanner", "Stock", "Shopping", "Labels"],
+    ["Overview", "Shelves", "Take out", "Scanner", "Stock", "Shopping", "Labels"],
   );
   assert.equal(mod.t("in_tagen", { tage: 3 }), "in 3 days");
   const leer = mod.generateDashboard({ states: {}, entities: {}, locale: { language: "en-GB" } });
@@ -85,4 +85,18 @@ test("Englisch, wenn der Benutzer HA auf Englisch nutzt", async () => {
   const de = mod.generateDashboard({ ...hass, locale: { language: "de" } });
   assert.equal(de.views[0].title, "Übersicht");
   assert.equal(mod.t("in_tagen", { tage: 3 }), "in 3 Tagen");
+});
+
+test("Regale und Böden aus den Fachnamen, oben zuerst", () => {
+  assert.deepEqual(mod.regalUndBoden("Links, dritter Boden"), { regal: "Links", boden: "dritter Boden", rang: 3 });
+  assert.equal(mod.regalUndBoden("Right, bottom shelf").rang, 0);
+  assert.equal(mod.regalUndBoden("Weißes Regal").regal, "Weißes Regal");
+  const p = (id, fach) => ({ id, fach, fach_id: mod.makeId(fach), name: id, bestand: 0, soll: 0, fehlt: 0 });
+  const r = mod.regale([p("a", "Links, unterster Boden"), p("b", "Links, oberster Boden"), p("c", "Rechts, zweiter Boden")]);
+  assert.deepEqual(r.map((x) => x.name), ["Links", "Rechts"]);
+  assert.deepEqual(r[0].boeden.map((b) => b.boden), ["oberster Boden", "unterster Boden"]);
+  assert.equal(mod.zustand({ soll: 4, bestand: 0, fehlt: 4 }), "leer");
+  assert.equal(mod.zustand({ soll: 4, bestand: 2, fehlt: 2 }), "knapp");
+  assert.equal(mod.zustand({ soll: 4, bestand: 4, fehlt: 0 }), "ok");
+  assert.equal(mod.zustand({ soll: 0, bestand: 1, fehlt: 0 }), "frei");
 });

@@ -1,7 +1,7 @@
 /*
  * Vorratskeller: Karte und Dashboard-Strategie für Home Assistant.
  *
- * Karte:      type: custom:vorratskeller-card, modus: entnahme | scanner | fehlend | ablaufend | etiketten
+ * Karte:      type: custom:vorratskeller-card, modus: kopf | regal | entnahme | scanner | fehlend | ablaufend | etiketten
  * Dashboard:  strategy: { type: custom:vorratskeller }
  *
  * Ohne Build-Schritt und ohne Fremdcode zur Laufzeit von außen: Scanner-Rückfall (zxing-wasm)
@@ -109,6 +109,21 @@ const TEXTE = {
     view_bestand: "Bestand",
     view_einkauf: "Einkauf",
     view_etiketten: "Etiketten",
+    view_regal: "Regal",
+    modus_kopf: "Übersicht mit Kennzahlen",
+    modus_regal: "Regal-Ansicht",
+    titel_regal: "Regal",
+    regal_hinweis: "Tippen nimmt eine Packung heraus.",
+    tage_reicht: "Tage reicht der Vorrat",
+    reicht_nicht: "Reichweite noch unbekannt",
+    engpass: "Am knappsten: {gruppe}",
+    n_unter_soll: "{n} unter Soll",
+    n_ablaufend: "{n} bald ablaufend",
+    gruppen: "Gruppen",
+    status_ok: "im Soll",
+    status_knapp: "knapp",
+    status_leer: "leer",
+    status_frei: "ohne Soll",
     vorrat: "Vorrat",
     vorratsstand: "Vorratsstand",
     reichweite: "Reichweite",
@@ -203,6 +218,21 @@ const TEXTE = {
     view_bestand: "Stock",
     view_einkauf: "Shopping",
     view_etiketten: "Labels",
+    view_regal: "Shelves",
+    modus_kopf: "Overview with key figures",
+    modus_regal: "Shelf view",
+    titel_regal: "Shelves",
+    regal_hinweis: "Tap takes out one pack.",
+    tage_reicht: "days of supply",
+    reicht_nicht: "Days of supply not known yet",
+    engpass: "Scarcest: {gruppe}",
+    n_unter_soll: "{n} below target",
+    n_ablaufend: "{n} expiring soon",
+    gruppen: "Groups",
+    status_ok: "at target",
+    status_knapp: "low",
+    status_leer: "empty",
+    status_frei: "no target",
     vorrat: "Pantry",
     vorratsstand: "Stock level",
     reichweite: "Days of supply",
@@ -322,6 +352,54 @@ export function faecher(liste) {
   return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, LOCALE));
 }
 
+// Ordnungswörter der Böden, oben zuerst (deutsch und englisch)
+const BODEN_RANG = [
+  ["oberster", 9], ["top", 9], ["sechster", 6], ["sixth", 6], ["fünfter", 5], ["fifth", 5],
+  ["vierter", 4], ["fourth", 4], ["dritter", 3], ["third", 3], ["zweiter", 2], ["second", 2],
+  ["erster", 1], ["first", 1], ["unterster", 0], ["bottom", 0],
+];
+
+/** Regal und Boden aus dem Fachnamen: „Links, dritter Boden“ → Regal „Links“, Rang 3. */
+export function regalUndBoden(fachName) {
+  const name = String(fachName || "");
+  const komma = name.indexOf(",");
+  const regal = komma > 0 ? name.slice(0, komma).trim() : name.trim();
+  const boden = komma > 0 ? name.slice(komma + 1).trim() : "";
+  const klein = name.toLowerCase();
+  let rang = -1;
+  for (const [wort, wert] of BODEN_RANG) {
+    if (new RegExp(`(^|[^a-zäöüß])${wort}([^a-zäöüß]|$)`).test(klein)) rang = Math.max(rang, wert);
+  }
+  return { regal, boden, rang };
+}
+
+/** Regale mit ihren Böden (oben zuerst) aus der Produktliste. */
+export function regale(liste) {
+  const map = new Map();
+  for (const f of faecher(liste)) {
+    const { regal, boden, rang } = regalUndBoden(f.name);
+    if (!map.has(regal)) map.set(regal, { name: regal, boeden: [] });
+    map.get(regal).boeden.push({ ...f, boden, rang });
+  }
+  for (const r of map.values()) r.boeden.sort((a, b) => b.rang - a.rang || a.name.localeCompare(b.name, LOCALE));
+  return [...map.values()];
+}
+
+/** Zustand eines Produkts für Farbe und Text. */
+export function zustand(p) {
+  if (p.soll <= 0) return "frei";
+  if (p.bestand <= 0) return "leer";
+  if (p.fehlt > 0) return "knapp";
+  return "ok";
+}
+
+function navigiere(ziel) {
+  // relativ zur aktuellen Dashboard-Ansicht, wie navigation_path in HA
+  const pfad = ziel.startsWith("/") ? ziel : location.pathname.replace(/[^/]*$/, ziel);
+  history.pushState(null, "", pfad);
+  window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+}
+
 function summaryEntity(hass, key) {
   if (hass.states[SUMMARY[key]]) return SUMMARY[key];
   const found = Object.entries(hass.entities || {}).find(
@@ -418,12 +496,73 @@ const STYLE = `
   .etikett { border: 1px dashed var(--divider-color); border-radius: 8px; padding: 8px; text-align: center;
     font-size: 0.85rem; }
   .etikett svg { width: 100%; height: auto; background: #fff; }
-  @media (prefers-reduced-motion: reduce) { .tile { transition: none; } .tile:active { transform: none; } }
+  .s-ok { --c: var(--success-color, #43a047); }
+  .s-knapp { --c: var(--warning-color, #ffa600); }
+  .s-leer { --c: var(--error-color, #db4437); }
+  .s-frei { --c: var(--disabled-text-color, #9e9e9e); }
+  /* Kopf: Ring und Kennzahlen */
+  .kopf { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .ring { position: relative; width: 132px; height: 132px; flex: none; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .spur { stroke: var(--divider-color); }
+  .ring .wert { stroke: var(--c); stroke-linecap: round; transition: stroke-dashoffset 600ms cubic-bezier(.2,.8,.2,1); }
+  .ring .mitte { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .ring .prozent { font-size: 1.9rem; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1; }
+  .ring .label { font-size: 0.8rem; color: var(--secondary-text-color); margin-top: 4px; }
+  .kennzahlen { flex: 1 1 180px; min-width: 0; }
+  .gross { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .gross .zahl { font-size: 2.6rem; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .stat { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px;
+    border-radius: 20px; border: 1px solid var(--divider-color); background: none; font: inherit;
+    color: var(--primary-text-color); }
+  button.stat { cursor: pointer; }
+  .stat ha-icon { --mdc-icon-size: 20px; color: var(--c); }
+  .gruppen { margin-top: 18px; display: grid; gap: 10px; }
+  .gruppe { display: grid; grid-template-columns: 24px 1fr auto; gap: 4px 10px; align-items: center; }
+  .gruppe ha-icon { --mdc-icon-size: 20px; color: var(--c); grid-row: span 2; }
+  .gruppe .gname { font-size: 0.9rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gruppe .gwert { font-size: 0.85rem; color: var(--secondary-text-color); font-variant-numeric: tabular-nums; }
+  .balken { grid-column: 2 / 4; height: 8px; border-radius: 4px; background: var(--divider-color); overflow: hidden; }
+  .balken span { display: block; height: 100%; background: var(--c); transform-origin: left;
+    transform: scaleX(var(--f)); transition: transform 600ms cubic-bezier(.2,.8,.2,1); }
+  /* Regal-Ansicht */
+  .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .regal h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 500; }
+  .boden { margin-bottom: 14px; }
+  .boden-name { font-size: 0.8rem; color: var(--secondary-text-color); margin-bottom: 4px; }
+  .dosen { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; padding: 0 6px; }
+  .brett { height: 6px; border-radius: 3px; background: var(--secondary-text-color); opacity: 0.45; margin-top: 2px; }
+  .dose { position: relative; width: 84px; height: 104px; padding: 8px 6px 6px; border-radius: 10px 10px 4px 4px;
+    border: 2px solid var(--c); background: var(--card-background-color); color: var(--primary-text-color);
+    font: inherit; cursor: pointer; overflow: hidden; display: flex; flex-direction: column; align-items: center;
+    gap: 2px; text-align: center; touch-action: manipulation; transition: transform 80ms ease-out; }
+  .dose:active { transform: scale(0.96); }
+  .dose .fuell { position: absolute; inset: 0; background: var(--c); opacity: 0.22; transform-origin: bottom;
+    transform: scaleY(var(--f)); transition: transform 400ms cubic-bezier(.2,.8,.2,1); }
+  .dose > :not(.fuell) { position: relative; }
+  .dose ha-icon { --mdc-icon-size: 22px; color: var(--c); }
+  .dose .dname { font-size: 0.72rem; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; hyphens: auto; overflow-wrap: anywhere; }
+  .dose .dzahl { margin-top: auto; font-size: 0.95rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .dose .dzahl small { font-weight: 400; color: var(--secondary-text-color); }
+  .dose.alt-mhd::after { content: ""; position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--error-color, #db4437); }
+  .legende { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; color: var(--secondary-text-color);
+    margin: 0 0 12px; }
+  .legende span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px;
+    background: var(--c); margin-right: 6px; vertical-align: -1px; }
+  @media (prefers-reduced-motion: reduce) {
+    .tile, .dose { transition: none; } .tile:active, .dose:active { transform: none; }
+    .ring .wert, .balken span, .dose .fuell { transition-duration: 1ms; }
+  }
 `;
 
 // ---------------------------------------------------------------------------
 // Karte
 // ---------------------------------------------------------------------------
+
+const MODI = ["entnahme", "scanner", "fehlend", "ablaufend", "etiketten", "kopf", "regal"];
 
 class VorratskellerCard extends HTMLElement {
   static getStubConfig() {
@@ -446,6 +585,8 @@ class VorratskellerCard extends HTMLElement {
                 { value: "fehlend", label: t("modus_fehlend", {}, lang) },
                 { value: "ablaufend", label: t("modus_ablaufend", {}, lang) },
                 { value: "etiketten", label: t("modus_etiketten", {}, lang) },
+                { value: "kopf", label: t("modus_kopf", {}, lang) },
+                { value: "regal", label: t("modus_regal", {}, lang) },
               ],
             },
           },
@@ -467,7 +608,7 @@ class VorratskellerCard extends HTMLElement {
 
   setConfig(config) {
     const modus = config?.modus || "entnahme";
-    if (!["entnahme", "scanner", "fehlend", "ablaufend", "etiketten"].includes(modus)) {
+    if (!MODI.includes(modus)) {
       throw new Error(t("unbekannter_modus", { modus }));
     }
     this._config = { ...config, modus };
@@ -512,7 +653,9 @@ class VorratskellerCard extends HTMLElement {
   // Nur neu zeichnen, wenn sich Produkte geändert haben
   _signaturVon(liste) {
     const s = liste.map((p) => `${p.id}:${p.bestand}:${p.soll}:${p.mhd}:${p.name}:${p.fach}`).join("|");
-    const extra = [SUMMARY.fehlend, SUMMARY.ablaufend].map((e) => this._hass.states[e]?.last_updated).join();
+    const extra = ["fehlend", "ablaufend", "reichweite", "abdeckung"]
+      .map((k) => this._hass.states[summaryEntity(this._hass, k)]?.last_updated)
+      .join();
     return `${s}#${extra}`;
   }
 
@@ -520,7 +663,7 @@ class VorratskellerCard extends HTMLElement {
     if (!this._config || !this._hass) return;
     const modus = this._config.modus;
     if (!this._aufbau) {
-      this.shadowRoot.innerHTML = `<style>${STYLE}</style><ha-card><div id="inhalt"></div></ha-card>`;
+      this.shadowRoot.innerHTML = `<style>${STYLE}</style><ha-card lang="${esc(LOCALE)}"><div id="inhalt"></div></ha-card>`;
       this._inhalt = this.shadowRoot.getElementById("inhalt");
       this._aufbau = true;
       if (modus === "scanner") this._scannerAufbauen();
@@ -535,6 +678,8 @@ class VorratskellerCard extends HTMLElement {
     else if (modus === "ablaufend") this._renderAblaufend();
     else if (modus === "etiketten") this._renderEtiketten(liste);
     else if (modus === "scanner") this._scannerAktualisieren();
+    else if (modus === "kopf") this._renderKopf(liste);
+    else if (modus === "regal") this._renderRegal(liste);
   }
 
   _titel(standard) {
@@ -660,6 +805,112 @@ class VorratskellerCard extends HTMLElement {
       toast(this, fehlerText(err));
       return null;
     }
+  }
+
+  // --- Kopf: Ring, Reichweite, Gruppen ---------------------------------------
+
+  _renderKopf(liste) {
+    const st = (k) => this._hass.states[summaryEntity(this._hass, k)];
+    const prozent = num(st("abdeckung")?.state);
+    const reichweite = st("reichweite");
+    const tage = Number(reichweite?.state);
+    const fehlend = num(st("fehlend")?.state);
+    const ablaufend = num(st("ablaufend")?.state);
+    const ringKlasse = prozent >= 90 ? "s-ok" : prozent >= 50 ? "s-knapp" : "s-leer";
+    const umfang = 2 * Math.PI * 52;
+    // Abdeckung je Gruppe aus den Produkten (Überbestand zählt nicht)
+    const gruppen = new Map();
+    for (const p of liste) {
+      if (p.soll <= 0) continue;
+      const g = gruppen.get(p.gruppe) ?? { name: p.gruppe, icon: p.icon, soll: 0, da: 0 };
+      g.soll += p.soll;
+      g.da += Math.min(p.soll, p.bestand);
+      gruppen.set(p.gruppe, g);
+    }
+    const zeilen = [...gruppen.values()]
+      .map((g) => ({ ...g, f: g.soll ? g.da / g.soll : 0 }))
+      .sort((a, b) => a.f - b.f)
+      .map((g) => {
+        const k = g.f >= 0.9 ? "s-ok" : g.f >= 0.5 ? "s-knapp" : "s-leer";
+        return `<div class="gruppe ${k}"><ha-icon icon="${esc(g.icon)}"></ha-icon>
+          <span class="gname">${esc(g.name)}</span><span class="gwert">${fmt(Math.round(g.f * 100))} %</span>
+          <div class="balken"><span style="--f:${g.f.toFixed(3)}"></span></div></div>`;
+      })
+      .join("");
+    this._inhalt.innerHTML = `
+      ${this._titel("")}
+      <div class="kopf">
+        <div class="ring ${ringKlasse}" role="img" aria-label="${esc(t("vorratsstand"))}: ${fmt(prozent)} %">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="spur" cx="60" cy="60" r="52" fill="none" stroke-width="12"></circle>
+            <circle class="wert" cx="60" cy="60" r="52" fill="none" stroke-width="12"
+              stroke-dasharray="${umfang.toFixed(1)}"
+              stroke-dashoffset="${(umfang * (1 - Math.min(prozent, 100) / 100)).toFixed(1)}"></circle>
+          </svg>
+          <div class="mitte"><div class="prozent">${fmt(Math.round(prozent))} %</div>
+            <div class="label">${esc(t("vorratsstand"))}</div></div>
+        </div>
+        <div class="kennzahlen">
+          ${
+            Number.isFinite(tage)
+              ? `<div class="gross"><span class="zahl">${fmt(Math.floor(tage))}</span>
+                  <span>${esc(t("tage_reicht"))}</span></div>
+                ${reichweite.attributes?.engpass ? `<div class="muted">${esc(t("engpass", { gruppe: reichweite.attributes.engpass }))}</div>` : ""}`
+              : `<div class="muted">${esc(t("reicht_nicht"))}</div>`
+          }
+          <div class="stats">
+            <button class="stat ${fehlend ? "s-knapp" : "s-ok"}" data-nav="einkauf">
+              <ha-icon icon="mdi:cart-arrow-down"></ha-icon>${esc(t("n_unter_soll", { n: fmt(fehlend) }))}</button>
+            <span class="stat ${ablaufend ? "s-leer" : "s-ok"}">
+              <ha-icon icon="mdi:calendar-alert"></ha-icon>${esc(t("n_ablaufend", { n: fmt(ablaufend) }))}</span>
+          </div>
+        </div>
+      </div>
+      ${zeilen ? `<div class="gruppen" aria-label="${esc(t("gruppen"))}">${zeilen}</div>` : ""}`;
+    this._inhalt.querySelector("[data-nav]")?.addEventListener("click", (ev) => navigiere(ev.currentTarget.dataset.nav));
+  }
+
+  // --- Regal-Ansicht --------------------------------------------------------
+
+  _renderRegal(liste) {
+    const dose = (p) => {
+      const z = zustand(p);
+      const f = p.soll > 0 ? Math.min(1, p.bestand / p.soll) : p.bestand > 0 ? 1 : 0;
+      const alt = p.mhd && p.tage < 0 ? " alt-mhd" : "";
+      const label = t("kachel_label", {
+        name: p.name,
+        bestand: fmt(p.bestand),
+        soll: p.soll ? t("kachel_soll", { soll: fmt(p.soll) }) : "",
+      });
+      return `<button class="dose s-${z}${alt}" data-id="${esc(p.id)}" title="${esc(p.name)}" aria-label="${esc(label)}">
+        <span class="fuell" style="--f:${f.toFixed(3)}"></span>
+        <ha-icon icon="${esc(p.icon)}"></ha-icon>
+        <span class="dname">${esc(p.name)}</span>
+        <span class="dzahl">${fmt(p.bestand)}${p.soll ? `<small>/${fmt(p.soll)}</small>` : ""}</span>
+      </button>`;
+    };
+    const html = regale(liste)
+      .map(
+        (r) => `<section class="regal"><h3>${esc(r.name)}</h3>
+          ${r.boeden
+            .map(
+              (b) => `<div class="boden">${b.boden ? `<div class="boden-name">${esc(b.boden)}</div>` : ""}
+                <div class="dosen">${b.produkte.map(dose).join("")}</div><div class="brett"></div></div>`,
+            )
+            .join("")}</section>`,
+      )
+      .join("");
+    const fokus = this.shadowRoot.activeElement?.dataset?.id;
+    this._inhalt.innerHTML = `
+      ${this._titel(t("titel_regal"))}
+      <div class="legende">
+        <span class="s-ok">${esc(t("status_ok"))}</span><span class="s-knapp">${esc(t("status_knapp"))}</span>
+        <span class="s-leer">${esc(t("status_leer"))}</span><span class="s-frei">${esc(t("status_frei"))}</span>
+      </div>
+      <p class="muted" style="margin:0 0 12px">${esc(t("regal_hinweis"))}</p>
+      ${liste.length ? `<div class="regale">${html}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
+    this._inhalt.querySelectorAll(".dose").forEach((b) => b.addEventListener("click", () => this._entnehmen(b.dataset.id)));
+    if (fokus) this._inhalt.querySelector(`.dose[data-id="${CSS.escape(fokus)}"]`)?.focus();
   }
 
   // --- Listen ---------------------------------------------------------------
@@ -1067,13 +1318,7 @@ export function generateDashboard(hass) {
         type: "grid",
         cards: [
           { type: "heading", heading: t("vorrat"), heading_style: "title" },
-          tile(s("abdeckung"), { name: t("vorratsstand") }),
-          tile(s("reichweite"), { name: t("reichweite") }),
-          tile(s("fehlend"), {
-            name: t("unter_soll"),
-            tap_action: { action: "navigate", navigation_path: "einkauf" },
-          }),
-          tile(s("ablaufend"), { name: t("bald_ablaufend") }),
+          { type: "custom:vorratskeller-card", modus: "kopf" },
           {
             type: "history-graph",
             title: t("vorratsstand"),
@@ -1091,6 +1336,14 @@ export function generateDashboard(hass) {
         cards: [{ type: "custom:vorratskeller-card", modus: "fehlend" }],
       },
     ],
+  };
+
+  const regal = {
+    title: t("view_regal"),
+    path: "regal",
+    icon: "mdi:bookshelf",
+    type: "panel",
+    cards: [{ type: "custom:vorratskeller-card", modus: "regal" }],
   };
 
   const keller = {
@@ -1161,7 +1414,7 @@ export function generateDashboard(hass) {
       ],
     };
   }
-  return { title: t("name"), views: [uebersicht, keller, scanner, bestand, einkauf, etiketten] };
+  return { title: t("name"), views: [uebersicht, regal, keller, scanner, bestand, einkauf, etiketten] };
 }
 
 class VorratskellerStrategy extends HTMLElement {
