@@ -60,7 +60,7 @@
         "name": "Expiring soon"
       },
       "reichweite": {
-        "name": "Range"
+        "name": "Days of supply"
       },
       "abdeckung": {
         "name": "Stock level"
@@ -184,7 +184,7 @@
         },
         "packungsmenge": {
           "name": "Package amount",
-          "description": "Amount per package in the group's unit (kg or l), used for the range."
+          "description": "Amount per package in the group's unit (kg or l), used for the days of supply."
         },
         "soll": {
           "name": "Target",
@@ -226,7 +226,7 @@
         },
         "packungsmenge": {
           "name": "Package amount",
-          "description": "Amount per package in the group's unit (kg or l), used for the range."
+          "description": "Amount per package in the group's unit (kg or l), used for the days of supply."
         },
         "soll": {
           "name": "Target",

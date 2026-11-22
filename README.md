@@ -10,6 +10,10 @@
 </p>
 
 <p align="center">
+  <b>Deutsch</b> · <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/sunnyhd/ha-vorratskeller/actions/workflows/validate.yml"><img src="https://github.com/sunnyhd/ha-vorratskeller/actions/workflows/validate.yml/badge.svg" alt="Prüfungen"></a>
   <img src="https://img.shields.io/badge/Home%20Assistant-2026.10%2B-18BCF2?logo=homeassistant&logoColor=white" alt="Home Assistant 2026.10+">
   <img src="https://img.shields.io/badge/Marketplace-Integration-41BDF5" alt="Marketplace">
@@ -31,6 +35,8 @@
 - 🔔 **Wochenbericht** als Push-Nachricht: was bald abläuft und was fehlt.
 - 📊 **Eigenes Dashboard**, das sich selbst aufbaut, wie das Energie-Dashboard.
 - 🏷️ **Regal-Etiketten** mit QR-Code zum Ausdrucken.
+- 🌐 **Deutsch und Englisch:** Die Oberfläche folgt der Sprache des Benutzers; Produktnamen, Einheiten
+  und Nachrichten folgen der Systemsprache von Home Assistant.
 
 <table>
   <tr>
@@ -67,7 +73,8 @@ flowchart LR
 3. *Einstellungen → Geräte & Dienste → Integration hinzufügen →* **Vorratskeller**.
    Checkliste übernehmen, Personen und Tage angeben.
 4. **Dashboard:** *Einstellungen → Dashboards → Dashboard hinzufügen →* **Vorratskeller**
-   (unter den Community-Dashboards). Alternativ ein leeres Dashboard anlegen und im
+   (unter den Community-Dashboards), dann Titel (z. B. `Vorratskeller`) und Symbol
+   (`mdi:warehouse`) eintragen und erstellen. Alternativ ein leeres Dashboard anlegen und im
    Raw-Konfigurationseditor eintragen:
 
    ```yaml

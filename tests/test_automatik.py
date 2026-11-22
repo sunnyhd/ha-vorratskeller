@@ -102,6 +102,7 @@ async def test_wochenbericht(
     hass: HomeAssistant, freezer: FrozenDateTimeFactory, config_entry: MockConfigEntry
 ) -> None:
     calls = async_mock_service(hass, "notify", "handy")
+    hass.config.language = "de"
     await hass.config.async_set_time_zone("Europe/Berlin")
     assert await async_setup_component(hass, "http", {})
     config_entry.add_to_hass(hass)
@@ -137,6 +138,7 @@ async def test_bericht_without_target(
 
 
 async def test_config_flow_and_options(hass: HomeAssistant) -> None:
+    hass.config.language = "de"
     assert await async_setup_component(hass, "http", {})
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

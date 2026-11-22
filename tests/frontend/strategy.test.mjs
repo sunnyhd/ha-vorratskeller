@@ -70,3 +70,19 @@ test("makeId wie make_id in Python", () => {
     "print(json.dumps([make_id(n) for n in json.loads(sys.argv[1])]))", JSON.stringify(namen)]).toString();
   assert.deepEqual(namen.map(mod.makeId), JSON.parse(py));
 });
+
+test("Englisch, wenn der Benutzer HA auf Englisch nutzt", async () => {
+  const en = { ...hass, locale: { language: "en" } };
+  const dash = mod.generateDashboard(en);
+  assert.deepEqual(
+    dash.views.map((v) => v.title),
+    ["Overview", "Take out", "Scanner", "Stock", "Shopping", "Labels"],
+  );
+  assert.equal(mod.t("in_tagen", { tage: 3 }), "in 3 days");
+  const leer = mod.generateDashboard({ states: {}, entities: {}, locale: { language: "en-GB" } });
+  assert.match(leer.views[0].cards[0].content, /No products yet/);
+  // zurück auf Deutsch
+  const de = mod.generateDashboard({ ...hass, locale: { language: "de" } });
+  assert.equal(de.views[0].title, "Übersicht");
+  assert.equal(mod.t("in_tagen", { tage: 3 }), "in 3 Tagen");
+});

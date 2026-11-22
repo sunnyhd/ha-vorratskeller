@@ -26,6 +26,7 @@ from .const import (
     SIGNAL_UPDATED,
 )
 from .manager import VorratskellerConfigEntry, VorratskellerManager
+from .texte import text
 
 PARALLEL_UPDATES = 0
 
@@ -166,14 +167,14 @@ class FehlendSensor(VorratSensor):
 
     _attr_translation_key = "fehlend"
     _attr_icon = "mdi:cart-arrow-down"
-    # Einheiten übersetzt HA nur auf Englisch, daher fest auf Deutsch
-    _attr_native_unit_of_measurement = "Produkte"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _unrecorded_attributes = frozenset({"produkte"})
 
     def __init__(self, manager: VorratskellerManager) -> None:
         super().__init__(manager)
         self._attr_unique_id = "fehlend"
+        # Einheiten übersetzt HA nur auf Englisch, daher nach Systemsprache
+        self._attr_native_unit_of_measurement = text(manager.hass, "einheit_produkte")
         self.entity_id = f"sensor.{DOMAIN}_fehlende_produkte"
 
     @property
@@ -197,13 +198,13 @@ class AblaufendSensor(VorratSensor):
 
     _attr_translation_key = "ablaufend"
     _attr_icon = "mdi:calendar-alert"
-    _attr_native_unit_of_measurement = "Chargen"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _unrecorded_attributes = frozenset({"chargen"})
 
     def __init__(self, manager: VorratskellerManager) -> None:
         super().__init__(manager)
         self._attr_unique_id = "ablaufend"
+        self._attr_native_unit_of_measurement = text(manager.hass, "einheit_chargen")
         self.entity_id = f"sensor.{DOMAIN}_bald_ablaufend"
 
     @property

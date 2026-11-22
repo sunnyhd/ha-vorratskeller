@@ -21,6 +21,220 @@ const SUMMARY = {
 };
 
 // ---------------------------------------------------------------------------
+// Sprache: Deutsch bei "de", sonst Englisch (Spracheinstellung des Benutzers in HA)
+// ---------------------------------------------------------------------------
+
+const TEXTE = {
+  de: {
+    name: "Vorratskeller",
+    beschreibung_dashboard: "Lagerbuch des Vorratskellers: Übersicht, Entnahme, Scanner, Bestand, Einkauf, Etiketten.",
+    beschreibung_karte: "Entnahme-Kacheln, Scanner, fehlende und ablaufende Produkte, Regal-Etiketten.",
+    modus_entnahme: "Entnahme-Kacheln",
+    modus_scanner: "Scanner",
+    modus_fehlend: "Fehlende Produkte",
+    modus_ablaufend: "Bald ablaufend",
+    modus_etiketten: "Regal-Etiketten",
+    feld_modus: "Ansicht",
+    feld_fach: "Nur dieses Fach (Kennung)",
+    feld_titel: "Titel",
+    unbekannter_modus: "Unbekannter Modus: {modus}",
+    fach: "Fach",
+    ohne_fach: "Ohne Fach",
+    alle: "Alle",
+    titel_entnehmen: "Entnehmen",
+    titel_fehlend: "Fehlt bis zum Soll",
+    titel_ablaufend: "Bald verbrauchen",
+    titel_etiketten: "Regal-Etiketten",
+    titel_scanner: "Scanner",
+    keine_produkte: "Keine Produkte.",
+    mhd: "MHD {datum}",
+    abgelaufen_kurz: "abgelaufen",
+    kachel_label: "{name}: {bestand} da{soll}. Eine Packung entnehmen.",
+    kachel_soll: ", Soll {soll}",
+    plus_label: "{name}: eine Packung einlagern",
+    nichts_da: "{name}: nichts mehr da.",
+    entnommen: "{name}: {menge} entnommen, {rest} übrig.",
+    rueckgaengig: "Rückgängig",
+    eingelagert: "{name}: {menge} eingelagert{mhd}.",
+    eingelagert_mhd: ", MHD {datum}",
+    alles_im_soll: "Alles im Soll.",
+    abgelaufen_seit: "seit {tage} Tagen abgelaufen",
+    heute: "heute",
+    in_tagen: "in {tage} Tagen",
+    packungen: "{menge} Pkg.",
+    nichts_laeuft_ab: "In den nächsten {tage} Tagen läuft nichts ab.",
+    n_produkte: "{n} Produkte",
+    etiketten_hinweis: "Ein QR-Code je Fach. Scannen zeigt die Produkte dieses Fachs.",
+    drucken: "Drucken",
+    druck_blockiert: "Der Browser hat das Druckfenster blockiert.",
+    kamera_starten: "Kamera starten",
+    kamera_stoppen: "Kamera stoppen",
+    barcode_hand: "Barcode von Hand",
+    barcode_beispiel: "EAN, z. B. 4006381333931",
+    suchen: "Suchen",
+    kamera_https: "Die Kamera braucht eine verschlüsselte Verbindung (https). Barcode von Hand eingeben.",
+    kamera_fehlt: "Kamera nicht verfügbar: {fehler}",
+    kamera_laeuft: "Kamera läuft (Erkennung: {art}). Barcode oder Regal-Code in den Rahmen halten.",
+    etikett_unbekannt: "Unbekanntes Produkt-Etikett.",
+    code_unbekannt: "Unbekannter Code: {code}",
+    barcode_sucht: "Barcode {code} …",
+    von: "{bestand} von {soll}",
+    fach_hinweis: "Tippen nimmt eine Packung heraus, + lagert eine ein.",
+    weiter_scannen: "Weiter scannen",
+    bestand: "Bestand:",
+    menge: "Menge",
+    mhd_einlagern: "MHD (Einlagern)",
+    einlagern: "Einlagern",
+    entnehmen: "Entnehmen",
+    fertig: "Fertig",
+    off_kein_eintrag: "Kein Eintrag bei Open Food Facts.",
+    barcode_unbekannt: "Unbekannter Barcode {code}",
+    zu_produkt: "Zu vorhandenem Produkt",
+    produkt_waehlen: "Produkt wählen …",
+    ohne_barcode: "Noch ohne Barcode",
+    mit_barcode: "Mit Barcode",
+    zuordnen: "Zuordnen",
+    neues_produkt: "Neues Produkt anlegen",
+    feld_name: "Name",
+    gruppe: "Gruppe",
+    soll_packungen: "Soll (Packungen)",
+    haltbarkeit: "Haltbarkeit (Monate)",
+    anlegen: "Anlegen",
+    abbrechen: "Abbrechen",
+    zugeordnet: "Barcode gehört jetzt zu {name}.",
+    angelegt: "{name} angelegt.",
+    view_uebersicht: "Übersicht",
+    view_entnehmen: "Entnehmen",
+    view_scanner: "Scanner",
+    view_bestand: "Bestand",
+    view_einkauf: "Einkauf",
+    view_etiketten: "Etiketten",
+    vorrat: "Vorrat",
+    vorratsstand: "Vorratsstand",
+    reichweite: "Reichweite",
+    unter_soll: "Unter Soll",
+    bald_ablaufend: "Bald ablaufend",
+    leer_hinweis:
+      "Noch keine Produkte. Im **Scanner** einen Barcode scannen oder eingeben und " +
+      "„Neues Produkt anlegen“ wählen.\n\nFehlt die Integration: Einstellungen → " +
+      "Geräte & Dienste → Integration hinzufügen → Vorratskeller.",
+  },
+  en: {
+    name: "Pantry (Vorratskeller)",
+    beschreibung_dashboard: "Pantry inventory: overview, take out, scanner, stock, shopping, labels.",
+    beschreibung_karte: "Take-out tiles, scanner, missing and expiring products, shelf labels.",
+    modus_entnahme: "Take-out tiles",
+    modus_scanner: "Scanner",
+    modus_fehlend: "Missing products",
+    modus_ablaufend: "Expiring soon",
+    modus_etiketten: "Shelf labels",
+    feld_modus: "View",
+    feld_fach: "Only this shelf (ID)",
+    feld_titel: "Title",
+    unbekannter_modus: "Unknown mode: {modus}",
+    fach: "Shelf",
+    ohne_fach: "No shelf",
+    alle: "All",
+    titel_entnehmen: "Take out",
+    titel_fehlend: "Missing to reach target",
+    titel_ablaufend: "Use soon",
+    titel_etiketten: "Shelf labels",
+    titel_scanner: "Scanner",
+    keine_produkte: "No products.",
+    mhd: "BB {datum}",
+    abgelaufen_kurz: "expired",
+    kachel_label: "{name}: {bestand} in stock{soll}. Take out one pack.",
+    kachel_soll: ", target {soll}",
+    plus_label: "{name}: store one pack",
+    nichts_da: "{name}: none left.",
+    entnommen: "{name}: took out {menge}, {rest} left.",
+    rueckgaengig: "Undo",
+    eingelagert: "{name}: stored {menge}{mhd}.",
+    eingelagert_mhd: ", best before {datum}",
+    alles_im_soll: "Everything at target.",
+    abgelaufen_seit: "expired {tage} days ago",
+    heute: "today",
+    in_tagen: "in {tage} days",
+    packungen: "{menge} packs",
+    nichts_laeuft_ab: "Nothing expires in the next {tage} days.",
+    n_produkte: "{n} products",
+    etiketten_hinweis: "One QR code per shelf. Scanning it shows the products on that shelf.",
+    drucken: "Print",
+    druck_blockiert: "The browser blocked the print window.",
+    kamera_starten: "Start camera",
+    kamera_stoppen: "Stop camera",
+    barcode_hand: "Enter barcode",
+    barcode_beispiel: "EAN, e.g. 4006381333931",
+    suchen: "Search",
+    kamera_https: "The camera needs an encrypted connection (https). Enter the barcode by hand.",
+    kamera_fehlt: "Camera not available: {fehler}",
+    kamera_laeuft: "Camera running (detection: {art}). Hold a barcode or shelf code inside the frame.",
+    etikett_unbekannt: "Unknown product label.",
+    code_unbekannt: "Unknown code: {code}",
+    barcode_sucht: "Barcode {code} …",
+    von: "{bestand} of {soll}",
+    fach_hinweis: "Tap takes out one pack, + stores one.",
+    weiter_scannen: "Keep scanning",
+    bestand: "In stock:",
+    menge: "Quantity",
+    mhd_einlagern: "Best before (when storing)",
+    einlagern: "Store",
+    entnehmen: "Take out",
+    fertig: "Done",
+    off_kein_eintrag: "No entry on Open Food Facts.",
+    barcode_unbekannt: "Unknown barcode {code}",
+    zu_produkt: "Assign to existing product",
+    produkt_waehlen: "Choose product …",
+    ohne_barcode: "No barcode yet",
+    mit_barcode: "With barcode",
+    zuordnen: "Assign",
+    neues_produkt: "Create new product",
+    feld_name: "Name",
+    gruppe: "Group",
+    soll_packungen: "Target (packs)",
+    haltbarkeit: "Shelf life (months)",
+    anlegen: "Create",
+    abbrechen: "Cancel",
+    zugeordnet: "Barcode now belongs to {name}.",
+    angelegt: "{name} created.",
+    view_uebersicht: "Overview",
+    view_entnehmen: "Take out",
+    view_scanner: "Scanner",
+    view_bestand: "Stock",
+    view_einkauf: "Shopping",
+    view_etiketten: "Labels",
+    vorrat: "Pantry",
+    vorratsstand: "Stock level",
+    reichweite: "Days of supply",
+    unter_soll: "Below target",
+    bald_ablaufend: "Expiring soon",
+    leer_hinweis:
+      "No products yet. In the **Scanner**, scan or enter a barcode and choose " +
+      "“Create new product”.\n\nIntegration missing? Settings → Devices & services → " +
+      "Add integration → Vorratskeller.",
+  },
+};
+
+// Sprache und Gebietsschema; gesetzt aus hass (Karte, Strategie), vorher aus <html lang>
+let LOCALE = "de";
+const sprachBasis = () =>
+  (typeof document !== "undefined" && document.documentElement?.lang) ||
+  (typeof navigator !== "undefined" && navigator.language) ||
+  "de";
+const spracheVon = (locale) => (String(locale).toLowerCase().startsWith("de") ? "de" : "en");
+
+/** Sprache aus hass übernehmen (Spracheinstellung des Benutzers). */
+export function setzeSprache(hass) {
+  LOCALE = hass?.locale?.language || hass?.language || sprachBasis();
+}
+
+/** Text in der aktuellen Sprache, {platzhalter} gefüllt. */
+export function t(key, werte = {}, locale = LOCALE) {
+  const satz = TEXTE[spracheVon(locale)][key] ?? TEXTE.de[key] ?? key;
+  return satz.replace(/\{(\w+)\}/g, (_, k) => String(werte[k] ?? ""));
+}
+
+// ---------------------------------------------------------------------------
 // Hilfen
 // ---------------------------------------------------------------------------
 
@@ -42,11 +256,11 @@ const num = (v) => {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 };
-const fmt = (n) => num(n).toLocaleString("de-DE", { maximumFractionDigits: 2 });
+const fmt = (n) => num(n).toLocaleString(LOCALE, { maximumFractionDigits: 2 });
 const datum = (iso) => {
   if (!iso) return "";
-  const [y, m, d] = iso.split("-");
-  return `${d}.${m}.${y.slice(2)}`;
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(LOCALE, { day: "2-digit", month: "2-digit", year: "2-digit" });
 };
 const isoHeute = () => {
   const d = new Date();
@@ -96,16 +310,16 @@ export function produkte(hass) {
       chargen: a.chargen || [],
     });
   }
-  return list.sort((x, y) => x.name.localeCompare(y.name, "de"));
+  return list.sort((x, y) => x.name.localeCompare(y.name, LOCALE));
 }
 
 export function faecher(liste) {
   const map = new Map();
   for (const p of liste) {
-    if (!map.has(p.fach_id)) map.set(p.fach_id, { id: p.fach_id, name: p.fach || "Ohne Fach", produkte: [] });
+    if (!map.has(p.fach_id)) map.set(p.fach_id, { id: p.fach_id, name: p.fach || t("ohne_fach"), produkte: [] });
     map.get(p.fach_id).produkte.push(p);
   }
-  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, "de"));
+  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, LOCALE));
 }
 
 function summaryEntity(hass, key) {
@@ -217,6 +431,7 @@ class VorratskellerCard extends HTMLElement {
   }
 
   static getConfigForm() {
+    const lang = sprachBasis();
     return {
       schema: [
         {
@@ -226,11 +441,11 @@ class VorratskellerCard extends HTMLElement {
             select: {
               mode: "dropdown",
               options: [
-                { value: "entnahme", label: "Entnahme-Kacheln" },
-                { value: "scanner", label: "Scanner" },
-                { value: "fehlend", label: "Fehlende Produkte" },
-                { value: "ablaufend", label: "Bald ablaufend" },
-                { value: "etiketten", label: "Regal-Etiketten" },
+                { value: "entnahme", label: t("modus_entnahme", {}, lang) },
+                { value: "scanner", label: t("modus_scanner", {}, lang) },
+                { value: "fehlend", label: t("modus_fehlend", {}, lang) },
+                { value: "ablaufend", label: t("modus_ablaufend", {}, lang) },
+                { value: "etiketten", label: t("modus_etiketten", {}, lang) },
               ],
             },
           },
@@ -238,7 +453,7 @@ class VorratskellerCard extends HTMLElement {
         { name: "fach", selector: { text: {} } },
         { name: "titel", selector: { text: {} } },
       ],
-      computeLabel: (s) => ({ modus: "Ansicht", fach: "Nur dieses Fach (Kennung)", titel: "Titel" })[s.name],
+      computeLabel: (s) => t({ modus: "feld_modus", fach: "feld_fach", titel: "feld_titel" }[s.name], {}, lang),
     };
   }
 
@@ -253,7 +468,7 @@ class VorratskellerCard extends HTMLElement {
   setConfig(config) {
     const modus = config?.modus || "entnahme";
     if (!["entnahme", "scanner", "fehlend", "ablaufend", "etiketten"].includes(modus)) {
-      throw new Error(`Unbekannter Modus: ${modus}`);
+      throw new Error(t("unbekannter_modus", { modus }));
     }
     this._config = { ...config, modus };
     this._fach = config.fach || null;
@@ -264,6 +479,13 @@ class VorratskellerCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    const vorher = LOCALE;
+    setzeSprache(hass);
+    if (vorher !== LOCALE) {
+      // Sprache gewechselt: alles neu aufbauen
+      this._aufbau = false;
+      this._signatur = "";
+    }
     this._render();
   }
 
@@ -328,8 +550,8 @@ class VorratskellerCard extends HTMLElement {
     const sichtbar = fach ? liste.filter((p) => p.fach_id === fach) : liste;
     const chips = festesFach
       ? ""
-      : `<div class="chips" role="toolbar" aria-label="Fach">
-          <button class="chip" data-fach="" aria-pressed="${!fach}">Alle</button>
+      : `<div class="chips" role="toolbar" aria-label="${esc(t("fach"))}">
+          <button class="chip" data-fach="" aria-pressed="${!fach}">${esc(t("alle"))}</button>
           ${alle
             .map((f) => `<button class="chip" data-fach="${esc(f.id)}" aria-pressed="${f.id === fach}">${esc(f.name)}</button>`)
             .join("")}
@@ -343,9 +565,9 @@ class VorratskellerCard extends HTMLElement {
         ? `.chip[data-fach="${CSS.escape(fokus.dataset.fach ?? "")}"]`
         : null;
     ziel.innerHTML = `
-      ${titel ? this._titel("Entnehmen") : ""}
+      ${titel ? this._titel(t("titel_entnehmen")) : ""}
       ${chips}
-      ${sichtbar.length ? `<div class="grid">${tiles}</div>` : `<div class="leer-hinweis">Keine Produkte.</div>`}`;
+      ${sichtbar.length ? `<div class="grid">${tiles}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
     ziel.querySelectorAll(".chip").forEach((b) =>
       b.addEventListener("click", () => {
         this._fach = b.dataset.fach || null;
@@ -365,20 +587,20 @@ class VorratskellerCard extends HTMLElement {
     let mhd = "";
     if (p.mhd) {
       const cls = p.tage < 0 ? "alt" : p.tage <= 30 ? "warn" : "";
-      mhd = `<span class="mhd ${cls}">MHD ${esc(datum(p.mhd))}${p.tage < 0 ? " · abgelaufen" : ""}</span>`;
+      mhd = `<span class="mhd ${cls}">${esc(t("mhd", { datum: datum(p.mhd) }))}${p.tage < 0 ? ` · ${esc(t("abgelaufen_kurz"))}` : ""}</span>`;
     }
     const cls = [p.bestand <= 0 ? "leer" : "", p.fehlt > 0 ? "unter" : ""].join(" ");
     const soll = p.soll > 0 ? ` <small>/ ${fmt(p.soll)}</small>` : "";
     return `
       <div class="zelle">
         <button class="tile ${cls}" data-id="${esc(p.id)}"
-          aria-label="${esc(p.name)}: ${fmt(p.bestand)} da${p.soll ? `, Soll ${fmt(p.soll)}` : ""}. Eine Packung entnehmen.">
+          aria-label="${esc(t("kachel_label", { name: p.name, bestand: fmt(p.bestand), soll: p.soll ? t("kachel_soll", { soll: fmt(p.soll) }) : "" }))}">
           <ha-icon icon="${esc(p.icon)}"></ha-icon>
           <span class="name">${esc(p.name)}</span>
           <span class="zahl">${fmt(p.bestand)}${soll}</span>
           ${mhd}
         </button>
-        <button class="plus" data-id="${esc(p.id)}" aria-label="${esc(p.name)}: eine Packung einlagern">
+        <button class="plus" data-id="${esc(p.id)}" aria-label="${esc(t("plus_label", { name: p.name }))}">
           <ha-icon icon="mdi:plus"></ha-icon>
         </button>
       </div>`;
@@ -388,15 +610,15 @@ class VorratskellerCard extends HTMLElement {
     const p = this._liste.find((x) => x.id === id);
     if (!p || this._busy) return;
     if (p.bestand < menge) {
-      toast(this, `${p.name}: nichts mehr da.`);
+      toast(this, t("nichts_da", { name: p.name }));
       return;
     }
     this._busy = true;
     try {
       const res = await callService(this._hass, "entnehmen", { produkt: id, menge }, true);
       const zurueck = res?.entnommen || [];
-      toast(this, `${p.name}: ${fmt(menge)} entnommen, ${fmt(res?.bestand)} übrig.`, {
-        text: "Rückgängig",
+      toast(this, t("entnommen", { name: p.name, menge: fmt(menge), rest: fmt(res?.bestand) }), {
+        text: t("rueckgaengig"),
         action: () => this._rueckgaengig(id, zurueck),
       });
     } catch (err) {
@@ -425,7 +647,14 @@ class VorratskellerCard extends HTMLElement {
       const data = { produkt: id, menge };
       if (mhd) data.mhd = mhd;
       const res = await callService(this._hass, "einlagern", data, true);
-      toast(this, `${p?.name ?? id}: ${fmt(menge)} eingelagert${res?.mhd ? `, MHD ${datum(res.mhd)}` : ""}.`);
+      toast(
+        this,
+        t("eingelagert", {
+          name: p?.name ?? id,
+          menge: fmt(menge),
+          mhd: res?.mhd ? t("eingelagert_mhd", { datum: datum(res.mhd) }) : "",
+        }),
+      );
       return res;
     } catch (err) {
       toast(this, fehlerText(err));
@@ -436,9 +665,9 @@ class VorratskellerCard extends HTMLElement {
   // --- Listen ---------------------------------------------------------------
 
   _renderFehlend(liste) {
-    const fehlend = liste.filter((p) => p.fehlt > 0).sort((a, b) => a.fach.localeCompare(b.fach, "de"));
+    const fehlend = liste.filter((p) => p.fehlt > 0).sort((a, b) => a.fach.localeCompare(b.fach, LOCALE));
     this._inhalt.innerHTML = `
-      ${this._titel("Fehlt bis zum Soll")}
+      ${this._titel(t("titel_fehlend"))}
       ${
         fehlend.length
           ? `<ul class="liste">${fehlend
@@ -448,7 +677,7 @@ class VorratskellerCard extends HTMLElement {
                   <span class="wert">${fmt(p.fehlt)} ${esc(p.packung)}</span></li>`,
               )
               .join("")}</ul>`
-          : `<div class="leer-hinweis">Alles im Soll.</div>`
+          : `<div class="leer-hinweis">${esc(t("alles_im_soll"))}</div>`
       }`;
   }
 
@@ -457,18 +686,18 @@ class VorratskellerCard extends HTMLElement {
     const chargen = st?.attributes?.chargen || [];
     const warn = st?.attributes?.warn_tage ?? 30;
     this._inhalt.innerHTML = `
-      ${this._titel("Bald verbrauchen")}
+      ${this._titel(t("titel_ablaufend"))}
       ${
         chargen.length
           ? `<ul class="liste">${chargen
               .map((c) => {
                 const cls = c.tage < 0 ? "alt" : "warn";
-                const wann = c.tage < 0 ? `seit ${-c.tage} Tagen abgelaufen` : c.tage === 0 ? "heute" : `in ${c.tage} Tagen`;
-                return `<li><span class="grow">${esc(c.name)}<br><span class="muted">MHD ${esc(datum(c.mhd))}</span></span>
-                  <span class="wert"><span class="${cls}">${esc(wann)}</span><br>${fmt(c.menge)} Pkg.</span></li>`;
+                const wann = c.tage < 0 ? t("abgelaufen_seit", { tage: -c.tage }) : c.tage === 0 ? t("heute") : t("in_tagen", { tage: c.tage });
+                return `<li><span class="grow">${esc(c.name)}<br><span class="muted">${esc(t("mhd", { datum: datum(c.mhd) }))}</span></span>
+                  <span class="wert"><span class="${cls}">${esc(wann)}</span><br>${esc(t("packungen", { menge: fmt(c.menge) }))}</span></li>`;
               })
               .join("")}</ul>`
-          : `<div class="leer-hinweis">In den nächsten ${esc(warn)} Tagen läuft nichts ab.</div>`
+          : `<div class="leer-hinweis">${esc(t("nichts_laeuft_ab", { tage: warn }))}</div>`
       }`;
   }
 
@@ -486,18 +715,18 @@ class VorratskellerCard extends HTMLElement {
     const etiketten = alle
       .map(
         (f) => `<div class="etikett">${svg(QR_FACH + f.id)}<div><strong>${esc(f.name)}</strong></div>
-          <div class="muted">${f.produkte.length} Produkte</div></div>`,
+          <div class="muted">${esc(t("n_produkte", { n: f.produkte.length }))}</div></div>`,
       )
       .join("");
     this._inhalt.innerHTML = `
-      ${this._titel("Regal-Etiketten")}
-      <p class="muted">Ein QR-Code je Fach. Scannen zeigt die Produkte dieses Fachs.</p>
+      ${this._titel(t("titel_etiketten"))}
+      <p class="muted">${esc(t("etiketten_hinweis"))}</p>
       <div class="etiketten">${etiketten}</div>
-      <div class="zeile"><button class="aktion" id="drucken">Drucken</button></div>`;
+      <div class="zeile"><button class="aktion" id="drucken">${esc(t("drucken"))}</button></div>`;
     this._inhalt.querySelector("#drucken").addEventListener("click", () => {
       const w = window.open("", "_blank");
-      if (!w) return toast(this, "Der Browser hat das Druckfenster blockiert.");
-      w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Regal-Etiketten</title>
+      if (!w) return toast(this, t("druck_blockiert"));
+      w.document.write(`<!doctype html><html lang="${esc(LOCALE)}"><head><meta charset="utf-8"><title>${esc(t("titel_etiketten"))}</title>
         <style>body{font-family:sans-serif;margin:10mm}.e{display:inline-block;width:45mm;margin:2mm;padding:2mm;
         border:1px dashed #999;text-align:center;font-size:9pt;vertical-align:top;break-inside:avoid}
         .e svg{width:38mm;height:38mm}</style></head><body>
@@ -511,14 +740,14 @@ class VorratskellerCard extends HTMLElement {
 
   _scannerAufbauen() {
     this._inhalt.innerHTML = `
-      ${this._titel("Scanner")}
+      ${this._titel(t("titel_scanner"))}
       <div class="video"><video playsinline muted></video><div class="rahmen"></div></div>
       <div class="zeile">
-        <button class="aktion" id="start">Kamera starten</button>
-        <label style="flex:2 1 200px">Barcode von Hand
-          <input id="manuell" inputmode="numeric" autocomplete="off" placeholder="EAN, z. B. 4006381333931">
+        <button class="aktion" id="start">${esc(t("kamera_starten"))}</button>
+        <label style="flex:2 1 200px">${esc(t("barcode_hand"))}
+          <input id="manuell" inputmode="numeric" autocomplete="off" placeholder="${esc(t("barcode_beispiel"))}">
         </label>
-        <button class="aktion zweit" id="suchen">Suchen</button>
+        <button class="aktion zweit" id="suchen">${esc(t("suchen"))}</button>
       </div>
       <div class="status" id="status" role="status" aria-live="polite"></div>
       <div id="ergebnis"></div>`;
@@ -538,7 +767,7 @@ class VorratskellerCard extends HTMLElement {
     const zahl = this._ergebnis?.querySelector("[data-bestand-von]");
     if (zahl) {
       const p = this._liste.find((x) => x.id === zahl.dataset.bestandVon);
-      if (p) zahl.textContent = `${fmt(p.bestand)}${p.soll ? ` von ${fmt(p.soll)}` : ""}`;
+      if (p) zahl.textContent = p.soll ? t("von", { bestand: fmt(p.bestand), soll: fmt(p.soll) }) : fmt(p.bestand);
     }
     const fachGrid = this._ergebnis?.querySelector("[data-fach-grid]");
     if (fachGrid) this._renderEntnahme(fachGrid, this._liste, { festesFach: fachGrid.dataset.fachGrid, titel: false });
@@ -548,21 +777,20 @@ class VorratskellerCard extends HTMLElement {
     if (this._scanner && !this._scanner.gestoppt) {
       this._scanner.stop();
       this._scanner = null;
-      button.textContent = "Kamera starten";
+      button.textContent = t("kamera_starten");
       return;
     }
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-      this._status.textContent =
-        "Die Kamera braucht eine verschlüsselte Verbindung (https). Barcode von Hand eingeben.";
+      this._status.textContent = t("kamera_https");
       return;
     }
     button.disabled = true;
     try {
       this._scanner = new Scanner(this._video, (code) => this._erkannt(code), (t) => (this._status.textContent = t));
       await this._scanner.start();
-      button.textContent = "Kamera stoppen";
+      button.textContent = t("kamera_stoppen");
     } catch (err) {
-      this._status.textContent = `Kamera nicht verfügbar: ${fehlerText(err)}`;
+      this._status.textContent = t("kamera_fehlt", { fehler: fehlerText(err) });
     } finally {
       button.disabled = false;
     }
@@ -581,14 +809,14 @@ class VorratskellerCard extends HTMLElement {
     if (code.startsWith(QR_PRODUKT)) {
       const p = this._liste.find((x) => x.id === code.slice(QR_PRODUKT.length));
       if (p) return this._zeigeProdukt(p);
-      this._status.textContent = "Unbekanntes Produkt-Etikett.";
+      this._status.textContent = t("etikett_unbekannt");
       return this._ergebnisSchliessen();
     }
     if (!/^\d{8}$|^\d{12,14}$/.test(code)) {
-      this._status.textContent = `Unbekannter Code: ${code}`;
+      this._status.textContent = t("code_unbekannt", { code });
       return this._ergebnisSchliessen();
     }
-    this._status.textContent = `Barcode ${code} …`;
+    this._status.textContent = t("barcode_sucht", { code });
     try {
       const res = await callService(this._hass, "barcode_suchen", { barcode: code }, true);
       if (res.bekannt) {
@@ -607,9 +835,9 @@ class VorratskellerCard extends HTMLElement {
     const fach = faecher(this._liste).find((f) => f.id === fachId);
     this._status.textContent = "";
     this._ergebnis.innerHTML = `<div class="panel"><h3>${esc(fach?.name ?? fachId)}</h3>
-      <p class="muted">Tippen nimmt eine Packung heraus, + lagert eine ein.</p>
+      <p class="muted">${esc(t("fach_hinweis"))}</p>
       <div data-fach-grid="${esc(fachId)}"></div>
-      <div class="zeile"><button class="aktion zweit" id="fertig">Weiter scannen</button></div></div>`;
+      <div class="zeile"><button class="aktion zweit" id="fertig">${esc(t("weiter_scannen"))}</button></div></div>`;
     this._ergebnis.querySelector("#fertig").addEventListener("click", () => this._ergebnisSchliessen());
     this._renderEntnahme(this._ergebnis.querySelector("[data-fach-grid]"), this._liste, {
       festesFach: fachId,
@@ -622,15 +850,15 @@ class VorratskellerCard extends HTMLElement {
     this._ergebnis.innerHTML = `<div class="panel">
       <h3>${esc(p.name)}</h3>
       <div class="muted">${esc(p.fach)}${p.packung ? ` · ${esc(p.packung)}` : ""}</div>
-      <div>Bestand: <strong data-bestand-von="${esc(p.id)}">${fmt(p.bestand)}${p.soll ? ` von ${fmt(p.soll)}` : ""}</strong></div>
+      <div>${esc(t("bestand"))} <strong data-bestand-von="${esc(p.id)}">${esc(p.soll ? t("von", { bestand: fmt(p.bestand), soll: fmt(p.soll) }) : fmt(p.bestand))}</strong></div>
       <div class="zeile">
-        <label>Menge<input id="menge" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
-        <label>MHD (Einlagern)<input id="mhd" type="date" min="${isoHeute()}" value="${esc(mhd)}"></label>
+        <label>${esc(t("menge"))}<input id="menge" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+        <label>${esc(t("mhd_einlagern"))}<input id="mhd" type="date" min="${isoHeute()}" value="${esc(mhd)}"></label>
       </div>
       <div class="zeile">
-        <button class="aktion" id="rein">Einlagern</button>
-        <button class="aktion zweit" id="raus">Entnehmen</button>
-        <button class="aktion zweit" id="fertig">Fertig</button>
+        <button class="aktion" id="rein">${esc(t("einlagern"))}</button>
+        <button class="aktion zweit" id="raus">${esc(t("entnehmen"))}</button>
+        <button class="aktion zweit" id="fertig">${esc(t("fertig"))}</button>
       </div></div>`;
     const $ = (s) => this._ergebnis.querySelector(s);
     const menge = () => Math.max(0.001, num($("#menge").value) || 1);
@@ -642,39 +870,39 @@ class VorratskellerCard extends HTMLElement {
   }
 
   _zeigeUnbekannt(code, vorschlag) {
-    const gruppen = [...new Set(this._liste.map((p) => p.gruppe))].sort((a, b) => a.localeCompare(b, "de"));
+    const gruppen = [...new Set(this._liste.map((p) => p.gruppe))].sort((a, b) => a.localeCompare(b, LOCALE));
     const ohneCode = this._liste.filter((p) => !p.barcodes.length);
     const andere = this._liste.filter((p) => p.barcodes.length);
     const opt = (p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`;
     const vorschlagText = vorschlag
       ? `Open Food Facts: <strong>${esc(vorschlag.name)}</strong>${vorschlag.marke ? `, ${esc(vorschlag.marke)}` : ""}${vorschlag.menge ? `, ${esc(vorschlag.menge)}` : ""}`
-      : "Kein Eintrag bei Open Food Facts.";
+      : esc(t("off_kein_eintrag"));
     this._status.textContent = "";
     this._ergebnis.innerHTML = `<div class="panel">
-      <h3>Unbekannter Barcode ${esc(code)}</h3>
+      <h3>${esc(t("barcode_unbekannt", { code }))}</h3>
       <div class="muted">${vorschlagText}</div>
       <div class="zeile">
-        <label style="flex:3 1 220px">Zu vorhandenem Produkt
-          <select id="ziel"><option value="">Produkt wählen …</option>
-            <optgroup label="Noch ohne Barcode">${ohneCode.map(opt).join("")}</optgroup>
-            <optgroup label="Mit Barcode">${andere.map(opt).join("")}</optgroup>
+        <label style="flex:3 1 220px">${esc(t("zu_produkt"))}
+          <select id="ziel"><option value="">${esc(t("produkt_waehlen"))}</option>
+            <optgroup label="${esc(t("ohne_barcode"))}">${ohneCode.map(opt).join("")}</optgroup>
+            <optgroup label="${esc(t("mit_barcode"))}">${andere.map(opt).join("")}</optgroup>
           </select></label>
-        <button class="aktion" id="zuordnen">Zuordnen</button>
+        <button class="aktion" id="zuordnen">${esc(t("zuordnen"))}</button>
       </div>
-      <details style="margin-top:12px"><summary>Neues Produkt anlegen</summary>
+      <details style="margin-top:12px"><summary>${esc(t("neues_produkt"))}</summary>
         <div class="zeile">
-          <label style="flex:3 1 220px">Name<input id="name" value="${esc(vorschlag?.name ?? "")}" maxlength="120"></label>
-          <label>Gruppe<select id="gruppe">${gruppen.map((g) => `<option value="${esc(makeId(g))}">${esc(g)}</option>`).join("")}</select></label>
+          <label style="flex:3 1 220px">${esc(t("feld_name"))}<input id="name" value="${esc(vorschlag?.name ?? "")}" maxlength="120"></label>
+          <label>${esc(t("gruppe"))}<select id="gruppe">${gruppen.map((g) => `<option value="${esc(makeId(g))}">${esc(g)}</option>`).join("")}</select></label>
         </div>
         <div class="zeile">
-          <label>Fach<input id="fach" list="vk-faecher"></label>
+          <label>${esc(t("fach"))}<input id="fach" list="vk-faecher"></label>
           <datalist id="vk-faecher">${faecher(this._liste).map((f) => `<option value="${esc(f.name)}">`).join("")}</datalist>
-          <label>Soll (Packungen)<input id="soll" type="number" min="0" step="1" value="0"></label>
-          <label>Haltbarkeit (Monate)<input id="haltbar" type="number" min="0" step="1" value="12"></label>
+          <label>${esc(t("soll_packungen"))}<input id="soll" type="number" min="0" step="1" value="0"></label>
+          <label>${esc(t("haltbarkeit"))}<input id="haltbar" type="number" min="0" step="1" value="12"></label>
         </div>
-        <div class="zeile"><button class="aktion" id="anlegen">Anlegen</button></div>
+        <div class="zeile"><button class="aktion" id="anlegen">${esc(t("anlegen"))}</button></div>
       </details>
-      <div class="zeile"><button class="aktion zweit" id="fertig">Abbrechen</button></div></div>`;
+      <div class="zeile"><button class="aktion zweit" id="fertig">${esc(t("abbrechen"))}</button></div></div>`;
     const $ = (s) => this._ergebnis.querySelector(s);
     $("#fertig").addEventListener("click", () => this._ergebnisSchliessen());
     $("#zuordnen").addEventListener("click", async () => {
@@ -683,7 +911,7 @@ class VorratskellerCard extends HTMLElement {
       try {
         await callService(this._hass, "barcode_zuordnen", { barcode: code, produkt: id });
         const p = this._liste.find((x) => x.id === id);
-        toast(this, `Barcode gehört jetzt zu ${p?.name ?? id}.`);
+        toast(this, t("zugeordnet", { name: p?.name ?? id }));
         this._zeigeProdukt({ ...p, barcodes: [...(p?.barcodes ?? []), code] });
       } catch (err) {
         toast(this, fehlerText(err));
@@ -707,7 +935,7 @@ class VorratskellerCard extends HTMLElement {
           },
           true,
         );
-        toast(this, `${name} angelegt.`);
+        toast(this, t("angelegt", { name }));
         this._zeigeProdukt({ ...neu, haltbarkeit: neu.haltbarkeit_monate });
       } catch (err) {
         toast(this, fehlerText(err));
@@ -776,7 +1004,7 @@ class Scanner {
     }
     if (this.gestoppt) return this.stop();
     this.aktiv = true;
-    this.onStatus(`Kamera läuft (Erkennung: ${art}). Barcode oder Regal-Code in den Rahmen halten.`);
+    this.onStatus(t("kamera_laeuft", { art }));
     this._loop();
   }
 
@@ -818,6 +1046,7 @@ class Scanner {
 // ---------------------------------------------------------------------------
 
 export function generateDashboard(hass) {
+  setzeSprache(hass);
   const liste = produkte(hass);
   const gruppen = new Map();
   for (const p of liste) {
@@ -828,7 +1057,7 @@ export function generateDashboard(hass) {
   const s = (key) => summaryEntity(hass, key);
 
   const uebersicht = {
-    title: "Übersicht",
+    title: t("view_uebersicht"),
     path: "uebersicht",
     icon: "mdi:warehouse",
     type: "sections",
@@ -837,17 +1066,17 @@ export function generateDashboard(hass) {
       {
         type: "grid",
         cards: [
-          { type: "heading", heading: "Vorrat", heading_style: "title" },
-          tile(s("abdeckung"), { name: "Vorratsstand" }),
-          tile(s("reichweite"), { name: "Reichweite" }),
+          { type: "heading", heading: t("vorrat"), heading_style: "title" },
+          tile(s("abdeckung"), { name: t("vorratsstand") }),
+          tile(s("reichweite"), { name: t("reichweite") }),
           tile(s("fehlend"), {
-            name: "Unter Soll",
+            name: t("unter_soll"),
             tap_action: { action: "navigate", navigation_path: "einkauf" },
           }),
-          tile(s("ablaufend"), { name: "Bald ablaufend" }),
+          tile(s("ablaufend"), { name: t("bald_ablaufend") }),
           {
             type: "history-graph",
-            title: "Vorratsstand",
+            title: t("vorratsstand"),
             hours_to_show: 24 * 30,
             entities: [{ entity: s("abdeckung") }],
           },
@@ -865,7 +1094,7 @@ export function generateDashboard(hass) {
   };
 
   const keller = {
-    title: "Entnehmen",
+    title: t("view_entnehmen"),
     path: "keller",
     icon: "mdi:gesture-tap",
     type: "panel",
@@ -873,7 +1102,7 @@ export function generateDashboard(hass) {
   };
 
   const scanner = {
-    title: "Scanner",
+    title: t("view_scanner"),
     path: "scanner",
     icon: "mdi:barcode-scan",
     type: "panel",
@@ -881,7 +1110,7 @@ export function generateDashboard(hass) {
   };
 
   const bestand = {
-    title: "Bestand",
+    title: t("view_bestand"),
     path: "bestand",
     icon: "mdi:format-list-bulleted",
     type: "sections",
@@ -896,7 +1125,7 @@ export function generateDashboard(hass) {
   };
 
   const einkauf = {
-    title: "Einkauf",
+    title: t("view_einkauf"),
     path: "einkauf",
     icon: "mdi:cart-outline",
     type: "sections",
@@ -905,7 +1134,7 @@ export function generateDashboard(hass) {
   };
 
   const etiketten = {
-    title: "Etiketten",
+    title: t("view_etiketten"),
     path: "etiketten",
     icon: "mdi:qrcode",
     type: "panel",
@@ -915,19 +1144,16 @@ export function generateDashboard(hass) {
   if (!liste.length) {
     // Ohne Produkte: Hinweis und Scanner, damit sich das erste Produkt per Barcode anlegen lässt
     return {
-      title: "Vorratskeller",
+      title: t("name"),
       views: [
         {
-          title: "Übersicht",
+          title: t("view_uebersicht"),
           path: "uebersicht",
           icon: "mdi:warehouse",
           cards: [
             {
               type: "markdown",
-              content:
-                "Noch keine Produkte. Im **Scanner** einen Barcode scannen oder eingeben und " +
-                "„Neues Produkt anlegen“ wählen.\n\nFehlt die Integration: Einstellungen → " +
-                "Geräte & Dienste → Integration hinzufügen → Vorratskeller.",
+              content: t("leer_hinweis"),
             },
           ],
         },
@@ -935,7 +1161,7 @@ export function generateDashboard(hass) {
       ],
     };
   }
-  return { title: "Vorratskeller", views: [uebersicht, keller, scanner, bestand, einkauf, etiketten] };
+  return { title: t("name"), views: [uebersicht, keller, scanner, bestand, einkauf, etiketten] };
 }
 
 class VorratskellerStrategy extends HTMLElement {
@@ -985,8 +1211,12 @@ window.customCards = window.customCards || [];
 if (!window.customCards.some((c) => c.type === "vorratskeller-card")) {
   window.customCards.push({
     type: "vorratskeller-card",
-    name: "Vorratskeller",
-    description: "Entnahme-Kacheln, Scanner, fehlende und ablaufende Produkte, Regal-Etiketten.",
+    get name() {
+      return t("name", {}, sprachBasis());
+    },
+    get description() {
+      return t("beschreibung_karte", {}, sprachBasis());
+    },
     preview: false,
   });
 }
@@ -996,7 +1226,11 @@ if (!window.customStrategies.some((s) => s.type === DOMAIN)) {
   window.customStrategies.push({
     type: DOMAIN,
     strategyType: "dashboard",
-    name: "Vorratskeller",
-    description: "Lagerbuch des Vorratskellers: Übersicht, Entnahme, Scanner, Bestand, Einkauf, Etiketten.",
+    get name() {
+      return t("name", {}, sprachBasis());
+    },
+    get description() {
+      return t("beschreibung_dashboard", {}, sprachBasis());
+    },
   });
 }
