@@ -49,6 +49,8 @@
   </tr>
 </table>
 
+![Regal-Ansicht: Fächer als Regal, Produkte als farbige Blöcke](docs/bilder/regal.png)
+
 ## So greift es ineinander
 
 ```mermaid
@@ -94,7 +96,8 @@ Die Strategie baut das ganze Dashboard aus den Entitäten, ähnlich wie das Ener
 
 | Ansicht | Inhalt |
 |---|---|
-| Übersicht | Vorratsstand, Reichweite, Produkte unter Soll, bald ablaufende Chargen, Verlauf |
+| Übersicht | Ring mit Vorratsstand, Reichweite in Tagen, Füllstand je Gruppe, bald ablaufende Chargen, Produkte unter Soll, Verlauf |
+| Regal | die Fächer als Regal gezeichnet, jedes Produkt als farbiger Block (grün im Soll, orange knapp, rot leer); Tippen nimmt eine Packung heraus |
 | Entnehmen | eine Kachel je Produkt, nach Fach filterbar. Tippen nimmt eine Packung heraus (mit „Rückgängig“), **+** lagert eine ein |
 | Scanner | Kamera oder Eingabe von Hand: Barcode (EAN) oder Regal-Code |
 | Bestand | alle Produkte nach Gruppen |
@@ -102,7 +105,7 @@ Die Strategie baut das ganze Dashboard aus den Entitäten, ähnlich wie das Ener
 | Etiketten | ein QR-Code je Fach zum Ausdrucken |
 
 Die Karte gibt es auch einzeln: `type: custom:vorratskeller-card` mit
-`modus: entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
+`modus: kopf | regal | entnahme | scanner | fehlend | ablaufend | etiketten` und optional `fach: <kennung>`.
 
 ### Scanner
 
