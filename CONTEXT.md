@@ -22,7 +22,7 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
   Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal.
 
-## Aufbau (Version 1, Stand 2026-11-22, auf `main` seit PR #1)
+## Aufbau (Version 0.3.0, Stand 2026-11-22, auf `main`)
 - `custom_components/vorratskeller/`: `lager.py` (Fachlogik ohne HA: Produkte, Chargen, FIFO, Inventur,
   Reichweite, Journal), `seed.py` (Erstbefüllung aus `data/checkliste.json`, Soll auf Personen/Tage umgerechnet),
   `manager.py` (Store `.storage/vorratskeller`, Einkaufsliste, Wochenbericht, Mitternachts-Aktualisierung),
@@ -56,7 +56,15 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
 ## Offen
 - Repo öffentlich auf GitHub `sunnyhd/ha-vorratskeller` (KB, 2026-11-22), Lizenz MIT, 3D-Modell öffentlich,
   README mit Screenshots aus dem Test-HA. PR #1 gemergt (747abd6), alle Prüfungen grün (hassfest, HACS, Tests).
-- KB: Release v0.1.0 (Marketplace/HACS installiert sonst den letzten Commit) und Einspielen zu Hause.
+- 0.2.0 (PR #4): Deutsch/Englisch (Oberfläche nach Benutzersprache, Daten/Einheiten/Nachrichten nach
+  Systemsprache, `texte.py`, `data/checkliste.en.json`), Icon/Logo hell+dunkel (`scripts/brand.py`), Issue-Vorlagen.
+  0.3.0 (PR #5): Karte `kopf` (Ring, Reichweite, Gruppen-Balken) und `regal` (Regal/Boden aus Fachnamen), Ansicht Regal.
+  #4 und #5 ohne Codex-Review gemergt (Codex-Limit; KB 2026-11-22). Offene Prüffälle: Einkaufsliste nach
+  Sprachwechsel (Suffix ändert sich, Dubletten möglich), Statistik-Einheit der Zähler-Sensoren bei Sprachwechsel.
+- Release v0.1.0 erstellt; KB: Release v0.3.0. Installiert zu Hause (KB, 2026-11-22), Dashboard angelegt.
+- Dialog „Dashboard hinzufügen“: Titel und Symbol lassen sich nicht vorbelegen, kein Vorschaubild für
+  Community-Dashboards (HA-Frontend 2026.11 geprüft).
+- KB, später: 3D-Modell als eigene Karte (Raum per YAML, three.js lazy), Stufe 2, nicht beauftragt.
 - KB, später (2026-11-22 vertagt): Gerät an der Kellertür. a) altes Fire nur für Entnahme-Kacheln, b) eigenes
   ELC SMT101 privat gekauft, c) Pilot-Panel der Firma (abgeraten: Firmengerät; Raum-Panel-App ist Firmencode mit
   Kamera aus). Vorschlag: Wandgerät nur Entnahme, Scannen beim Einräumen mit den Handys (Rückkamera, https).
