@@ -18,7 +18,6 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
   Produkte, Soll, Fach, Haltbarkeit: `docs/grundlagen/produkte-checkliste.json`
   (Gruppe, Ziel, Einheit, Regal, Items `[Produkt, Hinweis, Anzahl, Packung, Menge, MHD-Monate]`).
 - Checkliste und 3D-Modell des Kellers: `docs/grundlagen/vorratskammer-14-tage.html`, `vorratskeller-3d.html`
-  (veröffentlicht: claude.ai/artifact/3WgvR3hecagusgoFYyfo2h und claude.ai/artifact/4RFAwwCXsQwTdwb6KDERpB).
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
   Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal. Feuchte Rückwand (Hygrometer, Fleck prüfen).
 
