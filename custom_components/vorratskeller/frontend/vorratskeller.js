@@ -27,6 +27,7 @@ const SUMMARY = {
 const TEXTE = {
   de: {
     name: "Vorratskeller",
+    titel_dashboard: "Vorratskeller",
     beschreibung_dashboard: "Lagerbuch des Vorratskellers: Übersicht, Entnahme, Scanner, Bestand, Einkauf, Etiketten.",
     beschreibung_karte: "Entnahme-Kacheln, Scanner, fehlende und ablaufende Produkte, Regal-Etiketten.",
     modus_entnahme: "Entnahme-Kacheln",
@@ -149,6 +150,7 @@ const TEXTE = {
   },
   en: {
     name: "Pantry (Vorratskeller)",
+    titel_dashboard: "Pantry",
     beschreibung_dashboard: "Pantry inventory: overview, take out, scanner, stock, shopping, labels.",
     beschreibung_karte: "Take-out tiles, scanner, missing and expiring products, shelf labels.",
     modus_entnahme: "Take-out tiles",
@@ -1612,6 +1614,12 @@ class VorratskellerStrategy extends HTMLElement {
     return generateDashboard(hass);
   }
 
+  /** Vorschlag für Titel und Symbol im Dialog „Neues Dashboard“ (HA-Frontend ab 2026.10). */
+  static getCreateSuggestions(hass) {
+    setzeSprache(hass);
+    return { title: t("titel_dashboard"), icon: "mdi:warehouse" };
+  }
+
   static noEditor = true;
 }
 
@@ -1664,6 +1672,28 @@ if (!window.customCards.some((c) => c.type === "vorratskeller-card")) {
   });
 }
 
+// Vorschaubild im Dialog „Dashboard hinzufügen“. HA zeigt Bilder nur bei eigenen Dashboards; die Karte
+// (dashboard-card) hat aber eine Eigenschaft img. Wir setzen sie, sobald der Dialog unsere Karte zeichnet.
+// Ändert HA den Dialog, fehlt nur das Bild (im HA-Frontend 2026.10 und 2026.11 geprüft).
+function vorschauEinsetzen() {
+  const dunkel = document.querySelector("home-assistant")?.hass?.themes?.darkMode;
+  const bild = `${BASE}/vorschau-${dunkel ? "dunkel" : "hell"}.svg`;
+  const suche = (wurzel) => {
+    for (const el of wurzel.querySelectorAll("*")) {
+      if (el.localName === "dashboard-card" && el.strategy === `custom:${DOMAIN}` && el.img !== bild) {
+        el.img = bild;
+        el.alt = t("name", {}, sprachBasis());
+      }
+      if (el.shadowRoot) suche(el.shadowRoot);
+    }
+  };
+  try {
+    suche(document);
+  } catch (_err) {
+    // ohne Bild weiter
+  }
+}
+
 window.customStrategies = window.customStrategies || [];
 if (!window.customStrategies.some((s) => s.type === DOMAIN)) {
   window.customStrategies.push({
@@ -1673,6 +1703,8 @@ if (!window.customStrategies.some((s) => s.type === DOMAIN)) {
       return t("name", {}, sprachBasis());
     },
     get description() {
+      // Der Dialog liest die Beschreibung beim Zeichnen; danach das Bild einsetzen
+      if (typeof document !== "undefined") for (const ms of [0, 150, 600]) setTimeout(vorschauEinsetzen, ms);
       return t("beschreibung_dashboard", {}, sprachBasis());
     },
   });
