@@ -62,7 +62,7 @@
 3. *Settings → Devices & services → Add integration →* **Vorratskeller**.
    Take over the checklist, enter people and days.
 4. **Dashboard:** *Settings → Dashboards → Add dashboard →* **Pantry (Vorratskeller)** under
-   *Community dashboards*, then enter a title (e.g. `Pantry`) and icon (`mdi:warehouse`) and create it.
+   *Community dashboards*. Title and icon are prefilled, just press “Create”.
    Alternatively create an empty dashboard and enter in the raw configuration editor:
 
    ```yaml

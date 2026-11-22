@@ -112,3 +112,10 @@ test("Gefäßform aus Packung und Hinweis", () => {
   assert.equal(f("Taschenlampen"), "kiste");
   assert.equal(f("Chopped tomatoes", "× 400 g", "can or jar"), "dose");
 });
+
+test("Vorschlag für Titel und Symbol beim Anlegen", () => {
+  const Strategy = defined.get("ll-strategy-dashboard-vorratskeller");
+  assert.deepEqual(Strategy.getCreateSuggestions({ locale: { language: "de" } }), { title: "Vorratskeller", icon: "mdi:warehouse" });
+  assert.deepEqual(Strategy.getCreateSuggestions({ locale: { language: "en" } }), { title: "Pantry", icon: "mdi:warehouse" });
+  Strategy.getCreateSuggestions({ locale: { language: "de" } });
+});

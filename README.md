@@ -77,8 +77,7 @@ flowchart LR
 3. *Einstellungen → Geräte & Dienste → Integration hinzufügen →* **Vorratskeller**.
    Checkliste übernehmen, Personen und Tage angeben.
 4. **Dashboard:** *Einstellungen → Dashboards → Dashboard hinzufügen →* **Vorratskeller**
-   (unter den Community-Dashboards), dann Titel (z. B. `Vorratskeller`) und Symbol
-   (`mdi:warehouse`) eintragen und erstellen. Alternativ ein leeres Dashboard anlegen und im
+   (unter den Community-Dashboards). Titel und Symbol sind vorbelegt, nur noch „Erstellen“. Alternativ ein leeres Dashboard anlegen und im
    Raw-Konfigurationseditor eintragen:
 
    ```yaml
