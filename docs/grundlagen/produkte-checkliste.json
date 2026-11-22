@@ -1,0 +1,554 @@
+[
+ [
+  "Getränke",
+  112,
+  "l",
+  "Neben dem linken Regal, gestapelt nahe der Tür",
+  [
+   [
+    "Mineralwasser in Mehrweg-Glasflaschen",
+    "Kasten 12 × 0,7 l, rund 15 kg; höchstens 4 Kästen übereinander, auf Latten statt direkt auf dem Boden. Leere Kästen beim Einkauf tauschen.",
+    13,
+    "Kästen",
+    109.2,
+    12
+   ],
+   [
+    "Direktsaft in Glasflaschen",
+    "zum Verdünnen, spart Zucker",
+    4,
+    "× 1 l",
+    4,
+    12
+   ]
+  ]
+ ],
+ [
+  "Getreide, Kartoffeln, Nudeln, Reis",
+  18.5,
+  "kg",
+  "Rechts, zweiter und dritter Boden, in Eimern",
+  [
+   [
+    "Vollkornnudeln",
+    "umgefüllt in Eimer mit Deckel",
+    12,
+    "× 500 g",
+    6,
+    18
+   ],
+   [
+    "Naturreis oder Parboiled-Reis",
+    "Naturreis hält kürzer, Parboiled länger",
+    4,
+    "× 1 kg",
+    4,
+    12
+   ],
+   [
+    "Haferflocken",
+    "Frühstück, jeden Tag in Gebrauch",
+    6,
+    "× 500 g",
+    3,
+    12
+   ],
+   [
+    "Mehl Type 1050 oder Dinkel 630",
+    "",
+    2,
+    "× 1 kg",
+    2,
+    9
+   ],
+   [
+    "Vollkorn-Knäckebrot",
+    "ersetzt Brot",
+    8,
+    "× 250 g",
+    2,
+    12
+   ],
+   [
+    "Bulgur oder Vollkorn-Couscous",
+    "in 10 min fertig, spart Brennstoff",
+    3,
+    "× 500 g",
+    1.5,
+    12
+   ]
+  ]
+ ],
+ [
+  "Gemüse, Hülsenfrüchte",
+  22.4,
+  "kg",
+  "Links, unterster Boden",
+  [
+   [
+    "Kichererbsen, Kidneybohnen, weiße Bohnen, Linsen",
+    "Glas oder Dose, ohne Salzzusatz",
+    20,
+    "× 400 g",
+    8,
+    24
+   ],
+   [
+    "Tomaten, gehackt",
+    "Dose oder Glas",
+    12,
+    "× 400 g",
+    4.8,
+    24
+   ],
+   [
+    "Mais, Erbsen & Möhren, grüne Bohnen",
+    "ohne Salzzusatz",
+    10,
+    "× 400 g",
+    4,
+    24
+   ],
+   [
+    "Sauerkraut, milchsauer vergoren",
+    "Glas, liefert Vitamin C",
+    4,
+    "× 680 g",
+    2.72,
+    18
+   ],
+   [
+    "Rote Bete",
+    "Glas",
+    4,
+    "× 460 g",
+    1.84,
+    18
+   ],
+   [
+    "Rote Linsen, getrocknet",
+    "für Eintopf und Dal, 15 min Kochzeit",
+    2,
+    "× 500 g",
+    1,
+    12
+   ]
+  ]
+ ],
+ [
+  "Obst, Nüsse",
+  14,
+  "kg",
+  "Links, zweiter Boden",
+  [
+   [
+    "Obstkonserven im eigenen Saft",
+    "statt in Sirup",
+    10,
+    "× 800 g",
+    8,
+    24
+   ],
+   [
+    "Apfelmus ohne Zuckerzusatz",
+    "Glas",
+    4,
+    "× 710 g",
+    2.84,
+    18
+   ],
+   [
+    "Nüsse, ungesalzen",
+    "Walnüsse, Mandeln, Haselnüsse",
+    10,
+    "× 200 g",
+    2,
+    9
+   ],
+   [
+    "Trockenobst, ungeschwefelt",
+    "Aprikosen, Rosinen, Pflaumen",
+    6,
+    "× 200 g",
+    1.2,
+    12
+   ]
+  ]
+ ],
+ [
+  "Milch, Milchprodukte",
+  14,
+  "kg",
+  "Rechts, unterster Boden",
+  [
+   [
+    "H-Milch",
+    "",
+    13,
+    "× 1 l",
+    13,
+    3
+   ],
+   [
+    "Hartkäse am Stück",
+    "Kühlschrank, ständig im Gebrauch",
+    4,
+    "× 250 g",
+    1,
+    2
+   ]
+  ]
+ ],
+ [
+  "Fisch, Fleisch, Eier",
+  6.7,
+  "kg",
+  "Links, dritter Boden",
+  [
+   [
+    "Makrele oder Sardinen",
+    "Dose, in Öl oder Tomate; Omega-3",
+    14,
+    "× 125 g",
+    1.75,
+    24
+   ],
+   [
+    "Thunfisch im eigenen Saft",
+    "Dose",
+    12,
+    "× 150 g",
+    1.8,
+    36
+   ],
+   [
+    "Chili con Carne oder Linsen mit Rind",
+    "Dose",
+    3,
+    "× 400 g",
+    1.2,
+    24
+   ],
+   [
+    "Geflügelwürstchen im Glas",
+    "",
+    2,
+    "× 400 g",
+    0.8,
+    18
+   ],
+   [
+    "Eier",
+    "Kühlschrank, wöchentlich nachkaufen",
+    20,
+    "Stück",
+    1.2,
+    1
+   ]
+  ]
+ ],
+ [
+  "Fette, Öle",
+  1.85,
+  "kg",
+  "Rechts, unterster Boden, dunkel",
+  [
+   [
+    "Rapsöl",
+    "beste Fettsäuren für den Alltag; kleine Flaschen, damit keine lange offen steht",
+    3,
+    "× 0,5 l",
+    1.38,
+    9
+   ],
+   [
+    "Olivenöl",
+    "",
+    1,
+    "× 0,5 l",
+    0.46,
+    12
+   ]
+  ]
+ ],
+ [
+  "Sonstiges",
+  0,
+  "",
+  "Rechts, dritter Boden",
+  [
+   [
+    "Tomatenmark",
+    "Tube oder Glas",
+    4,
+    "Stück",
+    0,
+    18
+   ],
+   [
+    "Gemüsebrühe, salzarm",
+    "",
+    2,
+    "Gläser",
+    0,
+    18
+   ],
+   [
+    "Honig",
+    "",
+    2,
+    "Gläser",
+    0,
+    24
+   ],
+   [
+    "Zucker, Salz, Jodsalz",
+    "sparsam",
+    1,
+    "je 1 Packung",
+    0,
+    0
+   ],
+   [
+    "Kaffee, Tee, Kakao",
+    "nach Gewohnheit",
+    0,
+    "",
+    0,
+    12
+   ],
+   [
+    "Zartbitterschokolade",
+    "für die Stimmung",
+    6,
+    "Tafeln",
+    0,
+    9
+   ],
+   [
+    "Gewürze, Kräuter getrocknet",
+    "",
+    0,
+    "",
+    0,
+    24
+   ]
+  ]
+ ],
+ [
+  "Hygiene",
+  0,
+  "",
+  "Rechts, vierter Boden",
+  [
+   [
+    "Toilettenpapier",
+    "",
+    2,
+    "× 8 Rollen",
+    0,
+    0
+   ],
+   [
+    "Seife, Zahnpasta, Zahnbürsten",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Müllbeutel",
+    "Toilette notfalls mit Beutel",
+    2,
+    "Rollen",
+    0,
+    0
+   ],
+   [
+    "Desinfektionsmittel, Feuchttücher",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Küchenrolle",
+    "",
+    2,
+    "Rollen",
+    0,
+    0
+   ]
+  ]
+ ],
+ [
+  "Hausapotheke (BBK)",
+  0,
+  "",
+  "Weißes Regal",
+  [
+   [
+    "Verbandmaterial, Pflaster, Schere, Pinzette, Einmalhandschuhe",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Wund- und Hautdesinfektion, Brand- und Wundsalbe",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Schmerz- und Fiebermittel, Fieberthermometer",
+    "Verfallsdatum jährlich prüfen",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Mittel gegen Durchfall und Übelkeit, Elektrolyte",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Erkältungsmittel, Nasenspray",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Dauermedikamente für 14 Tage",
+    "mit Arzt klären",
+    0,
+    "",
+    0,
+    0
+   ]
+  ]
+ ],
+ [
+  "Strom, Licht, Kochen (BBK)",
+  0,
+  "",
+  "Weißes Regal",
+  [
+   [
+    "Radio mit Kurbel oder Batterie",
+    "",
+    1,
+    "",
+    0,
+    0
+   ],
+   [
+    "Taschenlampen",
+    "eine pro Person",
+    4,
+    "",
+    0,
+    0
+   ],
+   [
+    "Batterien passend zu Radio und Lampen",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Powerbanks",
+    "geladen halten",
+    2,
+    "",
+    0,
+    0
+   ],
+   [
+    "Kerzen, Feuerzeug, Streichhölzer",
+    "",
+    0,
+    "",
+    0,
+    0
+   ],
+   [
+    "Campingkocher mit Gaskartuschen",
+    "Menge eigene Schätzung; nur im Freien oder gut gelüftet",
+    8,
+    "Kartuschen",
+    0,
+    0
+   ],
+   [
+    "Warme Decken",
+    "",
+    4,
+    "",
+    0,
+    0
+   ],
+   [
+    "Telefonliste auf Papier, Warn-App NINA",
+    "",
+    0,
+    "",
+    0,
+    0
+   ]
+  ]
+ ],
+ [
+  "Für den Raum",
+  0,
+  "",
+  "Weißes Regal",
+  [
+   [
+    "Hygrometer",
+    "zuerst kaufen",
+    1,
+    "",
+    0,
+    0
+   ],
+   [
+    "Eimer mit dichtem Deckel",
+    "für Trockenware",
+    6,
+    "",
+    0,
+    0
+   ],
+   [
+    "Block und Stift an der Kellertür",
+    "was rausgeht, kommt auf den Einkaufszettel",
+    1,
+    "",
+    0,
+    0
+   ],
+   [
+    "Etiketten, wasserfester Stift",
+    "",
+    0,
+    "",
+    0,
+    0
+   ]
+  ]
+ ]
+]

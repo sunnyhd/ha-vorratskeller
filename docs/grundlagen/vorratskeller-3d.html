@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vorratskeller in 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sachlich, wie ein Einrichtungsplan
+   IDEA: begehbares Modell des Kellerraums, eingeräumt nach der Vorratsliste
+   PICTURE: 3D-Raum mit Stahlregalen, Wasser, Konserven, Eimern; Etiketten an jedem Boden
+   COLOUR and TYPE: Beton, Ziegelboden, Kartonbraun; Archivo + Archivo Narrow
+   LAYOUT: Titelzeile, großes 3D-Bild, darunter Ansichten, Legende und Hinweise */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#12181d);--ink:light-dark(#1b232a,#e8ecef);--mute:light-dark(#5b6873,#9aa7b2);
+--steel:#24313b;--kraft:light-dark(#b8783a,#d9a05e);--line:light-dark(#d9dee2,#2c363e);--card:light-dark(#f6f7f8,#1a2228)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,sans-serif;overflow-x:clip}
+h1,h2{font-family:"Archivo Narrow",Archivo,sans-serif;line-height:1.05;text-wrap:balance;margin:0}
+.band{padding:clamp(20px,3vw,40px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header{background:var(--steel);color:#eef2f4}
+header h1{font-size:clamp(32px,4.5vw,46px)}
+header p{color:#c4cdd3;margin:8px 0 0;max-width:70ch}
+.stage{position:relative;height:clamp(420px,68vh,760px);background:#0f1418}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.lbl{position:absolute;left:0;top:0;transform:translate(-50%,-100%);background:rgba(15,20,24,.86);color:#fff;font-size:13px;line-height:1.25;padding:4px 8px;border-radius:4px;border-left:3px solid var(--c);white-space:nowrap;pointer-events:none;transition:opacity .2s}
+.hint{position:absolute;right:12px;bottom:10px;color:#9fb0bb;font-size:13px;pointer-events:none}
+.err{position:absolute;inset:0;display:none;place-items:center;color:#fff;padding:20px;text-align:center}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button[aria-pressed=true]{border-color:var(--kraft);box-shadow:inset 0 0 0 1px var(--kraft)}
+button:focus-visible{outline:2px solid var(--kraft);outline-offset:2px}
+.leg button::before{content:"";display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:7px;background:var(--c);vertical-align:-1px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px;margin-top:22px}
+.cols h2{font-size:20px;margin-bottom:6px}
+.cols ul{margin:0;padding-left:18px}
+.small{font-size:14px;color:var(--mute)}
+.small a{color:inherit}
+@media(prefers-reduced-motion:reduce){.lbl{transition:none}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <h1>Der Vorratskeller, eingeräumt</h1>
+  <p>Modell des Kellerraums vom Foto, bestückt für 4 Personen und 14 Tage. Ziehen zum Drehen, Scrollen oder zwei Finger zum Zoomen, rechte Maustaste zum Verschieben.</p>
+</div></header>
+<div class="stage" id="stage"><div class="err" id="err">Die 3D-Ansicht braucht WebGL, das dieser Browser gerade nicht bereitstellt.</div><span class="hint">Raum 3 × 4 m, Regalmaße geschätzt</span></div>
+<main class="band"><div class="wrap">
+  <div class="bar" id="views" aria-label="Ansichten">
+    <button type="button" data-v="door" aria-pressed="true">Von der Tür</button>
+    <button type="button" data-v="left">Regal links</button>
+    <button type="button" data-v="right">Regale rechts</button>
+    <button type="button" data-v="top">Von oben</button>
+    <button type="button" id="lb" aria-pressed="true">Etiketten</button>
+  </div>
+  <div class="bar leg" id="leg" style="margin-top:10px" aria-label="Gruppen hervorheben"></div>
+  <div class="cols">
+    <div><h2>Wasser neben dem Regal</h2><p>Die 13 Kästen Wasser in Glasflaschen (rund 195 kg) stehen nicht im Regal, sondern daneben: vor dem linken Regal, nahe der Tür, in Stapeln von höchstens 4 Kästen auf Latten. So bleiben sie leicht zu tauschen. In den Regalen stehen unten die Konserven und rechts H-Milch und Rapsöl, oben nur Leichtes wie Eimer mit Trockenware und Toilettenpapier. Links bleiben zwei Böden und rechts einer frei als Reserve.</p></div>
+    <div><h2>Abstand zu Boden und Wand</h2><p>Der unterste Boden sitzt 15 cm über dem Ziegelboden, die Regale stehen einige Zentimeter vor der Wand. Die dunkle Stelle an der Rückwand ist im Modell markiert: vor dem Einräumen prüfen, ob es Schimmel ist.</p></div>
+    <div><h2>Was das Modell annimmt</h2><ul><li>Raum 3 × 4 m (Breite × Tiefe). Die Höhe von 2,25 m ist aus dem Foto geschätzt.</li><li>Stahlregal links 2,4 m lang, rechts 1,6 m, je 40 cm tief mit 5 Böden; weißes Regal 1 m lang, 45 cm tief, 4 Fächer. Die Regalmaße sind geschätzt.</li><li>Bitte vor dem Kauf nachmessen, vor allem die Traglast pro Boden.</li></ul></div>
+  </div>
+  <p class="small" style="margin-top:22px">Mengen und Aufteilung: <a href="https://claude.ai/artifact/3WgvR3hecagusgoFYyfo2h">Checkliste Vorratskammer 14 Tage</a>. Modell gebaut mit three.js r128.</p>
+</div></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+{
+const stage=document.getElementById('stage');
+const CAT={W:['Wasser & Getränke','#4aa3df'],G:['Gemüse & Obst','#d9a05e'],F:['Fisch, Fleisch, Milch, Öl','#e9e4d8'],T:['Trockenware in Eimern','#c9b48a'],N:['Notfall & Hygiene','#ff5a66']};
+let ok=!!window.THREE;
+let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true});}catch(e){ok=false}
+if(!ok){document.getElementById('err').style.display='grid';}
+else{
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+stage.prepend(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#0f1418');
+const cam=new THREE.PerspectiveCamera(55,1,0.05,50);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);
+ctl.enableDamping=true;ctl.maxDistance=9;ctl.minDistance=0.4;
+
+const W=3,D=4,HR=2.25;
+const cache={},catMats={};
+const mat=(cat,color,o={})=>{const k=cat+color+JSON.stringify(o);if(cache[k])return cache[k];
+ const m=new THREE.MeshStandardMaterial(Object.assign({color,roughness:.75,metalness:0},o));cache[k]=m;(catMats[cat]=catMats[cat]||[]).push(m);return m};
+const add=(geo,m,x,y,z,parent)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;(parent||scene).add(o);return o};
+const box=(w,h,d,m,x,y,z,p)=>add(new THREE.BoxGeometry(w,h,d),m,x,y,z,p);
+const cyl=(r1,r2,h,m,x,y,z,p)=>add(new THREE.CylinderGeometry(r1,r2,h,18),m,x,y,z,p);
+
+/* Raum */
+const brick=mat('_','#7b4636',{roughness:.95}),conc=mat('_','#8e908c',{roughness:1}),steel=mat('_','#9aa3a8',{roughness:.5,metalness:.6}),white=mat('_','#eeeeea',{roughness:.7});
+box(W,0.04,D,brick,W/2,-0.02,-D/2);
+box(W,HR,0.05,conc,W/2,HR/2,-D-0.025);
+box(0.05,HR,D,conc,-0.025,HR/2,-D/2);
+box(0.05,HR,D,conc,W+0.025,HR/2,-D/2);
+const damp=add(new THREE.PlaneGeometry(0.55,0.4),mat('_','#1f2a1e',{roughness:1,transparent:true,opacity:.9}),1.15,0.2,-D+0.005);damp.castShadow=false;
+const stain=add(new THREE.PlaneGeometry(0.9,1.5),mat('_','#6f716b',{roughness:1,transparent:true,opacity:.5}),1.55,1.05,-D+0.003);stain.castShadow=false;
+cyl(0.07,0.07,0.08,mat('_','#fff6d8',{emissive:'#fff1c4',emissiveIntensity:1}),1.9,HR-0.04,-1.7);
+scene.add(new THREE.HemisphereLight('#dfe6ea','#4a2f26',0.32));
+const lamp=new THREE.PointLight('#fff1d6',0.85,9,1.6);lamp.position.set(1.9,HR-0.15,-1.7);lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);scene.add(lamp);
+
+/* Regale: laufen entlang z; xw = Wand, dir = Richtung in den Raum */
+const labels=[];
+function shelf(xw,dir,z0,len,dep,lv,height,m,secs){
+ const xc=xw+dir*(0.05+dep/2);
+ lv.forEach(y=>box(dep,0.025,len,m,xc,y,z0+len/2));
+ for(let s=0;s<=secs;s++){const z=z0+s*len/secs;[0.05,0.05+dep].forEach(o=>box(0.035,height,0.035,m,xw+dir*o,height/2,z))}
+ return {xw,dir,z0,len,dep,lv,xc};
+}
+const SL=shelf(0,1,-3.75,2.4,0.4,[0.15,0.55,0.95,1.35,1.75],2.0,steel,3);
+const SR=shelf(W,-1,-3.75,1.6,0.4,[0.15,0.55,0.95,1.35,1.75],2.0,steel,2);
+const SW=shelf(W,-1,-1.95,1.0,0.45,[0.1,0.55,1.0,1.45],1.85,white,1);
+box(0.02,1.85,1.0,white,W-0.05,0.925,-1.45);
+
+/* Bauteile */
+const K={
+ crate:{w:.31,d:.4,h:.3,mk:(c,x,y,z)=>{const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);
+   const k=mat(c,'#2f6f9f',{roughness:.6}),gl=mat(c,'#9fd0c0',{transparent:true,opacity:.8,roughness:.15}),cap=mat(c,'#c9c9c9',{metalness:.6});
+   box(.37,.13,.29,k,0,-.085,0,g);
+   for(let i=0;i<12;i++){const xx=(i%4-1.5)*.088,zz=(Math.floor(i/4)-1)*.088;cyl(.034,.034,.2,gl,xx,-.03,zz,g);cyl(.014,.02,.07,gl,xx,.105,zz,g);cyl(.016,.016,.015,cap,xx,.145,zz,g)}}},
+ six:{w:.28,d:.19,h:.32,mk:(c,x,y,z)=>{const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);
+   const b=mat(c,'#7cc3ee',{transparent:true,opacity:.85,roughness:.2}),cap=mat(c,'#2d6fb0');
+   for(let i=0;i<6;i++){const zz=(i%3-1)*.09,xx=(i<3?-1:1)*.045;cyl(.043,.043,.27,b,xx,-.02,zz,g);cyl(.016,.016,.04,cap,xx,.135,zz,g)}}},
+ tetra:{w:.075,d:.1,h:.2,mk:(c,x,y,z,col)=>box(.065,.2,.095,mat(c,col||'#f4f4f0'),x,y,z)},
+ can:{w:.08,d:.08,h:.115,s:2,mk:(c,x,y,z,col)=>cyl(.037,.037,.11,mat(c,col,{metalness:.3,roughness:.5}),x,y,z)},
+ big:{w:.105,d:.105,h:.125,s:2,mk:(c,x,y,z,col)=>cyl(.05,.05,.12,mat(c,col,{metalness:.3,roughness:.5}),x,y,z)},
+ flat:{w:.09,d:.09,h:.04,s:4,mk:(c,x,y,z,col)=>cyl(.043,.043,.036,mat(c,col,{metalness:.4,roughness:.4}),x,y,z)},
+ jar:{w:.09,d:.09,h:.15,mk:(c,x,y,z,col)=>{cyl(.04,.04,.12,mat(c,col,{transparent:true,opacity:.9,roughness:.3}),x,y-.015,z);cyl(.042,.042,.025,mat(c,'#c9c9c9',{metalness:.6}),x,y+.06,z)}},
+ bag:{w:.13,d:.06,h:.18,mk:(c,x,y,z,col)=>box(.12,.18,.05,mat(c,col),x,y,z)},
+ bottle:{w:.085,d:.085,h:.3,mk:(c,x,y,z,col)=>{cyl(.038,.038,.24,mat(c,col,{transparent:true,opacity:.85,roughness:.2}),x,y-.03,z);cyl(.015,.015,.06,mat(c,'#333'),x,y+.12,z)}},
+ block:{w:.11,d:.07,h:.13,mk:(c,x,y,z,col)=>box(.1,.13,.065,mat(c,col),x,y,z)},
+ eimer:{w:.33,d:.33,h:.34,mk:(c,x,y,z,col)=>{cyl(.16,.135,.32,mat(c,'#f2f0ea'),x,y-.01,z);cyl(.168,.168,.025,mat(c,col),x,y+.16,z)}},
+ tp:{w:.22,d:.21,h:.24,mk:(c,x,y,z)=>{const m=mat(c,'#fbfbfb');for(let a=0;a<2;a++)for(let b=0;b<2;b++)for(let l=0;l<2;l++)cyl(.05,.05,.11,m,x+(a-.5)*.1,y+(l-.5)*.12,z+(b-.5)*.1)}},
+ carton:{w:.42,d:.32,h:.26,mk:(c,x,y,z,col)=>box(.4,.25,.3,mat(c,col),x,y,z)},
+ kart:{w:.115,d:.115,h:.09,mk:(c,x,y,z)=>cyl(.054,.054,.085,mat(c,'#3a6ea5',{metalness:.5,roughness:.4}),x,y,z)},
+ decke:{w:.4,d:.38,h:.13,s:2,mk:(c,x,y,z,col)=>box(.38,.12,.36,mat(c,col),x,y,z)},
+ lampe:{w:.07,d:.07,h:.2,mk:(c,x,y,z)=>cyl(.028,.034,.19,mat(c,'#f2c230'),x,y,z)}
+};
+/* fill: Inhalte eines Bodens, der Reihe nach entlang z */
+function fill(S,lvl,cat,list,text){
+ let z=S.z0+.04;const y0=S.lv[lvl]+.0125;
+ for(const [kind,n,col] of list){const it=K[kind],per=Math.max(1,Math.floor((S.dep-.02)/it.d)),s=it.s||1,cap=per*s;
+  for(let k=0;k<n;k++){const ci=Math.floor(k/cap),r=k%cap,row=r%per,lay=Math.floor(r/per);
+   it.mk(cat,S.xw+S.dir*(.06+row*it.d+it.d/2),y0+lay*it.h+it.h/2,z+ci*it.w+it.w/2,col)}
+  z+=Math.ceil(n/cap)*it.w+.03}
+ if(text)labels.push({t:text,cat,p:new THREE.Vector3(S.xc,S.lv[lvl]+.36,S.z0+S.len/2)});
+}
+const L=SL,R=SR,Wh=SW;
+fill(L,0,'G',[['can',20,'#7a9a3a'],['can',12,'#c8302f'],['can',10,'#e3c23a'],['jar',4,'#b9c27a'],['jar',4,'#8a1f3a'],['bag',2,'#d9562e']],'Gemüse, Hülsenfrüchte');
+fill(L,1,'G',[['big',10,'#f0a23a'],['jar',4,'#e8d39a'],['bag',10,'#8a5a32'],['bag',6,'#b0472e']],'Obst, Apfelmus, Nüsse');
+fill(L,2,'F',[['flat',14,'#b03a3a'],['flat',12,'#2d6fb0'],['can',3,'#6a3a2a'],['jar',2,'#d99a6a'],['bottle',4,'#f39a1e']],'Fisch, etwas Fleisch, Saft');
+[3,4].forEach(l=>labels.push({t:'Reserve',cat:'_',p:new THREE.Vector3(L.xc,L.lv[l]+.2,L.z0+L.len/2)}));
+/* Wasser: Kastenstapel auf Latten vor dem linken Regal */
+const wood=mat('_','#9a7a52',{roughness:.9});
+for(const zz of [-1.2,-0.9,-0.6,-0.3])box(.42,.05,.06,wood,.26,.025,zz-.13),box(.42,.05,.06,wood,.26,.025,zz+.13);
+[4,3,3,3].forEach((n,c)=>{const z=-1.2+c*.3;for(let j=0;j<n;j++)K.crate.mk('W',.26,.05+.15+j*.3,z)});
+labels.push({t:'Wasser: 13 Kästen Glas',cat:'W',p:new THREE.Vector3(.26,1.38,-.75)});
+fill(R,0,'F',[['tetra',13],['bottle',3,'#e6c33a'],['bottle',1,'#8a9a3a']],'H-Milch 13 l, Rapsöl, Olivenöl');
+fill(R,1,'T',[['eimer',2,'#e0b54a'],['eimer',1,'#ffffff']],'Nudeln (2 Eimer), Reis');
+fill(R,2,'T',[['eimer',3,'#c9a46a'],['jar',4,'#e0a020']],'Haferflocken, Mehl, Zucker, Honig');
+fill(R,3,'N',[['tp',2],['carton',1,'#7fb6d8']],'Toilettenpapier, Hygiene');
+labels.push({t:'Reserve',cat:'_',p:new THREE.Vector3(R.xc,R.lv[4]+.2,R.z0+R.len/2)});
+fill(Wh,3,'N',[['carton',1,'#d8303a'],['carton',1,'#f2f2f2']],'Hausapotheke');
+fill(Wh,2,'N',[['carton',1,'#f2c230'],['lampe',4],['block',2,'#333']],'Radio, Lampen, Batterien');
+fill(Wh,1,'N',[['carton',1,'#5a6a74'],['kart',8]],'Kocher, 8 Kartuschen');
+fill(Wh,0,'N',[['decke',4,'#7a5a8a']],'Decken');
+labels.push({t:'Dunkle Stelle prüfen',cat:'N',p:new THREE.Vector3(1.15,0.5,-D+0.02)});
+
+/* Etiketten */
+const lblEls=labels.map(l=>{const e=document.createElement('div');e.className='lbl';e.textContent=l.t;e.style.setProperty('--c',(CAT[l.cat]||['','#8a98a3'])[1]);stage.appendChild(e);return e});
+let showLbl=true,focus=null;
+const v=new THREE.Vector3();
+function placeLabels(){const w=stage.clientWidth,h=stage.clientHeight;
+ labels.forEach((l,i)=>{const e=lblEls[i];v.copy(l.p).project(cam);
+  const vis=showLbl&&v.z<1&&Math.abs(v.x)<1.05&&Math.abs(v.y)<1.05;
+  e.style.display=vis?'block':'none';if(!vis)return;
+  e.style.left=((v.x+1)/2*w)+'px';e.style.top=((1-v.y)/2*h)+'px';
+  e.style.opacity=(!focus||l.cat===focus)?1:.25})}
+
+/* Ansichten */
+const VIEWS={door:[[1.5,1.65,0.9],[1.5,0.85,-2.4]],left:[[2.1,1.15,-1.7],[0.25,0.95,-2.6]],right:[[0.8,1.15,-1.3],[2.75,0.9,-2.4]],top:[[1.5,5.2,-1.5],[1.5,0,-2.05]]};
+function view(n){const [p,t]=VIEWS[n];cam.position.set(...p);ctl.target.set(...t);ctl.update();
+ document.querySelectorAll('#views [data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===n))}
+document.getElementById('views').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.id==='lb'){showLbl=!showLbl;b.setAttribute('aria-pressed',showLbl);return}view(b.dataset.v)});
+
+/* Legende: Gruppe hervorheben */
+const leg=document.getElementById('leg');
+leg.innerHTML=Object.entries(CAT).map(([k,[n,c]])=>`<button type="button" data-c="${k}" aria-pressed="false" style="--c:${c}">${n}</button>`).join('');
+leg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ focus=focus===b.dataset.c?null:b.dataset.c;
+ leg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.c===focus));
+ Object.entries(catMats).forEach(([c,ms])=>{if(c==='_')return;ms.forEach(m=>{if(m.userData.o===undefined)m.userData.o=m.opacity;
+  const dim=focus&&c!==focus;m.transparent=dim||m.userData.o<1;m.opacity=dim?.12:m.userData.o;m.depthWrite=!dim;m.needsUpdate=true})})});
+
+function size(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+const ro=new ResizeObserver(size);ro.observe(stage);size();view('door');
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam);placeLabels()})();
+}
+}
+</script>
+</body>
+</html>

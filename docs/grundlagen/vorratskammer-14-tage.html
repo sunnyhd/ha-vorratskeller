@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vorratskammer 14 Tage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Narrow:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sachlich, ruhig, wie ein gut geführtes Lagerbuch
+   IDEA: Bestandskarte eines Vorratslagers mit Regaletiketten
+   PICTURE: Regalplan des Kellers, drei Regale als Vorderansicht mit Zonen
+   COLOUR and TYPE: Dosenblech-Dunkel, Karton-Braun, Signalrot für Fehlbestand; Archivo + Archivo Narrow
+   LAYOUT: Kopfband mit Plan, darunter Gruppen als Etikettenkarten mit Abhakliste */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#12181d);--ink:light-dark(#1b232a,#e8ecef);--mute:light-dark(#5b6873,#9aa7b2);
+--steel:light-dark(#24313b,#0c1115);--kraft:light-dark(#c98b45,#d9a05e);--kraft2:light-dark(#f4e6d4,#2a2219);
+--red:light-dark(#c8202f,#ff5a66);--line:light-dark(#d9dee2,#2c363e);--card:light-dark(#f6f7f8,#1a2228);--ok:light-dark(#2f6b4f,#6fcf9e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Archivo Narrow",Archivo,sans-serif;line-height:1.05;text-wrap:balance;margin:0}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header.band{background:var(--steel);color:#eef2f4}
+header h1{font-size:clamp(34px,5vw,50px);font-weight:700}
+header p{max-width:62ch;color:#c4cdd3;margin:12px 0 0}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:clamp(20px,4vw,48px);align-items:start}
+.meter{margin-top:22px}
+.meter b{font-size:clamp(30px,4vw,40px);font-family:"Archivo Narrow";color:var(--kraft)}
+.bar{height:10px;background:#3a4853;border-radius:5px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--kraft);width:0;transition:width .4s}
+.fig{position:relative;background:#1a252d;border-radius:10px;padding:14px}
+.fig svg{width:100%;height:auto;display:block}
+.fig small{color:#9fb0bb;font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:13px;color:#c4cdd3}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--c)}
+.scroll{display:flex;gap:8px;overflow-x:auto;padding:12px max(5vw,16px);border-bottom:1px solid var(--line);background:var(--bg)}
+.scroll a{flex:none;color:var(--ink);text-decoration:none;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:20px}
+.scroll a:focus-visible,.scroll a:hover{border-color:var(--kraft)}
+@media(min-width:900px){.scroll{position:sticky;top:0;z-index:2}}
+html{scroll-padding-top:72px}
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:20px}
+.card{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.card h2{font-size:22px;padding:14px 16px 4px}
+.tag{padding:0 16px 10px;font-size:14px;color:var(--mute);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tag .target{background:var(--kraft2);color:var(--ink);padding:2px 8px;border-radius:4px;white-space:nowrap}
+.card ul{list-style:none;margin:0;padding:0}
+.card li{border-top:1px solid var(--line)}
+.card label{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 16px;min-height:44px;cursor:pointer}
+.card input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--ok)}
+.card input:focus-visible{outline:2px solid var(--kraft);outline-offset:2px}
+.what small{display:block;color:var(--mute);font-size:13px}
+.qty{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+.qty small{display:block;font-weight:400;color:var(--mute);font-size:13px}
+.t{display:inline-block;font-size:12.5px;font-weight:600;padding:1px 6px;border-radius:3px;margin-top:3px}
+.t.fast{background:light-dark(#fde3e5,#4a1d22);color:var(--red)}.t.mid{background:var(--kraft2);color:light-dark(#7a4d1c,#e9bd85)}.t.slow{background:light-dark(#e1efe7,#173326);color:var(--ok)}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:14px;color:var(--mute);font-weight:600}td.num,th.num{text-align:right;white-space:nowrap}
+.alltag{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(20px,4vw,48px)}.alltag h2{font-size:clamp(26px,3vw,34px);margin-bottom:8px}.alltag h3{font-size:20px;margin:0 0 6px}
+.meals{list-style:none;padding:0;margin:0}.meals li{padding:9px 0;border-bottom:1px solid var(--line)}.meals b{display:block}.meals span{color:var(--mute);font-size:14px}
+@media(max-width:1100px){.alltag{grid-template-columns:1fr}}
+li.done .what{text-decoration:line-through;color:var(--mute)}
+.sum{padding:10px 16px;font-size:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+.sum .short{color:var(--red)}.sum .full{color:var(--ok)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px}
+.notes h3{font-size:20px;margin-bottom:6px}
+.notes p,.notes li{max-width:68ch}
+.notes ul{padding-left:18px;margin:0}
+.src{font-size:14px;color:var(--mute);border-top:1px solid var(--line)}
+.src a{color:inherit}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button[aria-pressed=true]{border-color:var(--kraft);box-shadow:inset 0 0 0 1px var(--kraft)}
+.modebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}.modebar span{color:var(--mute);font-size:14px}
+button:focus-visible{outline:2px solid var(--kraft)}
+@media(max-width:600px){.top{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+@media print{:root{color-scheme:light}header.band{background:#fff;color:#000}header p,.legend{color:#333}.fig{background:#fff;border:1px solid #999}.scroll,button{display:none}.card{break-inside:avoid;background:#fff}body{font-size:12px}.band{padding:12px 0}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap top">
+  <div>
+    <h1>Vorratskammer: 4 Personen, 14 Tage</h1>
+    <p>Einkaufs- und Regalliste für den Keller, ausgewählt für den Alltag: Vollkorn, Hülsenfrüchte, Fisch, wenig Wurst, Salz und Zucker. Die Mengen folgen den Tageswerten des amtlichen Vorratskalkulators (BLE, 2.200 kcal pro Person und Tag), hochgerechnet auf 56 Personentage. Das BBK empfiehlt mindestens 10 Tage; 14 Tage liegen bewusst darüber.</p>
+    <div class="meter"><b id="pct">0 %</b> <span id="cnt">abgehakt</span><div class="bar"><i id="bar"></i></div></div>
+  </div>
+  <div class="fig" aria-label="Regalplan des Kellers">
+    <svg id="plan" viewBox="0 0 640 330" role="img"></svg>
+    <div class="legend" id="legend"></div>
+    <small>Schema, nicht maßstäblich. Unterster Boden mindestens 10–15 cm über dem Ziegelboden, Regale nicht direkt an der Außenwand. <a href="https://claude.ai/artifact/4RFAwwCXsQwTdwb6KDERpB" style="color:inherit">3D-Ansicht</a></small>
+  </div>
+</div></header>
+<nav class="scroll" id="nav"></nav>
+<section class="band" id="alltag" style="border-bottom:1px solid var(--line)"><div class="wrap alltag">
+  <div><h2>Im Alltag aufbrauchen</h2>
+  <p>Der Vorrat ist euer Hauptlager, kein Notfallschrank. Gekocht wird daraus jede Woche; was aus dem Keller geht, kommt auf den Block an der Tür und wird beim nächsten Einkauf ersetzt. Diese Posten laufen in unter einem Jahr ab und müssen mindestens so schnell verbraucht werden:</p>
+  <div class="scroll"><table class="stack"><thead><tr><th>Produkt</th><th class="num">Bestand</th><th>Haltbarkeit</th><th class="num">Verbrauch</th></tr></thead><tbody id="tempo"></tbody></table></div>
+  <p style="font-size:14px;color:var(--mute)">Haltbarkeit: typisches Mindesthaltbarkeitsdatum beim Kauf, eigene Schätzung; bei Öl, Reis, Nudeln und Getreide nach BLE. Maßgeblich ist das Datum auf der Packung. Alles andere hält ein bis drei Jahre und läuft über die Wochengerichte mit.</p></div>
+  <div><h3>Ein Vorratsgericht pro Woche</h3><p>Rund 95 Dosen und Gläser stehen im Regal. Mit einem Gericht pro Woche aus 4 bis 5 davon ist der Bestand in etwa fünf Monaten einmal umgeschlagen, weit vor dem Ablaufdatum.</p>
+  <ul class="meals">
+   <li><b>Chili sin oder con Carne mit Naturreis</b><span>Kidneybohnen, Mais, gehackte Tomaten, Chili-Dose</span></li>
+   <li><b>Linsen-Dal mit Bulgur</b><span>rote Linsen, Tomaten, Tomatenmark, Gewürze</span></li>
+   <li><b>Vollkornnudeln mit Tomaten-Thunfisch-Sauce</b><span>Thunfisch, gehackte Tomaten, Olivenöl</span></li>
+   <li><b>Kichererbsen-Gemüse-Pfanne</b><span>Kichererbsen, Erbsen und Möhren, Rapsöl, Brühe</span></li>
+   <li><b>Knäckebrot mit Makrele und Rote-Bete-Salat</b><span>kalte Küche, auch ohne Strom</span></li>
+   <li><b>Porridge mit Apfelmus, Nüssen, Trockenobst</b><span>Frühstück, verbraucht H-Milch und Haferflocken</span></li>
+  </ul></div>
+</div></section>
+<main class="band"><div class="wrap">
+  <div class="modebar" id="mode" role="group" aria-label="Sortierung"><span>Sortieren:</span><button type="button" data-m="gruppe" aria-pressed="true">Nach Gruppe und Regal</button><button type="button" data-m="verbrauch" aria-pressed="false">Nach Verbrauchsreihenfolge</button></div>
+  <div class="groups" id="groups"></div>
+  <p style="margin-top:20px"><button id="reset" type="button">Alle Haken zurücksetzen</button> <span style="color:var(--mute);font-size:14px">Die Haken bleiben nur in diesem Browser gespeichert.</span></p>
+</div></main>
+<section class="band" style="background:var(--kraft2)"><div class="wrap notes">
+  <div><h3>Feuchtigkeit zuerst prüfen</h3><p>Die BLE nennt für eine Speisekammer höchstens 70 % relative Luftfeuchte bei 15–20 °C. Ein typischer Keller liegt bei 85–90 %. Auf dem Foto zeigt die Rückwand Wasserspuren, unten links neben der Palette ist ein dunkler Fleck. Darum: Hygrometer zwei Wochen ablesen, den Fleck vor dem Einräumen prüfen und Trockenware nur in dichten Eimern oder Gläsern lagern.</p></div>
+  <div><h3>Farbpunkte statt Datum suchen</h3><p>Beim Einräumen bekommt jede Packung einen Klebepunkt in der Farbe des Quartals, in dem sie abläuft, zum Beispiel blau für Januar bis März, grün für April bis Juni, gelb für Juli bis September, rot für Oktober bis Dezember. Ein Zettel am Regal sagt, welche Farbe gerade dran ist. Ein Blick genügt, um zu sehen, was als Nächstes in die Küche wandert.</p></div>
+  <div><h3>In vier Einkäufen aufbauen</h3><ol style="padding-left:18px;margin:0"><li>Hygrometer, Eimer, Notfallausstattung; Wasser.</li><li>Die Hälfte der Konserven.</li><li>Trockenware, Nüsse, Öl; Milch und Eier nur auf Alltagsniveau anheben.</li><li>Nach etwa drei Monaten die zweite Hälfte der Konserven.</li></ol><p>So verteilen sich die Ablaufdaten über das Jahr, statt alle in derselben Woche zu liegen, und die Kosten auch.</p></div>
+  <div><h3>Lebender Vorrat</h3><ul><li>Neue Ware nach hinten, verbraucht wird von vorn.</li><li>Auf jede Packung das Mindesthaltbarkeitsdatum groß mit Stift schreiben.</li><li>Zweimal im Jahr durchsehen, etwa bei der Zeitumstellung.</li><li>Nur kaufen, was ihr auch im Alltag esst. Innerhalb einer Gruppe dürft ihr Produkte frei tauschen, solange die Menge gleich bleibt.</li></ul></div>
+  <div><h3>Warum gesund so aussieht</h3><ul><li>Vollkorn statt Weißmehl, Naturreis, Haferflocken: mehr Ballaststoffe, länger satt.</li><li>Hülsenfrüchte als Eiweißquelle, Fleisch und Wurst zusammen rund 250 g pro Person und Woche; die DGE rät zu höchstens 300 g.</li><li>Fettfisch wie Makrele und Sardine einmal pro Woche, Rapsöl als Hauptfett.</li><li>Konserven ohne Salz- und Zuckerzusatz, Obst im eigenen Saft.</li></ul></div>
+  <div><h3>Was die Liste nicht abdeckt</h3><ul><li>Dauermedikamente, Babynahrung, Tierfutter: selbst ergänzen.</li><li>Konserven sind nach Füllmenge gerechnet. Ob die BLE Füll- oder Abtropfgewicht meint, steht dort nicht; im Zweifel etwas mehr kaufen.</li><li>Campingkocher nie im Keller oder in geschlossenen Räumen betreiben (Kohlenmonoxid).</li></ul></div>
+</div></section>
+<footer class="band src"><div class="wrap">
+  Quellen: <a href="https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Ratgeber-Checkliste/ratgeber-checkliste_node.html">BBK, Ratgeber und Checkliste</a> (10 Tage, Inhalte der Checkliste) ·
+  <a href="https://www.ernaehrungsvorsorge.de/private-vorsorge/notvorrat/vorratskalkulator/">BLE, Vorratskalkulator</a> (Tagesmengen) ·
+  <a href="https://www.ernaehrungsvorsorge.de/private-vorsorge/empfehlungen-tipps/so-koennen-lebensmittel-gelagert-werden">BLE, Lagerung</a> (Haltbarkeiten) ·
+  <a href="https://www.dge.de/gesunde-ernaehrung/gut-essen-und-trinken/dge-empfehlungen/">DGE, Empfehlungen</a> (Fleisch, Vollkorn, Hülsenfrüchte).
+  Die Aufteilung auf konkrete Produkte und die Mengen ohne amtliche Vorgabe (Sonstiges, Hygiene, Kartuschen) sind eigene Vorschläge. Stand 21.11.2026.
+</div></footer>
+<script>
+{
+const Z={W:['Wasser & Getränke','#4aa3df'],K:['Konserven','#d9a05e'],T:['Trockenware in Eimern','#e8d6a8'],M:['Milch & Öl','#f2f2f2'],N:['Notfall & Hygiene','#ff5a66'],R:['Reserve','#4b5a65']};
+const shelves=[
+ {name:'Stahlregal links',x:100,w:195,b:['R','R','K','K','K'],t:['Reserve','Reserve','Fisch, Fleisch, Saft','Obst, Apfelmus, Nüsse','Gemüse, Hülsenfrüchte']},
+ {name:'Stahlregal rechts',x:320,w:185,b:['R','N','T','T','M'],t:['Reserve','Toilettenpapier, Hygiene','Haferfl., Mehl, Honig','Nudeln, Reis','H-Milch, Öl']},
+ {name:'Weißes Regal',x:525,w:100,b:['N','N','N','N'],t:['Apotheke','Licht, Radio','Kocher, Kartuschen','Decken']}];
+const H=270,top=30;
+let s='';
+for(const sh of shelves){const n=sh.b.length,h=H/n;
+ s+=`<text x="${sh.x}" y="18" fill="#c4cdd3" font-size="13" font-family="Archivo">${sh.name}</text>`;
+ sh.b.forEach((z,i)=>{const y=top+i*h;
+  s+=`<rect x="${sh.x}" y="${y+3}" width="${sh.w}" height="${h-8}" rx="3" fill="${Z[z][1]}" opacity="${z==='R'?.6:.88}"/>`;
+  s+=`<rect x="${sh.x-3}" y="${y+h-5}" width="${sh.w+6}" height="4" fill="#8a98a3"/>`;
+  s+=`<text x="${sh.x+8}" y="${y+h/2+3}" fill="${z==='R'?'#dfe6ea':'#1b232a'}" font-size="${sh.w<120?11:12.5}" font-family="Archivo">${sh.t[i]}</text>`;});
+ s+=`<rect x="${sh.x-5}" y="${top-2}" width="5" height="${H+18}" fill="#8a98a3"/><rect x="${sh.x+sh.w}" y="${top-2}" width="5" height="${H+18}" fill="#8a98a3"/>`;}
+s+=`<text x="14" y="18" fill="#c4cdd3" font-size="13" font-family="Archivo">Wasser</text>`;
+[4,3,3,3].forEach((n,c)=>{for(let j=0;j<n;j++)s+=`<rect x="${14+c*19}" y="${top+H+10-(j+1)*30}" width="17" height="28" rx="2" fill="#4aa3df"/>`});
+s+=`<text x="14" y="${top+H-130}" fill="#c4cdd3" font-size="11.5" font-family="Archivo"><tspan x="14">13 Kästen,</tspan><tspan x="14" dy="14">gestapelt</tspan></text>`;
+s+=`<rect x="0" y="${top+H+14}" width="640" height="6" fill="#6b4a3a"/>`;
+document.getElementById('plan').innerHTML=s;
+document.getElementById('legend').innerHTML=Object.values(Z).map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
+
+/* [Gruppe, Ziel, Einheit, Regal, Items: [Produkt, Hinweis, Anzahl, Packung, Menge in Zieleinheit, typisches MHD beim Kauf in Monaten (0 = nicht relevant)]] */
+const G=[
+ ['Getränke',112,'l','Neben dem linken Regal, gestapelt nahe der Tür',[
+  ['Mineralwasser in Mehrweg-Glasflaschen','Kasten 12 × 0,7 l, rund 15 kg; höchstens 4 Kästen übereinander, auf Latten statt direkt auf dem Boden. Leere Kästen beim Einkauf tauschen.',13,'Kästen',109.2,12],
+  ['Direktsaft in Glasflaschen','zum Verdünnen, spart Zucker',4,'× 1 l',4,12]]],
+ ['Getreide, Kartoffeln, Nudeln, Reis',18.5,'kg','Rechts, zweiter und dritter Boden, in Eimern',[
+  ['Vollkornnudeln','umgefüllt in Eimer mit Deckel',12,'× 500 g',6,18],
+  ['Naturreis oder Parboiled-Reis','Naturreis hält kürzer, Parboiled länger',4,'× 1 kg',4,12],
+  ['Haferflocken','Frühstück, jeden Tag in Gebrauch',6,'× 500 g',3,12],
+  ['Mehl Type 1050 oder Dinkel 630','',2,'× 1 kg',2,9],
+  ['Vollkorn-Knäckebrot','ersetzt Brot',8,'× 250 g',2,12],
+  ['Bulgur oder Vollkorn-Couscous','in 10 min fertig, spart Brennstoff',3,'× 500 g',1.5,12]]],
+ ['Gemüse, Hülsenfrüchte',22.4,'kg','Links, unterster Boden',[
+  ['Kichererbsen, Kidneybohnen, weiße Bohnen, Linsen','Glas oder Dose, ohne Salzzusatz',20,'× 400 g',8,24],
+  ['Tomaten, gehackt','Dose oder Glas',12,'× 400 g',4.8,24],
+  ['Mais, Erbsen & Möhren, grüne Bohnen','ohne Salzzusatz',10,'× 400 g',4,24],
+  ['Sauerkraut, milchsauer vergoren','Glas, liefert Vitamin C',4,'× 680 g',2.72,18],
+  ['Rote Bete','Glas',4,'× 460 g',1.84,18],
+  ['Rote Linsen, getrocknet','für Eintopf und Dal, 15 min Kochzeit',2,'× 500 g',1,12]]],
+ ['Obst, Nüsse',14,'kg','Links, zweiter Boden',[
+  ['Obstkonserven im eigenen Saft','statt in Sirup',10,'× 800 g',8,24],
+  ['Apfelmus ohne Zuckerzusatz','Glas',4,'× 710 g',2.84,18],
+  ['Nüsse, ungesalzen','Walnüsse, Mandeln, Haselnüsse',10,'× 200 g',2,9],
+  ['Trockenobst, ungeschwefelt','Aprikosen, Rosinen, Pflaumen',6,'× 200 g',1.2,12]]],
+ ['Milch, Milchprodukte',14,'kg','Rechts, unterster Boden',[
+  ['H-Milch','',13,'× 1 l',13,3],
+  ['Hartkäse am Stück','Kühlschrank, ständig im Gebrauch',4,'× 250 g',1,2]]],
+ ['Fisch, Fleisch, Eier',6.7,'kg','Links, dritter Boden',[
+  ['Makrele oder Sardinen','Dose, in Öl oder Tomate; Omega-3',14,'× 125 g',1.75,24],
+  ['Thunfisch im eigenen Saft','Dose',12,'× 150 g',1.8,36],
+  ['Chili con Carne oder Linsen mit Rind','Dose',3,'× 400 g',1.2,24],
+  ['Geflügelwürstchen im Glas','',2,'× 400 g',0.8,18],
+  ['Eier','Kühlschrank, wöchentlich nachkaufen',20,'Stück',1.2,1]]],
+ ['Fette, Öle',1.85,'kg','Rechts, unterster Boden, dunkel',[
+  ['Rapsöl','beste Fettsäuren für den Alltag; kleine Flaschen, damit keine lange offen steht',3,'× 0,5 l',1.38,9],
+  ['Olivenöl','',1,'× 0,5 l',0.46,12]]],
+ ['Sonstiges',0,'','Rechts, dritter Boden',[
+  ['Tomatenmark','Tube oder Glas',4,'Stück',0,18],['Gemüsebrühe, salzarm','',2,'Gläser',0,18],
+  ['Honig','',2,'Gläser',0,24],['Zucker, Salz, Jodsalz','sparsam',1,'je 1 Packung',0,0],
+  ['Kaffee, Tee, Kakao','nach Gewohnheit',0,'',0,12],['Zartbitterschokolade','für die Stimmung',6,'Tafeln',0,9],
+  ['Gewürze, Kräuter getrocknet','',0,'',0,24]]],
+ ['Hygiene',0,'','Rechts, vierter Boden',[
+  ['Toilettenpapier','',2,'× 8 Rollen',0,0],['Seife, Zahnpasta, Zahnbürsten','',0,'',0,0],
+  ['Müllbeutel','Toilette notfalls mit Beutel',2,'Rollen',0,0],['Desinfektionsmittel, Feuchttücher','',0,'',0,0],['Küchenrolle','',2,'Rollen',0,0]]],
+ ['Hausapotheke (BBK)',0,'','Weißes Regal',[
+  ['Verbandmaterial, Pflaster, Schere, Pinzette, Einmalhandschuhe','',0,'',0,0],
+  ['Wund- und Hautdesinfektion, Brand- und Wundsalbe','',0,'',0,0],
+  ['Schmerz- und Fiebermittel, Fieberthermometer','Verfallsdatum jährlich prüfen',0,'',0,0],
+  ['Mittel gegen Durchfall und Übelkeit, Elektrolyte','',0,'',0,0],
+  ['Erkältungsmittel, Nasenspray','',0,'',0,0],['Dauermedikamente für 14 Tage','mit Arzt klären',0,'',0,0]]],
+ ['Strom, Licht, Kochen (BBK)',0,'','Weißes Regal',[
+  ['Radio mit Kurbel oder Batterie','',1,'',0,0],['Taschenlampen','eine pro Person',4,'',0,0],
+  ['Batterien passend zu Radio und Lampen','',0,'',0,0],['Powerbanks','geladen halten',2,'',0,0],
+  ['Kerzen, Feuerzeug, Streichhölzer','',0,'',0,0],
+  ['Campingkocher mit Gaskartuschen','Menge eigene Schätzung; nur im Freien oder gut gelüftet',8,'Kartuschen',0,0],
+  ['Warme Decken','',4,'',0,0],['Telefonliste auf Papier, Warn-App NINA','',0,'',0,0]]],
+ ['Für den Raum',0,'','Weißes Regal',[
+  ['Hygrometer','zuerst kaufen',1,'',0,0],['Eimer mit dichtem Deckel','für Trockenware',6,'',0,0],
+  ['Block und Stift an der Kellertür','was rausgeht, kommt auf den Einkaufszettel',1,'',0,0],
+  ['Etiketten, wasserfester Stift','',0,'',0,0]]]];
+
+let st={};try{st=JSON.parse(localStorage.getItem('vk14')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('vk14',JSON.stringify(st))}catch(e){}};
+const id=(g,i)=>`g${g}i${i}`;
+const fmt=n=>n.toLocaleString('de-DE',{maximumFractionDigits:2});
+const tc=m=>m<=3?'fast':m<=12?'mid':'slow';
+const mt=m=>m<=1?'hält ca. 4 Wochen':m<12?`hält ca. ${m} Monate`:m===12?'hält ca. 1 Jahr':`hält ca. ${fmt(m/12)} Jahre`;
+const liH=(k,i,grp)=>{const [p,h,n,pk,q,m]=G[k][4][i],unit=G[k][2];
+ return `<li id="li${id(k,i)}"><label><input type="checkbox" id="${id(k,i)}">
+ <span class="what">${p}${h||grp?`<small>${[grp?G[k][0].split(',')[0]+' · '+G[k][3]:'',h].filter(Boolean).join(' · ')}</small>`:''}</span>
+ <span class="qty">${n?n+' '+pk:pk}${q?`<small>${fmt(q)} ${unit}</small>`:''}${m?`<small class="t ${tc(m)}">${mt(m)}</small>`:''}</span></label></li>`};
+const card=(k)=>{const [name,goal,unit,shelf,items]=G[k];return `<section class="card" id="grp${k}"><h2>${name}</h2>
+ <div class="tag"><span>${shelf}</span>${goal?`<span class="target">Ziel ${fmt(goal)} ${unit}</span>`:''}</div>
+ <ul>${items.map((_,i)=>liH(k,i)).join('')}</ul>${goal?`<div class="sum" id="sum${k}"></div>`:''}</section>`};
+const food=k=>G[k][4].some(it=>it[5]);
+const B=[['1 · Laufend verbrauchen','hält bis 3 Monate: gehört in den Wochenrhythmus von Kühlschrank und Frühstück',m=>m>0&&m<=3],
+ ['2 · Innerhalb eines Jahres','hält 4 bis 12 Monate: jeden Monat etwas davon kochen',m=>m>3&&m<=12],
+ ['3 · Langsam umschlagen','hält 1 bis 3 Jahre: läuft über das Vorratsgericht pro Woche',m=>m>12],
+ ['4 · Praktisch unbegrenzt','Zucker, Salz und Ähnliches: bei Bedarf nachfüllen',m=>m===0]];
+let mode='gruppe';try{mode=localStorage.getItem('vk14m')||'gruppe'}catch(e){}
+function draw(){
+ if(mode==='gruppe')document.getElementById('groups').innerHTML=G.map((_,k)=>card(k)).join('');
+ else{const all=[];G.forEach((g,k)=>{if(food(k))g[4].forEach((it,i)=>all.push([k,i,it[5]]))});
+  document.getElementById('groups').innerHTML=B.map(([h,sub,f],bi)=>{const l=all.filter(x=>f(x[2])).sort((a,b)=>a[2]-b[2]);
+   return l.length?`<section class="card" id="grp-b${bi}"><h2>${h}</h2><div class="tag"><span>${sub}</span><span class="target">${l.length} Posten</span></div><ul>${l.map(([k,i])=>liH(k,i,true)).join('')}</ul></section>`:''}).join('')
+   +G.map((_,k)=>food(k)?'':card(k)).join('');}
+ document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode));
+ document.getElementById('nav').innerHTML='<a href="#alltag">Im Alltag</a>'+(mode==='gruppe'?G.map((g,k)=>`<a href="#grp${k}">${g[0].split(' (')[0]}</a>`):B.map((b,i)=>`<a href="#grp-b${i}">${b[0].slice(4)}</a>`).concat(G.map((g,k)=>food(k)?'':`<a href="#grp${k}">${g[0].split(' (')[0]}</a>`))).join('');
+}
+draw();
+document.getElementById('mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.m;try{localStorage.setItem('vk14m',mode)}catch(e){}draw();render()});
+const tempo=[];G.forEach(([g,,,,items])=>items.forEach(([p,h,n,pk,q,m])=>{if(m&&m<=12&&n)tempo.push([p,n,pk,m,Math.ceil(n/m)])}));
+tempo.sort((a,b)=>a[3]-b[3]||b[4]-a[4]);
+document.getElementById('tempo').innerHTML=tempo.map(([p,n,pk,m,per])=>`<tr><td>${p}</td><td class="num">${n} ${pk.replace('× ','à ')}</td><td><span class="t ${tc(m)}">${mt(m)}</span></td><td class="num">${m<=1?'laufend nachkaufen':'mind. '+per+' pro Monat'}</td></tr>`).join('');
+const render=()=>{let all=0,done=0;
+ G.forEach(([n,goal,unit,s,items],k)=>{let have=0,plan=0;
+  items.forEach((it,i)=>{const c=!!st[id(k,i)];all++;if(c)done++;have+=c?it[4]:0;plan+=it[4];
+   document.getElementById(id(k,i)).checked=c;document.getElementById('li'+id(k,i)).classList.toggle('done',c)});
+  const el=document.getElementById('sum'+k);
+  if(el)el.innerHTML=`<span>Geplant ${fmt(plan)} ${unit}</span><span class="${have>=goal-0.05?'full':'short'}">vorhanden ${fmt(have)} ${unit}</span>`;});
+ const p=Math.round(done/all*100);
+ document.getElementById('pct').textContent=p+' %';
+ document.getElementById('cnt').textContent=`${done} von ${all} Posten abgehakt`;
+ document.getElementById('bar').style.width=p+'%';};
+document.getElementById('groups').addEventListener('change',e=>{const t=e.target;if(t.type!=='checkbox')return;st[t.id]=t.checked;save();render()});
+document.getElementById('reset').addEventListener('click',()=>{st={};save();render()});
+render();
+}
+</script>
+</body>
+</html>
