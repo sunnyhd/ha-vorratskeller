@@ -29,6 +29,16 @@ const TEXTE = {
     name: "Vorratskeller",
     titel_dashboard: "Vorratskeller",
     produkt_bearbeiten: "Produkt bearbeiten",
+    produkt_neu: "+ Produkt",
+    produkt_loeschen: "Produkt löschen",
+    loeschen_frage: "{name} mit Bestand {bestand} endgültig löschen?",
+    geloescht: "{name} gelöscht.",
+    ort: "Lagerort",
+    ort_haupt: "Keller",
+    alle_orte: "Alle Orte",
+    einlagern_titel: "{name} einlagern",
+    mhd_tipp: "Vorbelegt mit der üblichen Haltbarkeit ({monate} Monate). Leer lassen schätzt das MHD.",
+    einlagern_fehlgeschlagen: "Einlagern fehlgeschlagen.",
     bearbeiten: "Bearbeiten",
     bearbeiten_fertig: "Fertig",
     regal_hinweis_bearbeiten: "Produkt antippen zum Bearbeiten; Stift am Regal oder Fach zum Umbenennen.",
@@ -196,6 +206,16 @@ const TEXTE = {
     name: "Pantry (Vorratskeller)",
     titel_dashboard: "Pantry",
     produkt_bearbeiten: "Edit product",
+    produkt_neu: "+ Product",
+    produkt_loeschen: "Delete product",
+    loeschen_frage: "Delete {name} with stock {bestand} for good?",
+    geloescht: "{name} deleted.",
+    ort: "Location",
+    ort_haupt: "Pantry",
+    alle_orte: "All locations",
+    einlagern_titel: "Store {name}",
+    mhd_tipp: "Prefilled with the usual shelf life ({monate} months). Leave empty to estimate.",
+    einlagern_fehlgeschlagen: "Storing failed.",
     bearbeiten: "Edit",
     bearbeiten_fertig: "Done",
     regal_hinweis_bearbeiten: "Tap a product to edit it; pencil on a shelf or board to rename.",
@@ -446,7 +466,9 @@ export function produkte(hass) {
       fehlt: num(a.fehlt),
       gruppe: a.gruppe || "",
       fach: a.fach || "",
-      fach_id: makeId(a.fach || "ohne-fach"),
+      ort: a.ort || "",
+      // Lagerort gehört zur Kennung des Fachs, damit gleiche Fachnamen an zwei Orten getrennt bleiben
+      fach_id: makeId(`${a.ort ? `${a.ort} ` : ""}${a.fach || "ohne-fach"}`),
       packung: a.packung || "",
       hinweis: a.hinweis || "",
       form: a.form || "",
@@ -464,11 +486,19 @@ export function produkte(hass) {
 export function faecher(liste) {
   const map = new Map();
   for (const p of liste) {
-    if (!map.has(p.fach_id)) map.set(p.fach_id, { id: p.fach_id, name: p.fach || t("ohne_fach"), produkte: [] });
+    if (!map.has(p.fach_id))
+      map.set(p.fach_id, { id: p.fach_id, name: p.fach || t("ohne_fach"), ort: p.ort || "", produkte: [] });
     map.get(p.fach_id).produkte.push(p);
   }
-  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, LOCALE));
+  return [...map.values()].sort((a, b) => a.ort.localeCompare(b.ort, LOCALE) || a.name.localeCompare(b.name, LOCALE));
 }
+
+/** Lagerorte der Produkte; "" ist das Hauptlager. */
+export function orte(liste) {
+  return [...new Set(liste.map((p) => p.ort || ""))].sort((a, b) => (a === "" ? -1 : b === "" ? 1 : a.localeCompare(b, LOCALE)));
+}
+
+const ortName = (ort) => ort || t("ort_haupt");
 
 // Ordnungswörter der Böden, oben zuerst (deutsch und englisch)
 const BODEN_RANG = [
@@ -496,8 +526,9 @@ export function regale(liste) {
   const map = new Map();
   for (const f of faecher(liste)) {
     const { regal, boden, rang } = regalUndBoden(f.name);
-    if (!map.has(regal)) map.set(regal, { name: regal, boeden: [] });
-    map.get(regal).boeden.push({ ...f, boden, rang });
+    const key = `${f.ort}\u0000${regal}`;
+    if (!map.has(key)) map.set(key, { name: regal, ort: f.ort, boeden: [] });
+    map.get(key).boeden.push({ ...f, boden, rang });
   }
   for (const r of map.values()) r.boeden.sort((a, b) => b.rang - a.rang || a.name.localeCompare(b.name, LOCALE));
   return [...map.values()];
@@ -630,7 +661,7 @@ function etikettenDruck(faecherListe, e, svg) {
   const html = Array.from({ length: seiten }, (_, s) =>
     `<div class="seite">${pos
       .map((p, i) => (p.seite !== s ? "" : `<div class="e" style="left:${p.x + e.x}mm;top:${p.y + e.y}mm">
-          ${svg(QR_FACH + faecherListe[i].id)}<div class="t">${esc(faecherListe[i].name)}</div></div>`))
+          ${svg(QR_FACH + faecherListe[i].id)}<div class="t">${faecherListe[i].ort ? `${esc(faecherListe[i].ort)}<br>` : ""}${esc(faecherListe[i].name)}</div></div>`))
       .join("")}</div>`,
   ).join("");
   return `<!doctype html><html lang="${esc(LOCALE)}"><head><meta charset="utf-8"><title>${esc(t("titel_etiketten"))}</title>
@@ -792,6 +823,8 @@ const STYLE = `
   dialog.vk::backdrop { background: rgba(0, 0, 0, 0.45); }
   dialog.vk label { display: flex; flex-direction: column; gap: 4px; margin: 10px 0 0; flex: 1 1 140px; }
   .klein { font-size: 0.85rem; margin: 6px 0 0; }
+  .aktion.gefahr { background: none; color: var(--error-color); border: 1px solid var(--error-color); }
+  .chips.orte { margin-top: 8px; }
   /* Regal gezeichnet */
   .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
   .regal h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 500; }
@@ -854,9 +887,28 @@ const STYLE = `
 // Karte
 // ---------------------------------------------------------------------------
 
+// Bearbeiten-Modus und Ortsfilter überleben das Neuaufbauen des Dashboards (neues Produkt = neuer Sensor)
+const SITZUNG = { bearbeiten: false, ort: null };
+
 const MODI = ["entnahme", "scanner", "fehlend", "ablaufend", "etiketten", "kopf", "regal", "panel"];
 
 class VorratskellerCard extends HTMLElement {
+  get _bearbeiten() {
+    return SITZUNG.bearbeiten;
+  }
+
+  set _bearbeiten(wert) {
+    SITZUNG.bearbeiten = Boolean(wert);
+  }
+
+  get _ort() {
+    return SITZUNG.ort;
+  }
+
+  set _ort(wert) {
+    SITZUNG.ort = wert;
+  }
+
   static getStubConfig() {
     return { modus: "entnahme" };
   }
@@ -983,7 +1035,33 @@ class VorratskellerCard extends HTMLElement {
 
   // --- Entnahme -------------------------------------------------------------
 
+  /** Chips für die Lagerorte, nur wenn es mehr als einen gibt. */
+  _ortChips(liste, neuZeichnen) {
+    const alle = orte(liste);
+    if (alle.length < 2) {
+      this._ort = null;
+      return { html: "", liste, binden: () => {} };
+    }
+    const aktiv = this._ort;
+    const html = `<div class="chips orte" role="toolbar" aria-label="${esc(t("ort"))}">
+      <button class="chip" data-ort="*" aria-pressed="${aktiv === null || aktiv === undefined}">${esc(t("alle_orte"))}</button>
+      ${alle.map((o) => `<button class="chip" data-ort="${esc(o)}" aria-pressed="${aktiv === o}">${esc(ortName(o))}</button>`).join("")}
+    </div>`;
+    const gefiltert = aktiv === null || aktiv === undefined ? liste : liste.filter((p) => (p.ort || "") === aktiv);
+    const binden = (ziel) =>
+      ziel.querySelectorAll(".chip[data-ort]").forEach((b) =>
+        b.addEventListener("click", () => {
+          this._ort = b.dataset.ort === "*" ? null : b.dataset.ort;
+          this._fach = null;
+          neuZeichnen();
+        }),
+      );
+    return { html, liste: gefiltert, binden };
+  }
+
   _renderEntnahme(ziel, liste, { festesFach = null, titel = true } = {}) {
+    const ortWahl = festesFach ? { html: "", liste, binden: () => {} } : this._ortChips(liste, () => this._renderEntnahme(ziel, this._liste, { festesFach, titel }));
+    liste = ortWahl.liste;
     const alle = faecher(liste);
     const fach = festesFach || this._fach;
     const sichtbar = fach ? liste.filter((p) => p.fach_id === fach) : liste;
@@ -1005,9 +1083,11 @@ class VorratskellerCard extends HTMLElement {
         : null;
     ziel.innerHTML = `
       ${titel ? this._titel(t("titel_entnehmen")) : ""}
+      ${ortWahl.html}
       ${chips}
       ${sichtbar.length ? `<div class="grid">${tiles}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
-    ziel.querySelectorAll(".chip").forEach((b) =>
+    ortWahl.binden(ziel);
+    ziel.querySelectorAll(".chip[data-fach]").forEach((b) =>
       b.addEventListener("click", () => {
         this._fach = b.dataset.fach || null;
         this._renderEntnahme(ziel, this._liste);
@@ -1017,7 +1097,7 @@ class VorratskellerCard extends HTMLElement {
       t.addEventListener("click", () => this._entnehmen(t.dataset.id)),
     );
     ziel.querySelectorAll(".plus").forEach((b) =>
-      b.addEventListener("click", () => this._einlagern(b.dataset.id, 1)),
+      b.addEventListener("click", () => this._einlagernDialog(b.dataset.id)),
     );
     if (fokusSel) ziel.querySelector(fokusSel)?.focus();
   }
@@ -1218,16 +1298,19 @@ class VorratskellerCard extends HTMLElement {
     let nr = 0;
     // Bearbeiten nur in der Regal-Ansicht selbst, nicht im Wandpanel
     const bearbeiten = titel && this._bearbeiten;
+    const ortWahl = titel ? this._ortChips(liste, () => this._renderRegal(this._liste, ziel, { nurFach, titel })) : { html: "", liste, binden: () => {} };
+    liste = ortWahl.liste;
+    const mehrereOrte = orte(this._liste).length > 1;
     const alle = regale(nurFach ? liste.filter((p) => p.fach_id === nurFach) : liste);
     const html = alle
       .map(
-        (r) => `<section class="regal">${nurFach ? "" : `<h3>${esc(r.name)}${
-          bearbeiten ? ` <button class="umbenennen" data-regal="${esc(r.name)}" aria-label="${esc(t("regal_umbenennen", { name: r.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
+        (r) => `<section class="regal">${nurFach ? "" : `<h3>${mehrereOrte && this._ort == null ? `<span class="muted">${esc(ortName(r.ort))} · </span>` : ""}${esc(r.name)}${
+          bearbeiten ? ` <button class="umbenennen" data-ort="${esc(r.ort)}" data-regal="${esc(r.name)}" aria-label="${esc(t("regal_umbenennen", { name: r.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
         }</h3>`}<div class="gestell">
           ${r.boeden
             .map(
               (b) => `${b.boden || bearbeiten ? `<div class="boden-name">${esc(b.boden || b.name)}${
-                bearbeiten ? ` <button class="umbenennen" data-fach="${esc(b.name)}" aria-label="${esc(t("fach_umbenennen", { name: b.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
+                bearbeiten ? ` <button class="umbenennen" data-ort="${esc(b.ort)}" data-fach="${esc(b.name)}" aria-label="${esc(t("fach_umbenennen", { name: b.name }))}"><ha-icon icon="mdi:pencil"></ha-icon></button>` : ""
               }</div>` : ""}
                 <div class="fachreihe">${b.produkte.map((p) => this._gefaess(p, nr++)).join("")}</div>
                 <div class="brett"></div>`,
@@ -1242,26 +1325,29 @@ class VorratskellerCard extends HTMLElement {
         <span class="s-ok">${esc(t("status_ok"))}</span><span class="s-knapp">${esc(t("status_knapp"))}</span>
         <span class="s-leer">${esc(t("status_leer"))}</span><span class="s-frei">${esc(t("status_frei"))}</span>
         <span class="muted">${esc(t(bearbeiten ? "regal_hinweis_bearbeiten" : "regal_hinweis"))}</span>
+        ${bearbeiten ? `<button class="aktion zweit" id="neu">${esc(t("produkt_neu"))}</button>` : ""}
         <button class="aktion ${bearbeiten ? "" : "zweit"}" id="bearbeiten" aria-pressed="${Boolean(bearbeiten)}">
           ${esc(t(bearbeiten ? "bearbeiten_fertig" : "bearbeiten"))}</button>
-      </div>` : ""}
+      </div>${ortWahl.html}` : ""}
       ${alle.length ? `<div class="regale">${html}</div>` : `<div class="leer-hinweis">${esc(t("keine_produkte"))}</div>`}`;
     ziel.querySelectorAll(".gefaess").forEach((b) =>
       b.addEventListener("click", () => (bearbeiten ? this._produktDialog(b.dataset.id) : this._entnehmen(b.dataset.id))),
     );
+    ortWahl.binden(ziel);
+    ziel.querySelector("#neu")?.addEventListener("click", () => this._produktDialog(null));
     ziel.querySelector("#bearbeiten")?.addEventListener("click", () => {
       this._bearbeiten = !this._bearbeiten;
       this._renderRegal(this._liste, ziel, { nurFach, titel });
     });
     ziel.querySelectorAll(".umbenennen").forEach((b) =>
-      b.addEventListener("click", () => this._umbenennenDialog(b.dataset.fach ?? null, b.dataset.regal ?? null)),
+      b.addEventListener("click", () => this._umbenennenDialog(b.dataset.fach ?? null, b.dataset.regal ?? null, b.dataset.ort ?? "")),
     );
     if (fokus) ziel.querySelector(`.gefaess[data-id="${CSS.escape(fokus)}"]`)?.focus();
   }
 
   // --- Bearbeiten: Produkt und Fach ---------------------------------------
 
-  _dialog(titel, inhalt, speichern) {
+  _dialog(titel, inhalt, speichern, okText = t("speichern")) {
     this.shadowRoot.querySelector("dialog.vk")?.remove();
     const d = document.createElement("dialog");
     d.className = "vk";
@@ -1269,7 +1355,7 @@ class VorratskellerCard extends HTMLElement {
         <h2>${esc(titel)}</h2>${inhalt}
         <p class="fehler muted" role="alert"></p>
         <div class="zeile">
-          <button class="aktion" value="ok">${esc(t("speichern"))}</button>
+          <button class="aktion" value="ok">${esc(okText)}</button>
           <button class="aktion zweit" value="abbrechen" formnovalidate>${esc(t("abbrechen"))}</button>
         </div></form>`;
     this.shadowRoot.appendChild(d);
@@ -1289,45 +1375,97 @@ class VorratskellerCard extends HTMLElement {
   }
 
   _produktDialog(id) {
-    const p = this._liste.find((x) => x.id === id);
+    const neu = id === null;
+    const p = neu
+      ? { id: null, name: "", fach: "", ort: this._ort ?? "", soll: 0, packung: "", form: "", gruppe: "", haltbarkeit: 12 }
+      : this._liste.find((x) => x.id === id);
     if (!p) return;
-    const faecherListe = faecher(this._liste)
-      .map((f) => `<option value="${esc(f.name)}"></option>`)
-      .join("");
+    const liste = (werte) => werte.map((w) => `<option value="${esc(w)}"></option>`).join("");
     const formen = FORMEN.map(
       (f) => `<option value="${f}" ${p.form === f ? "selected" : ""}>${esc(t(`form_${f}`))}</option>`,
     ).join("");
-    this._dialog(
-      t("produkt_bearbeiten"),
+    const gruppen = [...new Set(this._liste.map((x) => x.gruppe).filter(Boolean))].sort((a, b) => a.localeCompare(b, LOCALE));
+    const admin = Boolean(this._hass.user?.is_admin);
+    const d = this._dialog(
+      t(neu ? "produkt_neu" : "produkt_bearbeiten"),
       `<label>${esc(t("name_feld"))}<input name="name" required maxlength="120" value="${esc(p.name)}"></label>
-       <label>${esc(t("fach"))}<input name="fach" list="vk-faecher-bearb" value="${esc(p.fach)}"></label>
-       <datalist id="vk-faecher-bearb">${faecherListe}</datalist>
+       ${neu ? `<label>${esc(t("gruppe"))}<select name="gruppe">${gruppen.map((g) => `<option value="${esc(makeId(g))}">${esc(g)}</option>`).join("")}</select></label>` : ""}
+       <div class="zeile">
+         <label style="flex:2 1 220px">${esc(t("fach"))}<input name="fach" list="vk-faecher-bearb" value="${esc(p.fach)}"></label>
+         <label>${esc(t("ort"))}<input name="ort" list="vk-orte-bearb" maxlength="60" placeholder="${esc(t("ort_haupt"))}" value="${esc(p.ort)}"></label>
+       </div>
+       <datalist id="vk-faecher-bearb">${liste([...new Set(this._liste.map((x) => x.fach).filter(Boolean))])}</datalist>
+       <datalist id="vk-orte-bearb">${liste(orte(this._liste).filter(Boolean))}</datalist>
        <p class="muted klein">${esc(t("fach_tipp"))}</p>
        <div class="zeile">
          <label>${esc(t("soll_feld"))}<input name="soll" type="number" min="0" step="1" value="${esc(p.soll)}"></label>
-         <label>${esc(t("packung_feld"))}<input name="packung" value="${esc(p.packung)}"></label>
+         <label>${esc(t("packung_feld"))}<input name="packung" placeholder="× 500 g" value="${esc(p.packung)}"></label>
+         <label>${esc(t("haltbarkeit"))}<input name="haltbar" type="number" min="0" step="1" value="${esc(p.haltbarkeit)}"></label>
        </div>
        <label>${esc(t("form"))}<select name="form">
          <option value="auto">${esc(t("form_auto", { form: t(`form_${form({ ...p, form: "" })}`) }))}</option>${formen}
-       </select></label>`,
-      async (d) => {
-        const f = d.querySelector("form").elements;
-        const daten = { produkt: p.id };
+       </select></label>
+       ${!neu && admin ? `<div class="zeile"><button type="button" class="aktion gefahr" id="loeschen">${esc(t("produkt_loeschen"))}</button></div>` : ""}`,
+      async (dlg) => {
+        const f = dlg.querySelector("form").elements;
         const name = f.name.value.trim();
-        if (name !== p.name) daten.name = name;
-        if (f.fach.value.trim() !== p.fach) daten.fach = f.fach.value.trim();
-        if (num(f.soll.value) !== p.soll) daten.soll = num(f.soll.value);
-        if (f.packung.value !== p.packung) daten.packung = f.packung.value;
-        if (f.form.value !== (p.form || "auto")) daten.form = f.form.value;
+        const werte = {
+          name,
+          fach: f.fach.value.trim(),
+          ort: f.ort.value.trim(),
+          soll: num(f.soll.value),
+          packung: f.packung.value.trim(),
+          haltbarkeit_monate: Math.max(0, Math.round(num(f.haltbar.value))),
+          form: f.form.value,
+        };
+        if (neu) {
+          await callService(this._hass, "produkt_anlegen", { ...werte, gruppe: f.gruppe?.value || "" });
+          toast(this, t("angelegt", { name }));
+          return;
+        }
+        const alt = { name: p.name, fach: p.fach, ort: p.ort, soll: p.soll, packung: p.packung, haltbarkeit_monate: p.haltbarkeit, form: p.form || "auto" };
+        const daten = { produkt: p.id };
+        for (const [k, v] of Object.entries(werte)) if (v !== alt[k]) daten[k] = v;
         if (Object.keys(daten).length === 1) return;
         await callService(this._hass, "produkt_aendern", daten);
-        toast(this, t("produkt_gespeichert", { name: daten.name ?? p.name }));
+        toast(this, t("produkt_gespeichert", { name }));
       },
+    );
+    d.querySelector("#loeschen")?.addEventListener("click", async () => {
+      if (!window.confirm(t("loeschen_frage", { name: p.name, bestand: fmt(p.bestand) }))) return;
+      try {
+        await callService(this._hass, "produkt_loeschen", { produkt: p.id });
+        d.close();
+        toast(this, t("geloescht", { name: p.name }));
+      } catch (err) {
+        d.querySelector(".fehler").textContent = fehlerText(err);
+      }
+    });
+  }
+
+  /** Einlagern über „+“: Menge und MHD abfragen; ohne übliche Haltbarkeit direkt eine Packung. */
+  _einlagernDialog(id) {
+    const p = this._liste.find((x) => x.id === id);
+    if (!p) return;
+    if (!p.haltbarkeit) return this._einlagern(id, 1);
+    this._dialog(
+      t("einlagern_titel", { name: p.name }),
+      `<div class="zeile">
+         <label>${esc(t("menge"))}<input name="menge" type="number" min="1" step="1" value="1" required></label>
+         <label style="flex:2 1 180px">${esc(t("mhd_einlagern"))}<input name="mhd" type="date" min="${isoHeute()}" value="${esc(plusMonate(p.haltbarkeit))}"></label>
+       </div>
+       <p class="muted klein">${esc(t("mhd_tipp", { monate: fmt(p.haltbarkeit) }))}</p>`,
+      async (dlg) => {
+        const f = dlg.querySelector("form").elements;
+        const res = await this._einlagern(id, Math.max(1, num(f.menge.value)), f.mhd.value || undefined);
+        if (!res) throw new Error(t("einlagern_fehlgeschlagen"));
+      },
+      t("einlagern"),
     );
   }
 
-  _umbenennenDialog(fach, regal) {
-    const alle = faecher(this._liste);
+  _umbenennenDialog(fach, regal, ort = "") {
+    const alle = faecher(this._liste).filter((f) => f.ort === ort);
     // Regal umbenennen: alle Fächer, deren Name mit „Regal,“ beginnt oder genau „Regal“ ist
     const betroffen = fach ? alle.filter((f) => f.name === fach) : alle.filter((f) => regalUndBoden(f.name).regal === regal);
     const alt = fach ?? regal;
@@ -1341,7 +1479,7 @@ class VorratskellerCard extends HTMLElement {
         if (!neu || neu === alt) return;
         for (const f of betroffen) {
           const ziel = fach ? neu : neu + f.name.slice(regal.length);
-          await callService(this._hass, "fach_umbenennen", { alt: f.name, neu: ziel });
+          await callService(this._hass, "fach_umbenennen", { alt: f.name, neu: ziel, ort });
         }
         toast(this, t("umbenannt", { n: betroffen.length }));
       },
@@ -1473,7 +1611,7 @@ class VorratskellerCard extends HTMLElement {
       .join("");
     const etiketten = alle
       .map(
-        (f) => `<div class="etikett">${svg(QR_FACH + f.id)}<div><strong>${esc(f.name)}</strong></div>
+        (f) => `<div class="etikett">${svg(QR_FACH + f.id)}<div>${f.ort ? `<span class="muted">${esc(f.ort)}</span><br>` : ""}<strong>${esc(f.name)}</strong></div>
           <div class="muted">${esc(t("n_produkte", { n: f.produkte.length }))}</div></div>`,
       )
       .join("");

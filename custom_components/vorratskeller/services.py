@@ -32,6 +32,7 @@ from .const import (
     ATTR_NAME,
     ATTR_NEU,
     ATTR_OHNE_MHD,
+    ATTR_ORT,
     ATTR_PACKUNG,
     ATTR_PACKUNGSMENGE,
     ATTR_PRODUKT,
@@ -113,6 +114,7 @@ PRODUKT_FELDER = {
     vol.Optional(ATTR_HALTBARKEIT): vol.All(vol.Coerce(int), vol.Range(min=0, max=600)),
     vol.Optional(ATTR_HINWEIS): cv.string,
     vol.Optional(ATTR_FORM): vol.In(FORMEN),
+    vol.Optional(ATTR_ORT): vol.All(cv.string, vol.Length(max=60)),
 }
 SCHEMA_PRODUKT_ANLEGEN = vol.Schema(
     {
@@ -133,6 +135,7 @@ SCHEMA_FACH_UMBENENNEN = vol.Schema(
     {
         vol.Required(ATTR_ALT): cv.string,
         vol.Required(ATTR_NEU): vol.All(cv.string, vol.Length(min=1, max=120)),
+        vol.Optional(ATTR_ORT): cv.string,
     }
 )
 
@@ -183,6 +186,7 @@ def produkt_info(manager: VorratskellerManager, produkt: Produkt) -> dict[str, A
         "haltbarkeit_monate": produkt.haltbarkeit_monate,
         "barcodes": list(produkt.barcodes),
         "form": produkt.form,
+        "ort": produkt.ort,
     }
 
 
@@ -255,7 +259,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
 
     async def fach_umbenennen(call: ServiceCall) -> ServiceResponse:
         anzahl = _manager(hass).fach_umbenennen(
-            call.data[ATTR_ALT], call.data[ATTR_NEU], call.context.user_id
+            call.data[ATTR_ALT], call.data[ATTR_NEU], call.data.get(ATTR_ORT), call.context.user_id
         )
         return {"produkte": anzahl}
 

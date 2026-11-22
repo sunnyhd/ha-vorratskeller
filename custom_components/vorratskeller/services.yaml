@@ -107,6 +107,10 @@ produkt_anlegen:
     hinweis: &hinweis
       selector:
         text:
+    ort: &ort
+      example: Küche
+      selector:
+        text:
     form: &form
       selector:
         select:
@@ -131,6 +135,7 @@ produkt_aendern:
     haltbarkeit_monate: *haltbarkeit
     hinweis: *hinweis
     form: *form
+    ort: *ort
 
 fach_umbenennen:
   fields:
@@ -142,6 +147,10 @@ fach_umbenennen:
     neu:
       required: true
       example: "Weißes Regal, oberster Boden"
+      selector:
+        text:
+    ort:
+      example: Küche
       selector:
         text:
 

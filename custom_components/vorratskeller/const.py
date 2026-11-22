@@ -78,6 +78,7 @@ ATTR_SOLL: Final = "soll"
 ATTR_HALTBARKEIT: Final = "haltbarkeit_monate"
 ATTR_HINWEIS: Final = "hinweis"
 ATTR_FORM: Final = "form"
+ATTR_ORT: Final = "ort"
 # "auto" (Auswahl in der Oberfläche) und "" bedeuten: aus Packung und Hinweis ableiten
 FORMEN: Final = ("", "auto", "glas", "dose", "flasche", "kasten", "packung", "kiste")
 

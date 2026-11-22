@@ -94,6 +94,7 @@ class Produkt:
     haltbarkeit_monate: int = 0
     hinweis: str = ""
     barcodes: list[str] = field(default_factory=list)
+    ort: str = ""  # Lagerort (z. B. Küche); leer = Hauptlager
     form: str = ""  # Gefäß in der Regal-Ansicht; leer = aus Packung und Hinweis ableiten
 
 
@@ -196,6 +197,16 @@ class Lager:
             if produkt.soll > 0 and (fehlt := self.fehlt(produkt.id)) > _EPS:
                 result.append((produkt, fehlt))
         return result
+
+    def ueberschuss(self, heute: date, tage: int) -> list[tuple[Produkt, float, int]]:
+        """Produkte über Soll mit MHD in höchstens ``tage`` Tagen: zuerst aufbrauchen."""
+        result = []
+        for produkt in self.produkte.values():
+            mehr = self.bestand(produkt.id) - produkt.soll
+            mhd = self.naechstes_mhd(produkt.id)
+            if produkt.soll > 0 and mehr > _EPS and mhd is not None and (mhd - heute).days <= tage:
+                result.append((produkt, _round(mehr), (mhd - heute).days))
+        return sorted(result, key=lambda x: x[2])
 
     def ablaufend(self, heute: date, warn_tage: int) -> list[tuple[Charge, int]]:
         """Chargen, deren MHD in höchstens ``warn_tage`` Tagen erreicht ist (auch abgelaufene)."""
@@ -419,13 +430,23 @@ class Lager:
         return produkt
 
     def fach_umbenennen(
-        self, alt: str, neu: str, *, jetzt: datetime, user_id: str | None = None
+        self,
+        alt: str,
+        neu: str,
+        *,
+        ort: str | None = None,
+        jetzt: datetime,
+        user_id: str | None = None,
     ) -> int:
-        """Benenne ein Fach in allen Produkten um; Anzahl der geänderten Produkte."""
+        """Benenne ein Fach in allen Produkten um (optional nur an einem Lagerort)."""
         alt, neu = str(alt).strip(), str(neu).strip()
         if not neu:
             raise LagerError("invalid_fach")
-        treffer = [p for p in self.produkte.values() if p.fach.strip() == alt]
+        treffer = [
+            p
+            for p in self.produkte.values()
+            if p.fach.strip() == alt and (ort is None or p.ort.strip() == ort.strip())
+        ]
         if not treffer:
             raise LagerError("unknown_fach", fach=alt)
         for produkt in treffer:

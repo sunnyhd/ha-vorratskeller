@@ -119,6 +119,7 @@ async def test_wochenbericht(
     assert calls[0].data["title"] == "Vorratskeller: Wochenbericht"
     assert "• H-Milch: 2 (in 9 Tagen)" in calls[0].data["message"]
     assert "Unter Soll:" in calls[0].data["message"]
+    assert " weitere" in calls[0].data["message"].split("Unter Soll:")[1]
 
     freezer.move_to("2026-11-22 09:00:00+00:00")  # Sonntag: nichts
     async_fire_time_changed(hass)

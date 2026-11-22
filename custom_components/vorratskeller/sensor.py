@@ -97,7 +97,7 @@ class ProduktSensor(VorratSensor):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_suggested_display_precision = 0
     _unrecorded_attributes = frozenset(
-        {"chargen", "barcodes", "hinweis", "fach", "packung", "form"}
+        {"chargen", "barcodes", "hinweis", "fach", "packung", "form", "ort"}
     )
 
     def __init__(self, manager: VorratskellerManager, produkt_id: str) -> None:
@@ -157,6 +157,7 @@ class ProduktSensor(VorratSensor):
             "haltbarkeit_monate": produkt.haltbarkeit_monate,
             "hinweis": produkt.hinweis,
             "form": produkt.form,
+            "ort": produkt.ort,
             "barcodes": list(produkt.barcodes),
             "chargen": [
                 {"menge": c.menge, "mhd": c.mhd, "eingelagert": c.eingelagert}

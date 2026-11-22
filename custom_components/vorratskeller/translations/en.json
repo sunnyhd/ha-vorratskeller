@@ -212,6 +212,10 @@
         "form": {
           "name": "Shape",
           "description": "Container in the shelf view. Empty: derived from pack and note."
+        },
+        "ort": {
+          "name": "Storage location",
+          "description": "Second location, e.g. kitchen; empty = main pantry."
         }
       }
     },
@@ -258,6 +262,10 @@
         "form": {
           "name": "Shape",
           "description": "Container in the shelf view. Empty: derived from pack and note."
+        },
+        "ort": {
+          "name": "Storage location",
+          "description": "Second location, e.g. kitchen; empty = main pantry."
         }
       }
     },
@@ -290,6 +298,10 @@
         "neu": {
           "name": "New name",
           "description": "Shelf before the comma, board after it, e.g. “White shelf, top board”."
+        },
+        "ort": {
+          "name": "Storage location",
+          "description": "Only rename shelves at this location; empty = main pantry, omit = everywhere."
         }
       }
     }

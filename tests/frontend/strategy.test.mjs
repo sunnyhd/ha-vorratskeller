@@ -149,3 +149,13 @@ test("Etiketten: Bedarf an Bögen", () => {
   assert.deepEqual(mod.etikettenBedarf("L4776", 2, 11), { etiketten: 2, boegen: 1, frei: 0 });
   assert.deepEqual(mod.etikettenBedarf("3474", 10), { etiketten: 10, boegen: 1, frei: 14 });
 });
+
+test("Lagerorte: Hauptlager zuerst, Fächer je Ort getrennt", () => {
+  const p = (id, fach, ort) => ({ id, name: id, fach, ort, fach_id: mod.makeId(`${ort ? `${ort} ` : ""}${fach}`) });
+  const liste = [p("a", "Schrank, oben", "Küche"), p("b", "Schrank, oben", ""), p("c", "Links, unten", "")];
+  assert.deepEqual(mod.orte(liste), ["", "Küche"]);
+  const f = mod.faecher(liste);
+  assert.equal(f.length, 3);
+  assert.deepEqual(f.map((x) => x.ort), ["", "", "Küche"]);
+  assert.equal(mod.regale(liste).filter((r) => r.name === "Schrank").length, 2);
+});

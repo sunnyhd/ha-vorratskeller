@@ -130,6 +130,13 @@ Soll, Packung und Form im Regal (z. B. Flasche). Der Stift neben einem Regal ode
 der Teil des Fachnamens vor dem Komma, der Boden der Teil danach. Weil der QR-Code am Fachnamen hängt, danach die
 Etiketten der umbenannten Fächer neu drucken. In Automationen: `vorratskeller.fach_umbenennen` mit `alt` und `neu`.
 
+- **Neues Produkt ohne Barcode** (Eier, Obst, Selbstgemachtes): im Bearbeiten-Modus „+ Produkt“.
+- **Löschen:** im Bearbeiten-Dialog, nur für Administratoren, mit Rückfrage.
+- **Lagerort:** Produkte können an einem zweiten Ort liegen, z. B. „Küche“ (leer = Keller). Gibt es mehr als
+  einen Ort, filtern Chips in Regal und Entnehmen nach Ort; Etiketten zeigen den Ort mit an.
+- **Einlagern mit MHD:** „+“ beim Entnehmen fragt Menge und MHD ab, vorbelegt mit der üblichen Haltbarkeit.
+  Produkte ohne MHD (Haltbarkeit 0) lagern weiter mit einem Tipp ein.
+
 ### Etiketten
 
 Die Ansicht **Etiketten** druckt einen QR-Code je Fach auf Etikettenbögen von Avery Zweckform:
@@ -172,7 +179,8 @@ Reichweite je Gruppe = vorhandene Menge (Packungen × Packungsmenge in kg oder l
 | `vorratskeller.inventur` | gezählten Bestand setzen |
 | `vorratskeller.barcode_zuordnen` | Barcode einem Produkt zuordnen (wird bei einem anderen Produkt entfernt) |
 | `vorratskeller.barcode_suchen` | Produkt zum Barcode, sonst Vorschlag von Open Food Facts (Antwort) |
-| `vorratskeller.produkt_anlegen` / `produkt_aendern` / `produkt_loeschen` | Stammdaten |
+| `vorratskeller.produkt_anlegen` / `produkt_aendern` / `produkt_loeschen` | Stammdaten, mit `form` und `ort` |
+| `vorratskeller.fach_umbenennen` | Fach in allen Produkten umbenennen (`alt`, `neu`, optional `ort`) |
 | `vorratskeller.einkaufsliste_abgleichen` | fehlende Produkte auf die Einkaufsliste |
 | `vorratskeller.bericht_senden` | Wochenbericht sofort senden |
 
@@ -183,8 +191,17 @@ Alle Änderungen landen mit Zeit und Benutzer im Journal.
 - **Einkaufsliste:** Fällt ein Produkt unter Soll, kommt es als „Name (Vorrat)“ auf die
   gewählte Liste. Ein offener Eintrag mit gleichem Text verhindert Dubletten; ist er
   abgehakt und das Produkt fehlt erneut, kommt es wieder auf die Liste.
-- **Wochenbericht:** am gewählten Tag zur gewählten Uhrzeit, was bald abläuft und wie viele
-  Produkte unter Soll sind.
+- **Wochenbericht:** am gewählten Tag zur gewählten Uhrzeit, was bald abläuft, was über Soll liegt und bald
+  aufgebraucht werden sollte, und welche Produkte unter Soll sind.
+
+### Blueprint für Push-Nachrichten
+
+[![Blueprint importieren](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fsunnyhd%2Fha-vorratskeller%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fvorratskeller%2Fpush_vorrat.yaml)
+
+Für eigene Tage und Uhrzeiten, mehrere Empfänger und Nachrichten nur dann, wenn es etwas zu melden gibt:
+Blueprint importieren, dann unter Einstellungen → Automationen → Blueprints eine Automation daraus anlegen.
+Einstellbar: Empfänger (`notify`-Entitäten), Uhrzeit, Wochentage, ab wie vielen Tagen vor dem MHD gemeldet wird,
+fehlende Produkte mitschicken. Die Texte des Blueprints sind deutsch.
 
 ### Beispiel: Warnung, wenn der Vorrat knapp wird
 

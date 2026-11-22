@@ -100,6 +100,10 @@ In the **Shelves** tab, “Edit” switches to edit mode: tapping a product open
 the comma. The QR code depends on the name, so reprint the labels of renamed shelves. In automations:
 `vorratskeller.fach_umbenennen` with `alt` and `neu`.
 
+Edit mode also offers “+ Product” for items without a barcode, deleting (administrators only), and a second
+storage location per product (e.g. kitchen) with location chips. “+” when taking out asks for quantity and
+best-before date, prefilled from the usual shelf life.
+
 ### Labels
 
 The **Labels** view prints one QR code per shelf on Avery Zweckform label sheets: L4776 (99.1 × 42.3 mm,
@@ -133,6 +137,14 @@ position” uses partly used sheets. Choose 100 % scale and no margins in the pr
 | `vorratskeller.bericht_senden` | send the weekly report now |
 
 Service and field descriptions are translated in the Home Assistant UI.
+
+### Blueprint for push notifications
+
+[![Import blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fsunnyhd%2Fha-vorratskeller%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fvorratskeller%2Fpush_vorrat.yaml)
+
+Choose recipients (`notify` entities), time, weekdays and how many days before the best-before date to report;
+optionally include products below target and send only when there is something to report. The blueprint texts
+are in German.
 
 ### Example: warning when supplies run low
 
