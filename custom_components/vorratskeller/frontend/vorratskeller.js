@@ -28,6 +28,13 @@ const TEXTE = {
   de: {
     name: "Vorratskeller",
     titel_dashboard: "Vorratskeller",
+    start_titel: "Noch nichts eingelagert.",
+    start_text: "Die Soll-Mengen für {n} Produkte sind angelegt. Jetzt erfassen, was schon im Keller steht.",
+    start_schritt_1: "Unter Entnehmen bei jedem Produkt mit + die vorhandenen Packungen einlagern.",
+    start_schritt_2: "Oder im Scanner den Barcode scannen und Menge und MHD eingeben.",
+    start_schritt_3: "Danach zeigt die Übersicht, wie lange der Vorrat reicht und was fehlt.",
+    start_einlagern: "Bestand erfassen",
+    start_scanner: "Scanner öffnen",
     beschreibung_dashboard: "Lagerbuch des Vorratskellers: Übersicht, Entnahme, Scanner, Bestand, Einkauf, Etiketten.",
     beschreibung_karte: "Entnahme-Kacheln, Scanner, fehlende und ablaufende Produkte, Regal-Etiketten.",
     modus_entnahme: "Entnahme-Kacheln",
@@ -151,6 +158,13 @@ const TEXTE = {
   en: {
     name: "Pantry (Vorratskeller)",
     titel_dashboard: "Pantry",
+    start_titel: "Nothing stored yet.",
+    start_text: "Targets for {n} products are set up. Now record what is already in your pantry.",
+    start_schritt_1: "Under Take out, press + on each product for every pack you have.",
+    start_schritt_2: "Or scan the barcode in the Scanner and enter quantity and best-before date.",
+    start_schritt_3: "Afterwards the overview shows how long supplies last and what is missing.",
+    start_einlagern: "Record stock",
+    start_scanner: "Open scanner",
     beschreibung_dashboard: "Pantry inventory: overview, take out, scanner, stock, shopping, labels.",
     beschreibung_karte: "Take-out tiles, scanner, missing and expiring products, shelf labels.",
     modus_entnahme: "Take-out tiles",
@@ -590,13 +604,17 @@ const STYLE = `
     color: var(--primary-text-color); }
   button.stat { cursor: pointer; }
   .stat ha-icon { --mdc-icon-size: 20px; color: var(--c); }
-  .gruppen { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .gruppen { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
   .gruppe { display: flex; gap: 10px; align-items: center; min-width: 0; }
   .miniring { width: 40px; height: 40px; flex: none; transform: rotate(-90deg); }
   .gruppe .gtext { min-width: 0; }
   .gruppe .gname { font-size: 0.9rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .gruppe .gwert { font-size: 0.8rem; color: var(--secondary-text-color); font-variant-numeric: tabular-nums; }
   @media (max-width: 420px) { .kopf { flex-direction: column; align-items: flex-start; } .satz { font-size: 1.35rem; } }
+  .start { display: flex; gap: 18px; align-items: flex-start; }
+  .start > ha-icon { --mdc-icon-size: 56px; color: var(--primary-color); flex: none; margin-top: 4px; }
+  .schritte { margin: 12px 0 4px; padding-left: 20px; display: grid; gap: 6px; }
+  @media (max-width: 420px) { .start { flex-direction: column; } }
   /* Regal gezeichnet */
   .regale { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
   .regal h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 500; }
@@ -922,6 +940,7 @@ class VorratskellerCard extends HTMLElement {
   }
 
   _renderKopf(liste) {
+    if (!liste.some((p) => p.bestand > 0)) return this._renderStart(liste);
     const k = this._kennzahlen();
     const ringKlasse = stufe(k.prozent / 100);
     const tageKlasse = !Number.isFinite(k.tage) ? "s-frei" : k.tage >= 14 ? "s-ok" : k.tage >= 7 ? "s-knapp" : "s-leer";
@@ -973,6 +992,31 @@ class VorratskellerCard extends HTMLElement {
       </div>
       ${zeilen ? `<div class="gruppen" aria-label="${esc(t("gruppen"))}">${zeilen}</div>` : ""}`;
     this._inhalt.querySelector("[data-nav]")?.addEventListener("click", (ev) => navigiere(ev.currentTarget.dataset.nav));
+  }
+
+  // Noch nichts eingelagert: Anleitung statt lauter Nullen
+  _renderStart(liste) {
+    const mitSoll = liste.filter((p) => p.soll > 0).length;
+    this._inhalt.innerHTML = `
+      <div class="start">
+        <ha-icon icon="mdi:warehouse"></ha-icon>
+        <div>
+          <div class="satz">${esc(t("start_titel"))}</div>
+          <p class="unter-satz">${esc(t("start_text", { n: fmt(mitSoll) }))}</p>
+          <ol class="schritte">
+            <li>${esc(t("start_schritt_1"))}</li>
+            <li>${esc(t("start_schritt_2"))}</li>
+            <li>${esc(t("start_schritt_3"))}</li>
+          </ol>
+          <div class="zeile">
+            <button class="aktion" data-nav="keller">${esc(t("start_einlagern"))}</button>
+            <button class="aktion zweit" data-nav="scanner">${esc(t("start_scanner"))}</button>
+          </div>
+        </div>
+      </div>`;
+    this._inhalt.querySelectorAll("[data-nav]").forEach((b) =>
+      b.addEventListener("click", () => navigiere(b.dataset.nav)),
+    );
   }
 
   // --- Regal, gezeichnet ----------------------------------------------------
@@ -1502,7 +1546,8 @@ export function generateDashboard(hass) {
         type: "grid",
         cards: [{ type: "custom:vorratskeller-card", modus: "ablaufend", grid_options: { columns: "full" } }],
       },
-      {
+      // Verlauf erst, wenn etwas eingelagert ist (vorher nur eine Linie auf 0)
+      ...(liste.some((p) => p.bestand > 0) ? [{
         type: "grid",
         column_span: 2,
         cards: [
@@ -1514,7 +1559,7 @@ export function generateDashboard(hass) {
             grid_options: { columns: "full" },
           },
         ],
-      },
+      }] : []),
       {
         type: "grid",
         cards: [{ type: "custom:vorratskeller-card", modus: "fehlend", grid_options: { columns: "full" } }],
