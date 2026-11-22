@@ -87,6 +87,10 @@
         "mhd": {
           "name": "Best-before date",
           "description": "Date on the package. Defaults to today plus the usual shelf life."
+        },
+        "ohne_mhd": {
+          "name": "Without date",
+          "description": "Do not set the default best-before date when none is given (e.g. for undo)."
         }
       }
     },

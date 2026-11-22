@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from datetime import date, datetime, time
 import logging
@@ -10,7 +11,7 @@ from typing import Any
 from homeassistant.components.todo import TodoListEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID, ATTR_SUPPORTED_FEATURES
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
+from homeassistant.core import CALLBACK_TYPE, Context, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.debounce import Debouncer
@@ -62,6 +63,9 @@ class VorratskellerManager:
             atomic_writes=True,
         )
         self._unsubs: list[CALLBACK_TYPE] = []
+        # Abgleiche nacheinander: gleichzeitige Läufe sähen dieselbe Liste und fügten doppelt hinzu
+        self._sync_lock = asyncio.Lock()
+        self._stopped = False
         self._sync_debouncer = Debouncer(
             hass,
             _LOGGER,
@@ -110,6 +114,7 @@ class VorratskellerManager:
 
     async def async_shutdown(self) -> None:
         """Beende Zeitpläne und schreibe ausstehende Änderungen."""
+        self._stopped = True
         for unsub in self._unsubs:
             unsub()
         self._unsubs.clear()
@@ -171,10 +176,18 @@ class VorratskellerManager:
         raise ServiceValidationError(translation_domain=DOMAIN, translation_key="product_required")
 
     def einlagern(
-        self, produkt: Produkt, menge: float, mhd: date | None, user_id: str | None
+        self,
+        produkt: Produkt,
+        menge: float,
+        mhd: date | None,
+        user_id: str | None,
+        *,
+        ohne_mhd: bool = False,
     ) -> dict[str, Any]:
         """Lagere ein."""
-        charge = self._run(self.lager.einlagern, produkt.id, menge, mhd, user_id=user_id)
+        charge = self._run(
+            self.lager.einlagern, produkt.id, menge, mhd, user_id=user_id, ohne_mhd=ohne_mhd
+        )
         return {"produkt": produkt.id, "bestand": self.lager.bestand(produkt.id), "mhd": charge.mhd}
 
     def entnehmen(self, produkt: Produkt, menge: float, user_id: str | None) -> dict[str, Any]:
@@ -223,12 +236,19 @@ class VorratskellerManager:
 
     # --- Einkaufsliste -------------------------------------------------------
 
-    async def async_sync_einkaufsliste(self) -> int:
+    async def async_sync_einkaufsliste(self, context: Context | None = None) -> int:
         """Setze fehlende Produkte auf die Einkaufsliste, ohne Dubletten.
 
         Offene Einträge mit gleichem Text gelten als vorhanden; erledigte nicht,
         damit ein Produkt nach dem Einkauf wieder auf die Liste kommt, wenn es erneut fehlt.
+        Läufe sind serialisiert; jeder liest die Liste und den Bestand neu.
         """
+        async with self._sync_lock:
+            if self._stopped:
+                return 0
+            return await self._sync_einkaufsliste(context)
+
+    async def _sync_einkaufsliste(self, context: Context | None) -> int:
         entity_id = self.entry.options.get(CONF_EINKAUFSLISTE)
         if not entity_id:
             return 0
@@ -245,6 +265,7 @@ class VorratskellerManager:
             {ATTR_ENTITY_ID: entity_id, "status": ["needs_action"]},
             blocking=True,
             return_response=True,
+            context=context,
         )
         offen = {
             str(item.get("summary", "")).casefold()
@@ -262,7 +283,9 @@ class VorratskellerManager:
             data: dict[str, Any] = {ATTR_ENTITY_ID: entity_id, "item": summary}
             if mit_beschreibung:
                 data["description"] = f"Es fehlen {fehlt:g} {produkt.packung}".strip()
-            await self.hass.services.async_call("todo", "add_item", data, blocking=True)
+            await self.hass.services.async_call(
+                "todo", "add_item", data, blocking=True, context=context
+            )
             offen.add(summary.casefold())
             neu += 1
         return neu
@@ -292,7 +315,7 @@ class VorratskellerManager:
             zeilen.append("Alles im Soll, nichts läuft in den nächsten Wochen ab.")
         return f"{NAME}: Wochenbericht", "\n".join(zeilen)
 
-    async def async_send_bericht(self) -> None:
+    async def async_send_bericht(self, context: Context | None = None) -> None:
         """Sende den Bericht an den eingestellten Dienst."""
         ziel = self.entry.options.get(CONF_NOTIFY)
         if not ziel:
@@ -303,7 +326,7 @@ class VorratskellerManager:
         domain, _, name = ziel.partition(".")
         if domain == "notify" and self.hass.services.has_service("notify", name):
             await self.hass.services.async_call(
-                "notify", name, {"title": title, "message": message}, blocking=True
+                "notify", name, {"title": title, "message": message}, blocking=True, context=context
             )
         elif self.hass.states.get(ziel) is not None and domain == "notify":
             await self.hass.services.async_call(
@@ -311,6 +334,7 @@ class VorratskellerManager:
                 "send_message",
                 {ATTR_ENTITY_ID: ziel, "title": title, "message": message},
                 blocking=True,
+                context=context,
             )
         else:
             raise HomeAssistantError(

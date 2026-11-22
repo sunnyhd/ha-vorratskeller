@@ -12,6 +12,7 @@ from homeassistant.helpers import entity_registry as er
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 from pytest_homeassistant_custom_component.typing import ClientSessionGenerator
+import voluptuous as vol
 
 from custom_components.vorratskeller.const import DOMAIN
 from custom_components.vorratskeller.seed import load_checkliste
@@ -215,3 +216,50 @@ async def test_frontend_served(
     client = await hass_client()
     resp = await client.get("/vorratskeller_static/vorratskeller.js")
     assert resp.status == 200
+
+
+async def test_keine_unendlichen_zahlen(
+    hass: HomeAssistant, setup_integration: MockConfigEntry
+) -> None:
+    for wert in ("inf", "nan", "-inf"):
+        with pytest.raises(vol.Invalid):
+            await call(hass, "produkt_aendern", {"produkt": "h-milch", "soll": wert})
+        with pytest.raises(vol.Invalid):
+            await call(hass, "einlagern", {"produkt": "h-milch", "menge": wert})
+    assert hass.states.get(MILCH).attributes["soll"] == 13
+
+
+async def test_rechte(hass: HomeAssistant, setup_integration: MockConfigEntry) -> None:
+    from homeassistant.auth.const import GROUP_ID_READ_ONLY, GROUP_ID_USER
+    from homeassistant.core import Context
+    from homeassistant.exceptions import Unauthorized
+
+    owner = await hass.auth.async_create_user("Eigentümer", group_ids=[GROUP_ID_USER])
+    nutzer = await hass.auth.async_create_user("Kellertablet", group_ids=[GROUP_ID_USER])
+    assert owner.is_owner
+    assert not nutzer.is_admin
+    leser = await hass.auth.async_create_user("Leser", group_ids=[GROUP_ID_READ_ONLY])
+
+    async def als(user, service, data):
+        return await hass.services.async_call(
+            DOMAIN, service, data, blocking=True, context=Context(user_id=user.id)
+        )
+
+    # Kellertablet (ohne Admin): ein- und auslagern ja, löschen nein
+    await als(nutzer, "einlagern", {"produkt": "h-milch"})
+    await als(nutzer, "entnehmen", {"produkt": "h-milch"})
+    with pytest.raises(Unauthorized):
+        await als(nutzer, "produkt_loeschen", {"produkt": "h-milch"})
+    # Nur-Lesen: nichts Schreibendes
+    with pytest.raises(Unauthorized):
+        await als(leser, "einlagern", {"produkt": "h-milch"})
+    with pytest.raises(Unauthorized):
+        await als(leser, "produkt_loeschen", {"produkt": "h-milch"})
+    assert "h-milch" in setup_integration.runtime_data.lager.produkte
+
+
+async def test_rueckgaengig_ohne_mhd(
+    hass: HomeAssistant, setup_integration: MockConfigEntry
+) -> None:
+    resp = await call(hass, "einlagern", {"produkt": "h-milch", "ohne_mhd": True})
+    assert resp["mhd"] is None

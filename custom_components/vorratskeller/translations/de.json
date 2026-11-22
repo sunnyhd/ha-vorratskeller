@@ -87,6 +87,10 @@
         "mhd": {
           "name": "Mindesthaltbarkeitsdatum",
           "description": "Datum auf der Packung. Ohne Angabe gilt heute plus übliche Haltbarkeit."
+        },
+        "ohne_mhd": {
+          "name": "Ohne MHD",
+          "description": "Kein Standard-MHD setzen, wenn kein Datum angegeben ist (z. B. für Rückgängig)."
         }
       }
     },

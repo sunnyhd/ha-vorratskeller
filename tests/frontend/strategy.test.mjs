@@ -56,9 +56,9 @@ test("Dashboard enthält alle Ansichten und Karten", async () => {
   assert.ok(window.customCards.some((c) => c.type === "vorratskeller-card"));
 });
 
-test("Leeres Dashboard mit Hinweis", async () => {
+test("Leeres Dashboard mit Hinweis und Scanner", async () => {
   const dash = mod.generateDashboard({ states: {}, entities: {} });
-  assert.equal(dash.views.length, 1);
+  assert.deepEqual(dash.views.map((v) => v.path), ["uebersicht", "scanner"]);
   assert.match(dash.views[0].cards[0].content, /Integration/);
 });
 

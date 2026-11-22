@@ -194,3 +194,36 @@ def test_valid_barcode_reference_examples() -> None:
     assert not valid_barcode("4006381333932")
     assert not valid_barcode("12345")
     assert not valid_barcode("VK:F:links-1")
+
+
+def test_mengen_einheitlich_gerundet(lager: Lager) -> None:
+    lager.einlagern("h-milch", 1, date(2027, 1, 1), jetzt=JETZT)
+    entnommen = lager.entnehmen("h-milch", 0.0015, jetzt=JETZT)
+    # Antwort, Journal und Bestand verbuchen dieselbe gerundete Menge
+    assert entnommen == [{"menge": 0.002, "mhd": "2027-01-01"}]
+    assert lager.journal[-1]["menge"] == 0.002
+    assert lager.bestand("h-milch") == 0.998
+    with pytest.raises(LagerError):
+        lager.entnehmen("h-milch", 0.0004, jetzt=JETZT)  # rundet auf 0
+
+
+def test_einlagern_ohne_mhd(lager: Lager) -> None:
+    charge = lager.einlagern("h-milch", 1, None, jetzt=JETZT, ohne_mhd=True)
+    assert charge.mhd is None
+
+
+def test_produkt_aendern_atomar(lager: Lager) -> None:
+    with pytest.raises(LagerError):
+        lager.produkt_aendern("h-milch", {"soll": 99, "name": "   "}, jetzt=JETZT)
+    assert lager.produkte["h-milch"].soll == 14
+    assert lager.journal == []
+
+
+def test_laden_repariert_ungueltige_zahlen(lager: Lager) -> None:
+    data = lager.to_dict()
+    data["produkte"][0]["soll"] = None
+    data["produkte"][0]["packungsmenge"] = float("inf")
+    again = Lager.from_dict(data)
+    assert again.produkte["h-milch"].soll == 0
+    assert again.produkte["h-milch"].packungsmenge == 0
+    assert again.fehlende() == []

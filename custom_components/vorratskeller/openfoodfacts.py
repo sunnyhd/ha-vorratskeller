@@ -8,7 +8,7 @@ from typing import Any
 
 import aiohttp
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .const import OPEN_FOOD_FACTS_FIELDS, OPEN_FOOD_FACTS_URL, USER_AGENT
 
@@ -17,6 +17,17 @@ _LOGGER = logging.getLogger(__name__)
 # EAN-8, UPC-A (12), EAN-13, ITF-14/GTIN-14
 BARCODE_RE = re.compile(r"^\d{8}$|^\d{12,14}$")
 TIMEOUT = aiohttp.ClientTimeout(total=10)
+
+
+_SESSION_KEY = "vorratskeller_off_session"
+
+
+def _session(hass: HomeAssistant) -> aiohttp.ClientSession:
+    """Eigene Sitzung ohne Cookie-Speicher, damit nichts außer der Nummer mitgeht."""
+    if (session := hass.data.get(_SESSION_KEY)) is None:
+        session = async_create_clientsession(hass, cookie_jar=aiohttp.DummyCookieJar())
+        hass.data[_SESSION_KEY] = session
+    return session
 
 
 def valid_barcode(barcode: str) -> bool:
@@ -36,7 +47,7 @@ async def async_lookup(hass: HomeAssistant, barcode: str, version: str) -> dict[
     """
     if not valid_barcode(barcode):
         return None
-    session = async_get_clientsession(hass)
+    session = _session(hass)
     try:
         async with session.get(
             OPEN_FOOD_FACTS_URL.format(barcode=barcode),

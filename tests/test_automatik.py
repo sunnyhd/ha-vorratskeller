@@ -184,3 +184,16 @@ async def test_ohne_checkliste(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     assert entry.runtime_data.lager.produkte == {}
     assert hass.states.get("sensor.vorratskeller_reichweite").state == "unknown"
+
+
+@pytest.mark.parametrize("options", [{"einkaufsliste": "todo.shopping_list"}])
+async def test_einkaufsliste_parallel_ohne_dubletten(
+    hass: HomeAssistant, einkaufsliste: str, setup_integration: MockConfigEntry
+) -> None:
+    import asyncio
+
+    manager = setup_integration.runtime_data
+    await asyncio.gather(*(manager.async_sync_einkaufsliste() for _ in range(3)))
+    liste = await items(hass, einkaufsliste)
+    summaries = [i["summary"] for i in liste]
+    assert len(summaries) == len(set(summaries)) == len(manager.lager.fehlende())

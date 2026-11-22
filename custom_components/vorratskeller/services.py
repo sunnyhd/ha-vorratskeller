@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
+import math
 from typing import Any
 
+from homeassistant.auth.const import GROUP_ID_READ_ONLY
 from homeassistant.core import (
     HomeAssistant,
     ServiceCall,
@@ -11,7 +14,7 @@ from homeassistant.core import (
     SupportsResponse,
     callback,
 )
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import ServiceValidationError, Unauthorized, UnknownUser
 from homeassistant.helpers import config_validation as cv
 from homeassistant.loader import async_get_integration
 import voluptuous as vol
@@ -25,6 +28,7 @@ from .const import (
     ATTR_MENGE,
     ATTR_MHD,
     ATTR_NAME,
+    ATTR_OHNE_MHD,
     ATTR_PACKUNG,
     ATTR_PACKUNGSMENGE,
     ATTR_PRODUKT,
@@ -54,8 +58,20 @@ def _barcode(value: Any) -> str:
     return value
 
 
+def _endlich(value: Any) -> float:
+    number = float(value)
+    if not math.isfinite(number):
+        raise vol.Invalid("number must be finite")
+    return number
+
+
+def _zahl(minimum: float, maximum: float) -> vol.All:
+    """Endliche Zahl im Bereich (nan und inf würden gespeichert als null)."""
+    return vol.All(_endlich, vol.Range(min=minimum, max=maximum))
+
+
 BARCODE = vol.All(cv.string, _barcode)
-MENGE = vol.All(vol.Coerce(float), vol.Range(min=0.001, max=100000))
+MENGE = _zahl(0.001, 100000)
 
 PRODUKT_REF = {
     vol.Optional(ATTR_PRODUKT): cv.string,
@@ -63,13 +79,18 @@ PRODUKT_REF = {
 }
 
 SCHEMA_EINLAGERN = vol.Schema(
-    {**PRODUKT_REF, vol.Optional(ATTR_MENGE, default=1): MENGE, vol.Optional(ATTR_MHD): cv.date}
+    {
+        **PRODUKT_REF,
+        vol.Optional(ATTR_MENGE, default=1): MENGE,
+        vol.Optional(ATTR_MHD): cv.date,
+        vol.Optional(ATTR_OHNE_MHD, default=False): cv.boolean,
+    }
 )
 SCHEMA_ENTNEHMEN = vol.Schema({**PRODUKT_REF, vol.Optional(ATTR_MENGE, default=1): MENGE})
 SCHEMA_INVENTUR = vol.Schema(
     {
         **PRODUKT_REF,
-        vol.Required(ATTR_MENGE): vol.All(vol.Coerce(float), vol.Range(min=0, max=100000)),
+        vol.Required(ATTR_MENGE): _zahl(0, 100000),
         vol.Optional(ATTR_MHD): cv.date,
     }
 )
@@ -82,8 +103,8 @@ PRODUKT_FELDER = {
     vol.Optional(ATTR_GRUPPE): cv.string,
     vol.Optional(ATTR_FACH): cv.string,
     vol.Optional(ATTR_PACKUNG): cv.string,
-    vol.Optional(ATTR_PACKUNGSMENGE): vol.All(vol.Coerce(float), vol.Range(min=0)),
-    vol.Optional(ATTR_SOLL): vol.All(vol.Coerce(float), vol.Range(min=0)),
+    vol.Optional(ATTR_PACKUNGSMENGE): _zahl(0, 10000),
+    vol.Optional(ATTR_SOLL): _zahl(0, 100000),
     vol.Optional(ATTR_HALTBARKEIT): vol.All(vol.Coerce(int), vol.Range(min=0, max=600)),
     vol.Optional(ATTR_HINWEIS): cv.string,
 }
@@ -109,6 +130,29 @@ def _manager(hass: HomeAssistant) -> VorratskellerManager:
     if not entries:
         raise ServiceValidationError(translation_domain=DOMAIN, translation_key="not_loaded")
     return entries[0].runtime_data
+
+
+Handler = Callable[[ServiceCall], Awaitable[ServiceResponse]]
+
+
+def _recht(hass: HomeAssistant, handler: Handler, *, admin: bool = False) -> Handler:
+    """Schreibende Dienste nicht für Nur-Lesen-Konten; Löschen nur für Admins.
+
+    Aufrufe ohne Benutzer (Automationen, Skripte) sind erlaubt.
+    """
+
+    async def pruefen(call: ServiceCall) -> ServiceResponse:
+        if (user_id := call.context.user_id) is not None:
+            user = await hass.auth.async_get_user(user_id)
+            if user is None:
+                raise UnknownUser(context=call.context, user_id=user_id)
+            if (admin and not user.is_admin) or any(
+                g.id == GROUP_ID_READ_ONLY for g in user.groups
+            ):
+                raise Unauthorized(context=call.context, user_id=user_id)
+        return await handler(call)
+
+    return pruefen
 
 
 def produkt_info(manager: VorratskellerManager, produkt: Produkt) -> dict[str, Any]:
@@ -139,7 +183,11 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def einlagern(call: ServiceCall) -> ServiceResponse:
         manager = _manager(hass)
         return manager.einlagern(
-            ref(manager, call), call.data[ATTR_MENGE], call.data.get(ATTR_MHD), call.context.user_id
+            ref(manager, call),
+            call.data[ATTR_MENGE],
+            call.data.get(ATTR_MHD),
+            call.context.user_id,
+            ohne_mhd=call.data[ATTR_OHNE_MHD],
         )
 
     async def entnehmen(call: ServiceCall) -> ServiceResponse:
@@ -189,19 +237,33 @@ def async_setup_services(hass: HomeAssistant) -> None:
         manager.produkt_loeschen(produkt, call.context.user_id)
 
     async def bericht_senden(call: ServiceCall) -> None:
-        await _manager(hass).async_send_bericht()
+        await _manager(hass).async_send_bericht(call.context)
 
     async def einkaufsliste_abgleichen(call: ServiceCall) -> ServiceResponse:
-        return {"neu": await _manager(hass).async_sync_einkaufsliste()}
+        return {"neu": await _manager(hass).async_sync_einkaufsliste(call.context)}
 
     register = hass.services.async_register
-    register(DOMAIN, SERVICE_EINLAGERN, einlagern, SCHEMA_EINLAGERN, SupportsResponse.OPTIONAL)
-    register(DOMAIN, SERVICE_ENTNEHMEN, entnehmen, SCHEMA_ENTNEHMEN, SupportsResponse.OPTIONAL)
-    register(DOMAIN, SERVICE_INVENTUR, inventur, SCHEMA_INVENTUR, SupportsResponse.OPTIONAL)
+    register(
+        DOMAIN,
+        SERVICE_EINLAGERN,
+        _recht(hass, einlagern),
+        SCHEMA_EINLAGERN,
+        SupportsResponse.OPTIONAL,
+    )
+    register(
+        DOMAIN,
+        SERVICE_ENTNEHMEN,
+        _recht(hass, entnehmen),
+        SCHEMA_ENTNEHMEN,
+        SupportsResponse.OPTIONAL,
+    )
+    register(
+        DOMAIN, SERVICE_INVENTUR, _recht(hass, inventur), SCHEMA_INVENTUR, SupportsResponse.OPTIONAL
+    )
     register(
         DOMAIN,
         SERVICE_BARCODE_ZUORDNEN,
-        barcode_zuordnen,
+        _recht(hass, barcode_zuordnen),
         SCHEMA_BARCODE_ZUORDNEN,
         SupportsResponse.OPTIONAL,
     )
@@ -211,23 +273,28 @@ def async_setup_services(hass: HomeAssistant) -> None:
     register(
         DOMAIN,
         SERVICE_PRODUKT_ANLEGEN,
-        produkt_anlegen,
+        _recht(hass, produkt_anlegen),
         SCHEMA_PRODUKT_ANLEGEN,
         SupportsResponse.OPTIONAL,
     )
     register(
         DOMAIN,
         SERVICE_PRODUKT_AENDERN,
-        produkt_aendern,
+        _recht(hass, produkt_aendern),
         SCHEMA_PRODUKT_AENDERN,
         SupportsResponse.OPTIONAL,
     )
-    register(DOMAIN, SERVICE_PRODUKT_LOESCHEN, produkt_loeschen, SCHEMA_PRODUKT_LOESCHEN)
-    register(DOMAIN, SERVICE_BERICHT_SENDEN, bericht_senden, vol.Schema({}))
+    register(
+        DOMAIN,
+        SERVICE_PRODUKT_LOESCHEN,
+        _recht(hass, produkt_loeschen, admin=True),
+        SCHEMA_PRODUKT_LOESCHEN,
+    )
+    register(DOMAIN, SERVICE_BERICHT_SENDEN, _recht(hass, bericht_senden), vol.Schema({}))
     register(
         DOMAIN,
         SERVICE_EINKAUFSLISTE_ABGLEICHEN,
-        einkaufsliste_abgleichen,
+        _recht(hass, einkaufsliste_abgleichen),
         vol.Schema({}),
         SupportsResponse.OPTIONAL,
     )

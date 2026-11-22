@@ -10,6 +10,7 @@ from __future__ import annotations
 import calendar
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
+import math
 import re
 from typing import Any
 import uuid
@@ -34,6 +35,23 @@ def add_months(start: date, months: int) -> date:
     month = month_index % 12 + 1
     day = min(start.day, calendar.monthrange(year, month)[1])
     return date(year, month, day)
+
+
+def _finite(value: Any) -> float:
+    """Zahl oder 0, falls leer, unendlich oder keine Zahl (ältere oder beschädigte Daten)."""
+    try:
+        number = float(value)
+    except TypeError, ValueError:
+        return 0.0
+    return number if math.isfinite(number) else 0.0
+
+
+def _menge(value: float) -> float:
+    """Menge auf drei Nachkommastellen; Antwort, Bestand und Journal nutzen denselben Wert."""
+    menge = _round(_finite(value))
+    if menge <= 0:
+        raise LagerError("invalid_amount")
+    return menge
 
 
 def _round(value: float) -> float:
@@ -118,6 +136,9 @@ class Lager:
             lager.gruppen[gruppe.id] = gruppe
         for raw in data.get("produkte", []):
             produkt = Produkt(**raw)
+            for feld in ("packungsmenge", "soll"):
+                setattr(produkt, feld, _finite(getattr(produkt, feld)))
+            produkt.haltbarkeit_monate = int(_finite(produkt.haltbarkeit_monate))
             lager.produkte[produkt.id] = produkt
         lager.chargen = [Charge(**raw) for raw in data.get("chargen", [])]
         lager.journal = list(data.get("journal", []))
@@ -254,12 +275,12 @@ class Lager:
         *,
         jetzt: datetime,
         user_id: str | None = None,
+        ohne_mhd: bool = False,
     ) -> Charge:
-        """Lagere ein. Ohne MHD gilt heute + übliche Haltbarkeit (falls bekannt)."""
+        """Lagere ein. Ohne MHD gilt heute + übliche Haltbarkeit, außer ``ohne_mhd``."""
         produkt = self.produkt(produkt_id)
-        if menge <= 0:
-            raise LagerError("invalid_amount")
-        if mhd is None and produkt.haltbarkeit_monate > 0:
+        menge = _menge(menge)
+        if mhd is None and not ohne_mhd and produkt.haltbarkeit_monate > 0:
             mhd = add_months(jetzt.date(), produkt.haltbarkeit_monate)
         mhd_iso = mhd.isoformat() if mhd else None
         heute = jetzt.date().isoformat()
@@ -295,8 +316,7 @@ class Lager:
     ) -> list[dict[str, Any]]:
         """Entnimm nach FIFO. Ändert nichts, wenn der Bestand nicht reicht."""
         self.produkt(produkt_id)
-        if menge <= 0:
-            raise LagerError("invalid_amount")
+        menge = _menge(menge)
         vorhanden = self.bestand(produkt_id)
         if menge > vorhanden + _EPS:
             raise LagerError(
@@ -383,11 +403,16 @@ class Lager:
     ) -> Produkt:
         """Ändere Felder eines Produkts (nicht Kennung und Barcodes)."""
         produkt = self.produkt(produkt_id)
-        for key, value in daten.items():
-            if key in ("id", "barcodes") or key not in Produkt.__dataclass_fields__:
-                continue
-            if key == "name" and not str(value).strip():
+        aenderungen = {
+            k: v
+            for k, v in daten.items()
+            if k not in ("id", "barcodes") and k in Produkt.__dataclass_fields__
+        }
+        if "name" in aenderungen:
+            aenderungen["name"] = str(aenderungen["name"]).strip()
+            if not aenderungen["name"]:
                 raise LagerError("invalid_name")
+        for key, value in aenderungen.items():
             setattr(produkt, key, value)
         self._log("produkt_aendern", produkt_id, jetzt=jetzt, user_id=user_id)
         return produkt

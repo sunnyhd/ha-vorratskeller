@@ -22,23 +22,45 @@ was ist da, was fehlt, was läuft ab, Nachkauf auf die HA-Einkaufsliste, Push-Na
 - Raum 3 × 4 m, Stahlregal links 2,4 m und rechts 1,6 m (je 5 Böden, 40 cm tief), weißes Regal 1 m (4 Fächer);
   Wasser in 13 Mehrweg-Glaskästen neben dem linken Regal. Feuchte Rückwand (Hygrometer, Fleck prüfen).
 
-## Geplanter Umfang (Version 1)
-1. Datenmodell: Produkte (Name, Gruppe, Fach, Einheit, Soll, Standard-Haltbarkeit, EANs), Chargen (Menge, MHD,
-   eingelagert am), Journal. Erstbefüllung aus `produkte-checkliste.json`.
-2. Services: `einlagern`, `entnehmen` (FIFO, älteste zuerst), `barcode_zuordnen`, `inventur`.
-3. Entitäten: Sensor je Produkt (Bestand, nächstes MHD, Attribut Soll), Sammelsensoren (fehlt, läuft ab, „reicht X Tage“),
-   To-do-Liste „Vorrat bald verbrauchen“ optional.
-4. Automatik: unter Soll → `todo.add_item` auf konfigurierbare Einkaufsliste (ohne Dubletten); wöchentliche
-   Push-Nachricht über konfigurierbaren `notify`-Dienst.
-5. Frontend: Karte mit Kamera-Scanner (BarcodeDetector, Rückfall zxing), Entnahme-Kacheln fürs Kellertablet,
-   Dashboard-Strategie, die das ganze Dashboard aus den Entitäten baut. Regal-QR-Etiketten zum Drucken.
-6. Open Food Facts nur bei unbekanntem EAN, nur die Nummer.
+## Aufbau (Version 1, Stand 2026-11-22, Branch `v1-integration`)
+- `custom_components/vorratskeller/`: `lager.py` (Fachlogik ohne HA: Produkte, Chargen, FIFO, Inventur,
+  Reichweite, Journal), `seed.py` (Erstbefüllung aus `data/checkliste.json`, Soll auf Personen/Tage umgerechnet),
+  `manager.py` (Store `.storage/vorratskeller`, Einkaufsliste, Wochenbericht, Mitternachts-Aktualisierung),
+  `services.py` (10 Dienste), `sensor.py` (je Produkt + 4 Sammelsensoren), `config_flow.py`, `openfoodfacts.py`.
+- `frontend/vorratskeller.js`: Karte `custom:vorratskeller-card` (entnahme, scanner, fehlend, ablaufend, etiketten)
+  und Strategie `custom:vorratskeller` (6 Ansichten), ohne Build. `frontend/vendor/`: barcode-detector/zxing-wasm
+  und qrcode-generator, lokal ausgeliefert (`scripts/vendor.sh`, Lizenzen in `LICENSES.md`).
+- Tests: `tests/` (pytest-homeassistant-custom-component 0.13.375 = HA 2026.10.4), `tests/frontend/` (node --test).
+  CI: `.github/workflows/validate.yml` (hassfest, HACS, ruff, pytest, node).
+- Lokales HA: `config/` (gitignored, 127.0.0.1:18123, trusted_networks nur localhost), `.venv/bin/hass -c config`.
 
-## Prüfen (unabhängiger Beleg)
-HA lokal im venv (`pip install homeassistant`) mit der Integration starten; pytest mit
-`pytest-homeassistant-custom-component`; `hassfest` und HACS-Validierung als GitHub Action; Abnahme am Kellertablet durch KB.
+## Erkenntnisse (für spätere Änderungen)
+- HA-Frontend tauscht `window.customElements` gegen ein Polyfill, nachdem `add_extra_js_url`-Module geladen sind;
+  die Karte definiert ihre Elemente daher 30 s lang nach (im Browser belegt, sonst Timeout der Strategie).
+- Einheiten übersetzt HA nur auf Englisch; Sammelsensoren haben feste deutsche Einheiten.
+- `todo.get_items` ohne `status` liefert alle Einträge; für die Dublettenprüfung `needs_action` mitgeben.
+- HA 2026.x übernimmt `http:` aus YAML einmalig als 5-Minuten-Probe in `.storage/http`; ohne Bestätigung im UI
+  fällt es auf den Standard 0.0.0.0:8123 zurück. Lokal daher `stable` in `config/.storage/http` auf
+  127.0.0.1:18123 gesetzt (am 22.11. lief die Dev-Instanz ca. 10:16–10:25 auf 0.0.0.0:8123, mit Anmeldung,
+  keine fremden Zugriffe im Log).
+- Dienste: schreibende nicht für Nur-Lesen-Konten, `produkt_loeschen` nur für Admins; Automationen dürfen alles.
+
+## Geprüft
+pytest 38 grün, node 5 grün, ruff sauber. Codex-Review (11 Befunde: Rechte, inf/nan, Kamera-Abbruch,
+Scan überschreibt Eingaben, leeres Dashboard, Rundung, Rückgängig, Teiländerung, parallele Abgleiche, Cookies,
+Kachel-Bedienung) eingearbeitet, je mit Test wo möglich. Im echten HA 2026.10.4 lokal: Config Flow, Optionen, Einkaufsliste
+(39 fehlende → 39 Einträge, keine Dubletten), Dashboard per Strategie mit allen Ansichten, Entnahme-Kachel mit
+Rückgängig, Fach-Filter, Scanner von Hand (Regal-Code, unbekannter Barcode → Zuordnen → Einlagern),
+zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen außer Open Food Facts.
 
 ## Offen
-- GitHub-Repo `sunnyhd/ha-vorratskeller` (öffentlich) anlegen: Freigabe KB.
-- Fire-Tablet: Modell und Fire-OS-Version (für HA-App „minimal“ per F-Droid/GitHub, mind. Android 6).
-- Kellertablet-Benutzer in HA mit „nur lokal anmelden“ (HA über Cloudflare erreichbar).
+- KB: GitHub-Repo `sunnyhd/ha-vorratskeller` (öffentlich) anlegen und pushen; erst dann laufen hassfest und
+  HACS-Prüfung (lokal kein Docker). Lizenz MIT vorgeschlagen (`LICENSE`, Inhaber „sunnyhd“).
+- KB: Ob `docs/grundlagen/vorratskeller-3d.html` und die Grocy-Unterlagen ins öffentliche Repo sollen
+  (Raumaufteilung des Kellers); sonst vor dem Push entfernen oder ignorieren.
+- KB: Fire-Tablet Modell und Fire-OS-Version; ob dort `BarcodeDetector` oder der zxing-Rückfall läuft, zeigt
+  nur das Gerät. Kamera braucht https (Cloudflare-Adresse) oder localhost.
+- KB: Kellertablet-Benutzer in HA mit „nur lokal anmelden“ (HA über Cloudflare erreichbar).
+- Nicht geprüft: Dialog „Neues Dashboard“ → Community-Dashboards (Bildschirm im Test nicht verfügbar;
+  Dashboard per gleicher WebSocket-API angelegt), Druck der Etiketten, Kamera am echten Gerät.
+- Später möglich: To-do-Liste „bald verbrauchen“, Diagnose-Download, Produkt-QR-Etiketten.

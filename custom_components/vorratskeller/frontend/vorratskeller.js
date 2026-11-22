@@ -150,7 +150,8 @@ const STYLE = `
   .chip[aria-pressed="true"] { background: var(--primary-color); color: var(--text-primary-color, #fff);
     border-color: var(--primary-color); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-  .tile { position: relative; display: flex; flex-direction: column; gap: 4px; text-align: left;
+  .zelle { position: relative; display: flex; }
+  .tile { flex: 1; width: 100%; display: flex; flex-direction: column; gap: 4px; text-align: left;
     padding: 12px; min-height: 112px; border-radius: var(--ha-card-border-radius, 12px);
     border: 1px solid var(--divider-color); background: var(--secondary-background-color);
     color: var(--primary-text-color); font: inherit; cursor: pointer; touch-action: manipulation;
@@ -279,7 +280,11 @@ class VorratskellerCard extends HTMLElement {
   }
 
   disconnectedCallback() {
+    // Kamera freigeben; beim erneuten Einhängen (Ansichtswechsel) neu aufbauen
     this._scanner?.stop();
+    this._scanner = null;
+    this._aufbau = false;
+    this._signatur = "";
   }
 
   // Nur neu zeichnen, wenn sich Produkte geändert haben
@@ -330,6 +335,13 @@ class VorratskellerCard extends HTMLElement {
             .join("")}
         </div>`;
     const tiles = sichtbar.map((p) => this._tile(p)).join("");
+    // Fokus über das Neuzeichnen hinweg erhalten (Tastatur, Schalter-Bedienung)
+    const fokus = this.shadowRoot.activeElement;
+    const fokusSel = fokus?.dataset?.id
+      ? `.${fokus.classList.contains("plus") ? "plus" : "tile"}[data-id="${CSS.escape(fokus.dataset.id)}"]`
+      : fokus?.classList?.contains("chip")
+        ? `.chip[data-fach="${CSS.escape(fokus.dataset.fach ?? "")}"]`
+        : null;
     ziel.innerHTML = `
       ${titel ? this._titel("Entnehmen") : ""}
       ${chips}
@@ -340,24 +352,13 @@ class VorratskellerCard extends HTMLElement {
         this._renderEntnahme(ziel, this._liste);
       }),
     );
-    ziel.querySelectorAll(".tile").forEach((t) => {
-      t.addEventListener("click", (ev) => {
-        if (ev.target.closest(".plus")) return;
-        this._entnehmen(t.dataset.id);
-      });
-      t.addEventListener("keydown", (ev) => {
-        if ((ev.key === "Enter" || ev.key === " ") && ev.target === t) {
-          ev.preventDefault();
-          this._entnehmen(t.dataset.id);
-        }
-      });
-    });
-    ziel.querySelectorAll(".plus").forEach((b) =>
-      b.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        this._einlagern(b.dataset.id, 1);
-      }),
+    ziel.querySelectorAll(".tile").forEach((t) =>
+      t.addEventListener("click", () => this._entnehmen(t.dataset.id)),
     );
+    ziel.querySelectorAll(".plus").forEach((b) =>
+      b.addEventListener("click", () => this._einlagern(b.dataset.id, 1)),
+    );
+    if (fokusSel) ziel.querySelector(fokusSel)?.focus();
   }
 
   _tile(p) {
@@ -369,12 +370,14 @@ class VorratskellerCard extends HTMLElement {
     const cls = [p.bestand <= 0 ? "leer" : "", p.fehlt > 0 ? "unter" : ""].join(" ");
     const soll = p.soll > 0 ? ` <small>/ ${fmt(p.soll)}</small>` : "";
     return `
-      <div class="tile ${cls}" role="button" tabindex="0" data-id="${esc(p.id)}"
-        aria-label="${esc(p.name)}: ${fmt(p.bestand)} da. Tippen nimmt eine Packung heraus.">
-        <ha-icon icon="${esc(p.icon)}"></ha-icon>
-        <span class="name">${esc(p.name)}</span>
-        <span class="zahl">${fmt(p.bestand)}${soll}</span>
-        ${mhd}
+      <div class="zelle">
+        <button class="tile ${cls}" data-id="${esc(p.id)}"
+          aria-label="${esc(p.name)}: ${fmt(p.bestand)} da${p.soll ? `, Soll ${fmt(p.soll)}` : ""}. Eine Packung entnehmen.">
+          <ha-icon icon="${esc(p.icon)}"></ha-icon>
+          <span class="name">${esc(p.name)}</span>
+          <span class="zahl">${fmt(p.bestand)}${soll}</span>
+          ${mhd}
+        </button>
         <button class="plus" data-id="${esc(p.id)}" aria-label="${esc(p.name)}: eine Packung einlagern">
           <ha-icon icon="mdi:plus"></ha-icon>
         </button>
@@ -408,6 +411,7 @@ class VorratskellerCard extends HTMLElement {
       for (const e of entnommen) {
         const data = { produkt: id, menge: e.menge };
         if (e.mhd) data.mhd = e.mhd;
+        else data.ohne_mhd = true;
         await callService(this._hass, "einlagern", data);
       }
     } catch (err) {
@@ -541,8 +545,9 @@ class VorratskellerCard extends HTMLElement {
   }
 
   async _kameraUmschalten(button) {
-    if (this._scanner?.aktiv) {
+    if (this._scanner && !this._scanner.gestoppt) {
       this._scanner.stop();
+      this._scanner = null;
       button.textContent = "Kamera starten";
       return;
     }
@@ -563,17 +568,25 @@ class VorratskellerCard extends HTMLElement {
     }
   }
 
+  _ergebnisSchliessen() {
+    this._ergebnis.innerHTML = "";
+    if (this._scanner) this._scanner.gesperrt = false;
+  }
+
   async _erkannt(code) {
-    this._scanner?.pause(3000);
+    // Solange ein Ergebnis offen ist, nichts Neues erkennen: es würde Eingaben überschreiben
+    if (this._scanner) this._scanner.gesperrt = true;
     navigator.vibrate?.(60);
     if (code.startsWith(QR_FACH)) return this._zeigeFach(code.slice(QR_FACH.length));
     if (code.startsWith(QR_PRODUKT)) {
       const p = this._liste.find((x) => x.id === code.slice(QR_PRODUKT.length));
-      return p ? this._zeigeProdukt(p) : (this._status.textContent = "Unbekanntes Produkt-Etikett.");
+      if (p) return this._zeigeProdukt(p);
+      this._status.textContent = "Unbekanntes Produkt-Etikett.";
+      return this._ergebnisSchliessen();
     }
     if (!/^\d{8}$|^\d{12,14}$/.test(code)) {
       this._status.textContent = `Unbekannter Code: ${code}`;
-      return;
+      return this._ergebnisSchliessen();
     }
     this._status.textContent = `Barcode ${code} …`;
     try {
@@ -586,6 +599,7 @@ class VorratskellerCard extends HTMLElement {
       }
     } catch (err) {
       this._status.textContent = fehlerText(err);
+      this._ergebnisSchliessen();
     }
   }
 
@@ -594,7 +608,9 @@ class VorratskellerCard extends HTMLElement {
     this._status.textContent = "";
     this._ergebnis.innerHTML = `<div class="panel"><h3>${esc(fach?.name ?? fachId)}</h3>
       <p class="muted">Tippen nimmt eine Packung heraus, + lagert eine ein.</p>
-      <div data-fach-grid="${esc(fachId)}"></div></div>`;
+      <div data-fach-grid="${esc(fachId)}"></div>
+      <div class="zeile"><button class="aktion zweit" id="fertig">Weiter scannen</button></div></div>`;
+    this._ergebnis.querySelector("#fertig").addEventListener("click", () => this._ergebnisSchliessen());
     this._renderEntnahme(this._ergebnis.querySelector("[data-fach-grid]"), this._liste, {
       festesFach: fachId,
       titel: false,
@@ -622,7 +638,7 @@ class VorratskellerCard extends HTMLElement {
       await this._einlagern(p.id, menge(), $("#mhd").value || undefined);
     });
     $("#raus").addEventListener("click", () => this._entnehmen(p.id, menge()));
-    $("#fertig").addEventListener("click", () => (this._ergebnis.innerHTML = ""));
+    $("#fertig").addEventListener("click", () => this._ergebnisSchliessen());
   }
 
   _zeigeUnbekannt(code, vorschlag) {
@@ -660,7 +676,7 @@ class VorratskellerCard extends HTMLElement {
       </details>
       <div class="zeile"><button class="aktion zweit" id="fertig">Abbrechen</button></div></div>`;
     const $ = (s) => this._ergebnis.querySelector(s);
-    $("#fertig").addEventListener("click", () => (this._ergebnis.innerHTML = ""));
+    $("#fertig").addEventListener("click", () => this._ergebnisSchliessen());
     $("#zuordnen").addEventListener("click", async () => {
       const id = $("#ziel").value;
       if (!id) return;
@@ -735,6 +751,8 @@ class Scanner {
     this.onCode = onCode;
     this.onStatus = onStatus;
     this.aktiv = false;
+    this.gestoppt = false;
+    this.gesperrt = false;
     this.pauseBis = 0;
     this.letzter = { code: "", zeit: 0 };
   }
@@ -742,12 +760,21 @@ class Scanner {
   async start() {
     const { detector, art } = await getDetector();
     this.detector = detector;
+    if (this.gestoppt) return;
     this.stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false,
     });
-    this.video.srcObject = this.stream;
-    await this.video.play();
+    // Karte während der Berechtigungsabfrage verlassen: Kamera sofort wieder freigeben
+    if (this.gestoppt) return this.stop();
+    try {
+      this.video.srcObject = this.stream;
+      await this.video.play();
+    } catch (err) {
+      this.stop();
+      throw err;
+    }
+    if (this.gestoppt) return this.stop();
     this.aktiv = true;
     this.onStatus(`Kamera läuft (Erkennung: ${art}). Barcode oder Regal-Code in den Rahmen halten.`);
     this._loop();
@@ -758,6 +785,7 @@ class Scanner {
   }
 
   stop() {
+    this.gestoppt = true;
     this.aktiv = false;
     this.stream?.getTracks().forEach((t) => t.stop());
     this.stream = null;
@@ -767,7 +795,9 @@ class Scanner {
   async _loop() {
     while (this.aktiv) {
       await new Promise((r) => setTimeout(r, 200));
-      if (!this.aktiv || Date.now() < this.pauseBis || this.video.readyState < 2) continue;
+      if (!this.aktiv || this.gesperrt || Date.now() < this.pauseBis || this.video.readyState < 2) {
+        continue;
+      }
       try {
         const codes = await this.detector.detect(this.video);
         const code = codes[0]?.rawValue;
@@ -883,20 +913,25 @@ export function generateDashboard(hass) {
   };
 
   if (!liste.length) {
+    // Ohne Produkte: Hinweis und Scanner, damit sich das erste Produkt per Barcode anlegen lässt
     return {
       title: "Vorratskeller",
       views: [
         {
           title: "Übersicht",
+          path: "uebersicht",
+          icon: "mdi:warehouse",
           cards: [
             {
               type: "markdown",
               content:
-                "Keine Produkte gefunden. Ist die Integration **Vorratskeller** eingerichtet?\n\n" +
-                "Einstellungen → Geräte & Dienste → Integration hinzufügen → Vorratskeller.",
+                "Noch keine Produkte. Im **Scanner** einen Barcode scannen oder eingeben und " +
+                "„Neues Produkt anlegen“ wählen.\n\nFehlt die Integration: Einstellungen → " +
+                "Geräte & Dienste → Integration hinzufügen → Vorratskeller.",
             },
           ],
         },
+        scanner,
       ],
     };
   }
