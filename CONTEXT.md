@@ -80,6 +80,18 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
 - Idee für ein späteres Release (KB, offen): Kamera-Inventur. Vorschlag: Foto vom Regal → `ai_task` schlägt
   Bestände vor → KB bestätigt; nie automatisch buchen. Offen: Cloud-KI oder lokal (Ollama), weil Bilder aus dem
   Haus sonst nach außen gehen.
+- Idee für ein späteres Release (KB, 2026-11-27): Erinnerung im Geschäft. Entscheidungen KB: Personen
+  anhakbar; Nachricht umfasst die ganze Einkaufsliste (Vorrat und Handeinträge); keine Zuordnung Produkt →
+  Geschäft, nur das Produkt zählt; Auslöser Betreten der Zone. Vorschlag: Blueprint mit Auswahl Geschäfts-Zonen,
+  Personen und Einkaufsliste; beim Betreten offene Einträge per `todo.get_items` an das Handy der Person, einmal
+  je Besuch mit Sperrzeit, nichts senden bei leerer Liste. Kein neuer Integrationscode nötig. Integration
+  speichert keine Standorte, nichts nach außen.
+- Wochenstunde (KB, 2026-11-27): Sonntag 18:00 schlägt eine geplante Aufgabe 2–3 Punkte vor (vorher Issues,
+  HA-Kompatibilität, CI prüfen); KB wählt; ca. 1 h Umsetzung mit Tests, lokalem HA, Codex-Review und PR; Merge,
+  Release, Einspielen nur mit KB; KB prüft die Neuerung der Vorwoche 5 min zu Hause. Pflege vor Funktion.
+  Liste (Reihenfolge KB): A Sprachwechsel-Dubletten auf der Einkaufsliste, C Abhaken → Einlagern-Dialog,
+  B Blueprint Erinnerung im Geschäft, D Kalender der Ablaufdaten; danach E Assist-Sprachbefehle,
+  F Verbrauch aus Journal → Soll-Vorschlag (nie automatisch), G CSV-Export, H Kamera-Inventur Entscheidungsvorlage.
 - Zurückgestellt (KB): Amazon-Affiliate-Link zu den Zweckform-Bögen. Hinweis: Partnerlinks laut
   Amazon-Richtlinien nicht in clientseitiger Software, also nur in der README; braucht KBs Partner-Tag.
 - Dialog „Dashboard hinzufügen“: Titel und Symbol lassen sich nicht vorbelegen, kein Vorschaubild für
