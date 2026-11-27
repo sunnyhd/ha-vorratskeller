@@ -75,8 +75,8 @@ zxing-Rückfall erkennt QR, WASM vom eigenen Server, keine Anfragen nach außen 
   Bearbeiten-Modus und Ortsfilter liegen in `SITZUNG` (Modul), weil HA die Karten bei neuen Sensoren neu aufbaut.
 - Releases bis v0.6.0 erstellt; installiert zu Hause (KB), Dashboard angelegt. Tests zu Hause stehen aus (KB:
   „testen später“): Kamera, Etikettendruck auf echtem Bogen, Panel am Tablet.
-- Marketplace: Antrag hacs/default#14729 (2026-11-22, unter sunnyhd). Prüfung dauert laut Doku Monate; keine
-  Reviews anfordern, sonst wird der PR geschlossen. Bis dahin Installation über den My-Home-Assistant-Link.
+- Marketplace: Antrag hacs/default#14729 am 2026-11-24 aufgenommen (Frenck). Vorratskeller steht in der
+  Standardliste; READMEs führen zuerst die Suche, das Hinzufügen per Link nur noch als Ausweg.
 - Idee für ein späteres Release (KB, offen): Kamera-Inventur. Vorschlag: Foto vom Regal → `ai_task` schlägt
   Bestände vor → KB bestätigt; nie automatisch buchen. Offen: Cloud-KI oder lokal (Ollama), weil Bilder aus dem
   Haus sonst nach außen gehen.

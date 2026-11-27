@@ -72,11 +72,8 @@ flowchart LR
 
 ## Installation
 
-1. **Repository hinzufügen**
-   - Ab Home Assistant 2026.11: *Einstellungen → Marketplace →* Menü oben rechts *→ Add from link*,
-     `sunnyhd/ha-vorratskeller` eintragen, Typ *Integration*.
-   - Bis 2026.10: *HACS →* Menü *→ Benutzerdefinierte Repositories →*
-     `https://github.com/sunnyhd/ha-vorratskeller`, Kategorie *Integration*.
+1. **Vorratskeller suchen:** Ab Home Assistant 2026.11 unter *Einstellungen → Marketplace*, bis 2026.10
+   unter *HACS*, jeweils nach **Vorratskeller** suchen.
 2. **Vorratskeller** installieren und Home Assistant neu starten.
 3. *Einstellungen → Geräte & Dienste → Integration hinzufügen →* **Vorratskeller**.
    Checkliste übernehmen, Personen und Tage angeben.
@@ -92,6 +89,13 @@ flowchart LR
 5. **Optionen** der Integration: Einkaufsliste (`todo`-Entität), Ziel der Push-Nachricht
    (z. B. `notify.mobile_app_handy`), Wochentag und Uhrzeit des Berichts, Vorlauf für
    „läuft bald ab“, Open Food Facts an oder aus.
+
+Falls Vorratskeller in der Suche nicht erscheint, das Repository von Hand hinzufügen:
+
+- Ab Home Assistant 2026.11: *Einstellungen → Marketplace →* Menü oben rechts *→ Add from link*,
+  `sunnyhd/ha-vorratskeller` eintragen, Typ *Integration*.
+- Bis 2026.10: *HACS →* Menü *→ Benutzerdefinierte Repositories →*
+  `https://github.com/sunnyhd/ha-vorratskeller`, Kategorie *Integration*.
 
 Mindestversion: Home Assistant 2026.10.
 
