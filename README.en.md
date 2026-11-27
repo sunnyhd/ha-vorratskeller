@@ -57,11 +57,8 @@
 
 ## Installation
 
-1. **Add the repository**
-   - Home Assistant 2026.11 and later: *Settings → Marketplace →* menu top right *→ Add from link*,
-     enter `sunnyhd/ha-vorratskeller`, type *Integration*.
-   - Up to 2026.10: *HACS →* menu *→ Custom repositories →*
-     `https://github.com/sunnyhd/ha-vorratskeller`, category *Integration*.
+1. **Search for Vorratskeller:** in *Settings → Marketplace* (Home Assistant 2026.11 and later) or in
+   *HACS* (up to 2026.10), search for **Vorratskeller**.
 2. Install **Vorratskeller** and restart Home Assistant.
 3. *Settings → Devices & services → Add integration →* **Vorratskeller**.
    Take over the checklist, enter people and days.
@@ -77,6 +74,13 @@
 5. **Options** of the integration: shopping list (`todo` entity), target of the push notification
    (e.g. `notify.mobile_app_phone`), weekday and time of the report, warning period for
    “expiring soon”, Open Food Facts on or off.
+
+If Vorratskeller does not show up in the search, add the repository manually:
+
+- Home Assistant 2026.11 and later: *Settings → Marketplace →* menu top right *→ Add from link*,
+  enter `sunnyhd/ha-vorratskeller`, type *Integration*.
+- Up to 2026.10: *HACS →* menu *→ Custom repositories →*
+  `https://github.com/sunnyhd/ha-vorratskeller`, category *Integration*.
 
 Minimum version: Home Assistant 2026.10.
 
